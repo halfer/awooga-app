@@ -25,11 +25,14 @@ if mount | cut -d ' ' -f 3 | grep -q "^${PROJECT_ROOT}/${MOUNT_POINT}$" ; then
     exit 0
 fi
 
-# Number of M to set aside for this filing system
-dd if=/dev/zero of=$IMAGE bs=1M count=$SIZE &> /dev/null
+# If the FS image does not exist, let's create it
+if [ ! -f "$IMAGE" ]; then
+    # Number of M to set aside for this filing system
+    dd if=/dev/zero of=$IMAGE bs=1M count=$SIZE &> /dev/null
 
-# Format: the -F permits creation even though it's not a "block special device"
-mkfs.ext3 -F -q $IMAGE
+    # Format: the -F permits creation even though it's not a "block special device"
+    mkfs.ext3 -F -q $IMAGE
+fi
 
 # Create folder if required, mount
 mkdir --parents $MOUNT_POINT
