@@ -1,5 +1,13 @@
 #!/bin/bash
 
+######
+#
+# Script to create and mount a filing system into which contribution repos are pulled. The
+# use of a filing system is to prevent large remote repos from accidentally/maliciously
+# overwhelming the local machine by consuming all available disk space.
+#
+######
+
 # Set up some constants
 IMAGE=filesystem/image.img
 MOUNT_POINT=filesystem/mount
@@ -34,7 +42,7 @@ if [ ! -f "$IMAGE" ]; then
     mkfs.ext3 -F -q $IMAGE
 fi
 
-# Create folder if required, mount
+# Create folder if required, then mount
 mkdir --parents $MOUNT_POINT
 mount $IMAGE $MOUNT_POINT
 
