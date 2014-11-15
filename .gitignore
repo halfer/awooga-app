@@ -1,0 +1,5 @@
+# Ignore file system source
+filesystem/image.img
+
+# Ignore IDE stuff
+nbproject/
