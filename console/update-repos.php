@@ -7,6 +7,7 @@
  */
 
 $root = dirname(__DIR__);
+$repoRoot = $root . '/filesystem/mount';
 
 // Connect to the database
 // @todo Pull this from env config
@@ -27,7 +28,7 @@ $statement->execute();
 
 while ($row = $statement->fetch(PDO::FETCH_ASSOC))
 {
-	processRepo($pdo, $row['id'], $row['url'], $row['mount_path']);
+	processRepo($pdo, $row['id'], $row['url'], $repoRoot . '/' . $row['mount_path']);
 }
 
 function processRepo(PDO $pdo, $repoId, $url, $mountPath)
@@ -35,15 +36,17 @@ function processRepo(PDO $pdo, $repoId, $url, $mountPath)
 	// Try a new clone
 	try
 	{
-		// @todo Pull to a temporary location
+		$repoPath = doClone($url, $mountPath);
 		repoLog($pdo, $repoId, 'fetch');
 	}
 	catch (Exception $e)
 	{
 		repoLog($pdo, $repoId, 'fetch', 'Fetch failed', false);
+		return false;
 	}
 
 	// Try moving the clone into place
+	moveRepoLocation($pdo, $repoId, $repoPath);
 
 	// Log that info
 	// Scan repo
@@ -53,8 +56,31 @@ function processRepo(PDO $pdo, $repoId, $url, $mountPath)
 
 function doClone($url, $target)
 {
-	// The reset of HOME is to prevent Git trying to fetch config it doesn't have access to
+	// Set up return vars
+	$output = $return = null;
+
+	// If there's no target, let's make one
+	if (!$target)
+	{
+		$target = sha1($url . $target . time());
+	}
+
+	// Emptying HOME is to prevent Git trying to fetch config it doesn't have access to
 	$command = "HOME='' git clone {$url} {$target}";
+	exec($command, $output, $return);
+	echo "Run: $command\n";
+
+	if ($return)
+	{
+		throw new Exception("Problem when cloning");
+	}
+
+	return $command;
+}
+
+function moveRepoLocation(PDO $pdo, $repoId, $repoPath)
+{
+	// 
 }
 
 function repoLog(PDO $pdo, $repoId, $logType, $message = null, $isSuccess = true)

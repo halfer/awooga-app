@@ -14,8 +14,8 @@ CREATE TABLE repository (
 	/* Not auto-increment, so keys can be guaranteed */
 	id INTEGER PRIMARY KEY NOT NULL,
 	url VARCHAR(256) NOT NULL,
-	/* The relative path in the locally mounted file system */
-	mount_path VARCHAR(256) NOT NULL,
+	/* The relative path in the locally mounted file system, null before first pull */
+	mount_path VARCHAR(256),
 	is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
 	created_at DATETIME NOT NULL,
 	/* If this is not set, it can be set to now, or in a few hours */
