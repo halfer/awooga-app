@@ -12,12 +12,22 @@
 IMAGE=filesystem/image.img
 MOUNT_POINT=filesystem/mount
 SIZE=20
+USER=awooga
 
 # Bomb out if not run as root, exit as fail
 if [ "$EUID" -ne 0 ]
 then
     echo "Mount script must be run as root"
     exit 1
+fi
+
+# Check if user exists
+id -u $USER &> /dev/null
+result=$?
+
+if [ $result -ne 0 ]; then
+	# Create this user
+	useradd --no-create-home --shell /bin/false $USER
 fi
 
 # Save pwd and then change dir to the script location
@@ -45,6 +55,9 @@ fi
 # Create folder if required, then mount
 mkdir --parents $MOUNT_POINT
 mount $IMAGE $MOUNT_POINT
+
+# Set appropriate user perms on mounted filing system
+chown $USER $MOUNT_POINT
 
 # Go back to original dir
 cd $STARTDIR 
