@@ -36,6 +36,10 @@ while ($row = $statement->fetch(PDO::FETCH_ASSOC))
 
 class GitImporter
 {
+	const LOG_TYPE_FETCH = 'fetch';
+	const LOG_TYPE_MOVE = 'move';
+	const LOG_TYPE_SCAN = 'scan';
+
 	protected $pdo;
 	protected $repoRoot;
 
@@ -51,11 +55,11 @@ class GitImporter
 		try
 		{
 			$newPath = $this->doClone($url);
-			$this->repoLog($repoId, 'fetch');
+			$this->repoLog($repoId, self::LOG_TYPE_FETCH);
 		}
 		catch (Exception $e)
 		{
-			$this->repoLog($repoId, 'fetch', 'Fetch failed', false);
+			$this->repoLog($repoId, self::LOG_TYPE_FETCH, 'Fetch failed', false);
 			return false;
 		}
 
@@ -63,11 +67,11 @@ class GitImporter
 		try
 		{
 			$this->moveRepoLocation($repoId, $oldPath, $newPath);
-			$this->repoLog($repoId, 'move');
+			$this->repoLog($repoId, self::LOG_TYPE_MOVE);
 		}
 		catch (Exception $e)
 		{
-			$this->repoLog($repoId, 'move', "Move from $oldPath to $newPath failed", false);
+			$this->repoLog($repoId, self::LOG_TYPE_MOVE, "Move from $oldPath to $newPath failed", false);
 			return false;
 		}
 
@@ -126,7 +130,8 @@ class GitImporter
 	public function repoLog($repoId, $logType, $message = null, $isSuccess = true)
 	{
 		// Check the type is OK
-		if (!in_array($logType, array('fetch', 'move', 'scan', )))
+		$allowedTypes = array(self::LOG_TYPE_FETCH, self::LOG_TYPE_MOVE, self::LOG_TYPE_SCAN, );
+		if (!in_array($logType, $allowedTypes))
 		{
 			throw new Exception("The supplied type is not valid");
 		}
