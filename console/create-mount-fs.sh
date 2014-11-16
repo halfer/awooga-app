@@ -37,12 +37,6 @@ cd `dirname $0`/..
 # Get project folder root
 PROJECT_ROOT=`pwd`
 
-# If the filing system is already mounted, exit OK
-if mount | cut -d ' ' -f 3 | grep -q "^${PROJECT_ROOT}/${MOUNT_POINT}$" ; then
-    echo "File system '${MOUNT_POINT}' already mounted, exiting"
-    exit 0
-fi
-
 # If the FS image does not exist, let's create it
 if [ ! -f "$IMAGE" ]; then
     # Number of M to set aside for this filing system
@@ -52,9 +46,12 @@ if [ ! -f "$IMAGE" ]; then
     mkfs.ext3 -F -q $IMAGE
 fi
 
-# Create folder if required, then mount
-mkdir --parents $MOUNT_POINT
-mount $IMAGE $MOUNT_POINT
+# Mount if the filing system is not already mounted
+mount | cut -d ' ' -f 3 | grep -q "^${PROJECT_ROOT}/${MOUNT_POINT}$"
+if [ $? -ne 0 ]; then
+	mkdir --parents $MOUNT_POINT
+	mount $IMAGE $MOUNT_POINT
+fi
 
 # Set appropriate user perms on mounted filing system
 chown $USER $MOUNT_POINT
