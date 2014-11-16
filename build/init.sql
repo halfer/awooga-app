@@ -3,6 +3,7 @@
 CREATE DATABASE awooga DEFAULT CHARACTER SET utf8;
 USE awooga;
 
+DROP USER awooga_user@localhost;
 CREATE USER 'awooga_user'@'localhost' IDENTIFIED BY 'password';
 GRANT
 	SELECT, INSERT, UPDATE, DELETE ON awooga.*
@@ -13,6 +14,8 @@ CREATE TABLE repository (
 	/* Not auto-increment, so keys can be guaranteed */
 	id INTEGER PRIMARY KEY NOT NULL,
 	url VARCHAR(256) NOT NULL,
+	/* The relative path in the locally mounted file system */
+	mount_path VARCHAR(256) NOT NULL,
 	is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
 	created_at DATETIME NOT NULL,
 	/* If this is not set, it can be set to now, or in a few hours */
@@ -64,3 +67,17 @@ INSERT INTO issue (code) VALUES
 	('sql-needs-parameterisation'),
 	('uncategorised')
 ;
+
+/* The retry count is the last X rows for a repo that are unsuccessful */
+CREATE TABLE repository_log (
+	id INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	repository_id INTEGER NOT NULL,
+	/* These are the phases associated with updating a repo */
+    log_type ENUM('fetch', 'move', 'scan'),
+	/* Successful ops probably don't need a log */
+	message VARCHAR(256),
+	created_at DATETIME NOT NULL,
+	is_success BOOLEAN NOT NULL,
+
+	CONSTRAINT repository_log_repo FOREIGN KEY (repository_id) REFERENCES repository (id)
+);
