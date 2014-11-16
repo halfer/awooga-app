@@ -36,6 +36,7 @@ CREATE TABLE report (
 	description VARCHAR(1024),
 	/* Only day and not time is important here */
 	author_notified_at DATE,
+	is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
 
 	CONSTRAINT report_repo_fk FOREIGN KEY (repository_id) REFERENCES repository (id)
 );
