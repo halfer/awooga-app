@@ -14,6 +14,9 @@ $repoRoot = $root . '/filesystem/mount';
 $dsn = 'mysql:dbname=awooga;host=localhost;username=awooga_user;password=password';
 $pdo = new PDO($dsn, 'awooga_user', 'password');
 
+// Set up importer system
+$importer = new GitImporter($pdo, $repoRoot);
+
 $sql = '
 	SELECT * FROM repository
 	WHERE
@@ -28,85 +31,100 @@ $statement->execute();
 
 while ($row = $statement->fetch(PDO::FETCH_ASSOC))
 {
-	processRepo($pdo, $row['id'], $row['url'], $repoRoot . '/' . $row['mount_path']);
+	$importer->processRepo($row['id'], $row['url'], $row['mount_path']);
 }
 
-function processRepo(PDO $pdo, $repoId, $url, $mountPath)
+class GitImporter
 {
-	// Try a new clone
-	try
+	protected $pdo;
+	protected $repoRoot;
+
+	public function __construct(PDO $pdo, $repoRoot)
 	{
-		$repoPath = doClone($url, $mountPath);
-		repoLog($pdo, $repoId, 'fetch');
-	}
-	catch (Exception $e)
-	{
-		repoLog($pdo, $repoId, 'fetch', 'Fetch failed', false);
-		return false;
+		$this->pdo = $pdo;
+		$this->repoRoot = $repoRoot;
 	}
 
-	// Try moving the clone into place
-	moveRepoLocation($pdo, $repoId, $repoPath);
-
-	// Log that info
-	// Scan repo
-	// Add to database
-	// Log that info
-}
-
-function doClone($url, $target)
-{
-	// Set up return vars
-	$output = $return = null;
-
-	// If there's no target, let's make one
-	if (!$target)
+	public function processRepo($repoId, $url, $mountPath)
 	{
-		$target = sha1($url . $target . time());
+		// Try a new clone
+		try
+		{
+			$repoPath = $this->doClone($url, $mountPath);
+			$this->repoLog($repoId, 'fetch');
+		}
+		catch (Exception $e)
+		{
+			$this->repoLog($repoId, 'fetch', 'Fetch failed', false);
+			return false;
+		}
+
+		// Try moving the clone into place
+		$this->moveRepoLocation($repoId, $repoPath);
+
+		// Log that info
+		// Scan repo
+		// Add to database
+		// Log that info
 	}
 
-	// Emptying HOME is to prevent Git trying to fetch config it doesn't have access to
-	$command = "HOME='' git clone {$url} {$target}";
-	exec($command, $output, $return);
-	echo "Run: $command\n";
-
-	if ($return)
+	public function doClone($url, $target)
 	{
-		throw new Exception("Problem when cloning");
+		// Set up return vars
+		$output = $return = null;
+
+		// If there's no target, let's make one
+		if (!$target)
+		{
+			$target = sha1($url . $target . time());
+		}
+
+		// Turn relative target into fully qualified path
+		$fqTarget = $this->repoRoot . '/' . $target;
+
+		// Emptying HOME is to prevent Git trying to fetch config it doesn't have access to
+		$command = "HOME='' git clone {$url} {$fqTarget}";
+		exec($command, $output, $return);
+		echo "Run: $command\n";
+
+		if ($return)
+		{
+			throw new Exception("Problem when cloning");
+		}
+
+		return $target;
 	}
 
-	return $command;
-}
-
-function moveRepoLocation(PDO $pdo, $repoId, $repoPath)
-{
-	// 
-}
-
-function repoLog(PDO $pdo, $repoId, $logType, $message = null, $isSuccess = true)
-{
-	// Check the type is OK
-	if (!in_array($logType, array('fetch', 'move', 'scan', )))
+	public function moveRepoLocation($repoId, $repoPath)
 	{
-		throw new Exception("The supplied type is not valid");
+		// 
 	}
 
-	$sql = "
-		INSERT INTO repository_log
-		(repository_id, log_type, message, created_at, is_success)
-		VALUES
-		(:repository_id, :log_type, :message, NOW(), :is_success)
-	";
-	$statement = $pdo->prepare($sql);
-	$ok = $statement->execute(
-		array(
-			':repository_id' => $repoId, ':log_type' => $logType,
-			':message' => $message, ':is_success' => $isSuccess,
-		)
-	);
-
-	if (!$ok)
+	public function repoLog($repoId, $logType, $message = null, $isSuccess = true)
 	{
-		throw new Exception('Adding a log message seems to have failed');
+		// Check the type is OK
+		if (!in_array($logType, array('fetch', 'move', 'scan', )))
+		{
+			throw new Exception("The supplied type is not valid");
+		}
+
+		$sql = "
+			INSERT INTO repository_log
+			(repository_id, log_type, message, created_at, is_success)
+			VALUES
+			(:repository_id, :log_type, :message, NOW(), :is_success)
+		";
+		$statement = $this->pdo->prepare($sql);
+		$ok = $statement->execute(
+			array(
+				':repository_id' => $repoId, ':log_type' => $logType,
+				':message' => $message, ':is_success' => $isSuccess,
+			)
+		);
+
+		if (!$ok)
+		{
+			throw new Exception('Adding a log message seems to have failed');
+		}
 	}
 }
