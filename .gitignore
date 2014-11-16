@@ -1,5 +1,5 @@
-# Ignore file system source
-filesystem/image.img
+# Ignore file system source/mount-point
+filesystem/
 
 # Ignore IDE stuff
 nbproject/
