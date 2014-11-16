@@ -168,7 +168,8 @@ class GitImporter
 			throw new Exception('Adding a log message seems to have failed');
 		}
 
-		$this->writeDebug("Adding log message of type {$logType}");
+		$successType = $isSuccess ? 'success' : 'failure';
+		$this->writeDebug("Adding {$successType} log message for '{$logType}' op");
 	}
 
 	protected function writeDebug($message)
