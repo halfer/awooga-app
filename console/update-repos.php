@@ -15,7 +15,7 @@ $dsn = 'mysql:dbname=awooga;host=localhost;username=awooga_user;password=passwor
 $pdo = new PDO($dsn, 'awooga_user', 'password');
 
 // Set up importer system
-$importer = new GitImporter($pdo, $repoRoot);
+$importer = new GitImporter($pdo, $repoRoot, true);
 
 $sql = '
 	SELECT * FROM repository
@@ -42,11 +42,13 @@ class GitImporter
 
 	protected $pdo;
 	protected $repoRoot;
+	protected $debug;
 
-	public function __construct(PDO $pdo, $repoRoot)
+	public function __construct(PDO $pdo, $repoRoot, $debug = false)
 	{
 		$this->pdo = $pdo;
 		$this->repoRoot = $repoRoot;
+		$this->debug = $debug;
 	}
 
 	public function processRepo($repoId, $url, $oldPath)
@@ -89,7 +91,9 @@ class GitImporter
 		$fqTarget = $this->repoRoot . '/' . $target;
 
 		// Emptying HOME is to prevent Git trying to fetch config it doesn't have access to
-		$command = "HOME='' git clone --quiet {$url} {$fqTarget}";
+		$command = "HOME='' git clone --quiet \\
+			{$url} \\
+			{$fqTarget}";
 		$output = $return = null;
 		exec($command, $output, $return);
 
@@ -97,6 +101,8 @@ class GitImporter
 		{
 			throw new Exception("Problem when cloning");
 		}
+
+		$this->writeDebug("System command: $command");
 
 		return $target;
 	}
@@ -116,6 +122,8 @@ class GitImporter
 			throw new Exception("Updating the repo path failed");
 		}
 
+		$this->writeDebug("Update path '{$newPath}' for repo #{$repoId}");
+
 		// Delete the old location if there is one
 		if ($oldPath)
 		{
@@ -127,6 +135,8 @@ class GitImporter
 			{
 				throw new Exception("Problem when deleting the old repo");
 			}
+
+			$this->writeDebug("Remove old location '{$oldPath}' for repo #{$repoId}");
 		}
 	}
 
@@ -156,6 +166,16 @@ class GitImporter
 		if (!$ok)
 		{
 			throw new Exception('Adding a log message seems to have failed');
+		}
+
+		$this->writeDebug("Adding log message of type {$logType}");
+	}
+
+	protected function writeDebug($message)
+	{
+		if ($this->debug)
+		{
+			echo $message . "\n";
 		}
 	}
 }
