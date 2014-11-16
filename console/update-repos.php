@@ -89,7 +89,7 @@ class GitImporter
 		$fqTarget = $this->repoRoot . '/' . $target;
 
 		// Emptying HOME is to prevent Git trying to fetch config it doesn't have access to
-		$command = "HOME='' git clone {$url} {$fqTarget}";
+		$command = "HOME='' git clone --quiet {$url} {$fqTarget}";
 		$output = $return = null;
 		exec($command, $output, $return);
 
@@ -116,14 +116,17 @@ class GitImporter
 			throw new Exception("Updating the repo path failed");
 		}
 
-		// Delete the old location
-		$output = $return = null;
-		$command = "rm -rf {$this->repoRoot}/{$oldPath}";
-		exec($command, $output, $return);
-
-		if ($return)
+		// Delete the old location if there is one
+		if ($oldPath)
 		{
-			throw new Exception("Problem when deleting the old repo");
+			$output = $return = null;
+			$command = "rm -rf {$this->repoRoot}/{$oldPath}";
+			exec($command, $output, $return);
+
+			if ($return)
+			{
+				throw new Exception("Problem when deleting the old repo");
+			}
 		}
 	}
 
