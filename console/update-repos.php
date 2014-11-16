@@ -9,6 +9,9 @@
 $root = dirname(__DIR__);
 $repoRoot = $root . '/filesystem/mount';
 
+// Load library files
+require_once $root . '/src/classes/Report.php';
+
 // Connect to the database
 // @todo Pull this from env config
 $dsn = 'mysql:dbname=awooga;host=localhost;username=awooga_user;password=password';
@@ -39,6 +42,7 @@ class GitImporter
 	const LOG_TYPE_FETCH = 'fetch';
 	const LOG_TYPE_MOVE = 'move';
 	const LOG_TYPE_SCAN = 'scan';
+	const LOG_TYPE_RESCHED = 'resched';
 
 	protected $pdo;
 	protected $repoRoot;
@@ -78,8 +82,31 @@ class GitImporter
 		}
 
 		// Scan repo
-		// Add to database
-		// Log that info
+		try
+		{
+			$this->pdo->beginTransaction();
+			$this->scanRepo($repoId, $newPath);
+			$this->pdo->commit();
+			$this->repoLog($repoId, self::LOG_TYPE_SCAN);
+		}
+		catch (Exception $e)
+		{
+			$this->pdo->rollBack();
+			// @todo Catch a specific exception for which we can save messages into the public log safely
+			$this->repoLog($repoId, self::LOG_TYPE_SCAN, "Scanning failure", false);			
+		}
+
+		// Reschedule another scan
+		try
+		{
+			$this->rescheduleRepo($repoId);
+			$this->repoLog($repoId, self::LOG_TYPE_RESCHED);
+		}
+		catch (Exception $e)
+		{
+			// @todo Catch a specific exception for which we can save messages into the public log safely
+			$this->repoLog($repoId, self::LOG_TYPE_RESCHED, "Failed to reschedule repo", false);			
+		}
 	}
 
 	public function doClone($url)
@@ -140,10 +167,104 @@ class GitImporter
 		}
 	}
 
+	/**
+	 * Scans a folder for JSON reports
+	 * 
+	 * @todo Need to have a file size filter here - anything over 256K?
+	 * 
+	 * @param integer $repoId
+	 * @param string $repoPath
+	 * @throws Exception
+	 */
+	protected function scanRepo($repoId, $repoPath)
+	{
+		// Set up iterator to find JSON files
+		$directory = new RecursiveDirectoryIterator($this->repoRoot . '/' . $repoPath);
+		$iterator = new RecursiveIteratorIterator($directory);
+		$regex = new RegexIterator($iterator, '/^.+\.json$/i', RecursiveRegexIterator::GET_MATCH);
+
+		$this->writeDebug("Finding files in repo:");
+		foreach ($regex as $file)
+		{
+			$reportPath = $file[0];
+			$this->scanReport($repoId, $reportPath);
+			$this->writeDebug("\tFound report ..." . substr($reportPath, -80));
+		}
+	}
+
+	/**
+	 * Scans a single report and commits it to the database
+	 * 
+	 * @todo Review the JSON recursion limit, is this OK?
+	 * 
+	 * @param integer $repoId
+	 * @param string $reportPath
+	 * @throws Exception
+	 */
+	protected function scanReport($repoId, $reportPath)
+	{
+		// Unlikely to happen, we just scanned!
+		if (!file_exists($reportPath))
+		{
+			throw new Exception('File cannot be found');
+		}
+
+		// Let's get this in array form
+		$data = json_decode(file_get_contents($reportPath), true, 4);
+
+		// If this is not an array, throw a trivial exception
+
+		// Parse the data
+		$version = $this->grabElement($data, 'version');
+		$title = $this->grabElement($data, 'title');
+		$url = $this->grabElement($data, 'url');
+		$description = $this->grabElement($data, 'description');
+		$issues = $this->grabElement($data, 'issues');
+		$notifiedDate = $this->grabElement($data, 'author_notified_date');
+
+		// Handle depending on version
+		switch ($version)
+		{
+			case 1:
+				$report = new Awooga\Report($repoId);
+				$report->setTitle($title);
+				$report->setUrl($url);
+				$report->setDescription($description);
+				$report->setIssues($issues);
+				$report->setAuthorNotifiedDate($notifiedDate);
+				$report->update();
+				break;
+			default:
+				throw new Exception("Unrecognised version number");
+		}
+	}
+
+	/**
+	 * Grabs a keyed value from a hash
+	 * 
+	 * @param array $data
+	 * @param string $key
+	 * @return mixed
+	 */
+	protected function grabElement(array $data, $key)
+	{
+		return isset($data[$key]) ? $data[$key] : null;
+	}
+
+	protected function rescheduleRepo($repoId)
+	{
+		
+	}
+
 	public function repoLog($repoId, $logType, $message = null, $isSuccess = true)
 	{
 		// Check the type is OK
-		$allowedTypes = array(self::LOG_TYPE_FETCH, self::LOG_TYPE_MOVE, self::LOG_TYPE_SCAN, );
+		$allowedTypes = array(
+			self::LOG_TYPE_FETCH,
+			self::LOG_TYPE_MOVE,
+			self::LOG_TYPE_SCAN,
+			self::LOG_TYPE_RESCHED,
+		);
 		if (!in_array($logType, $allowedTypes))
 		{
 			throw new Exception("The supplied type is not valid");
