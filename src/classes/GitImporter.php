@@ -215,7 +215,7 @@ class GitImporter
 				$report->setDescription($description);
 				$report->setIssues($issues);
 				$report->setAuthorNotifiedDate($notifiedDate);
-				$report->update();
+				$report->save();
 				break;
 			default:
 				throw new Exceptions\TrivialException("Unrecognised version number");
