@@ -209,6 +209,7 @@ class GitImporter
 		{
 			case 1:
 				$report = new Report($repoId);
+				$report->setDriver($this->pdo);
 				$report->setTitle($title);
 				$report->setUrl($url);
 				$report->setDescription($description);
