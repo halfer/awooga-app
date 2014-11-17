@@ -58,7 +58,8 @@ class GitImporter
 		{
 			$this->pdo->rollBack();
 			// @todo Catch a specific exception for which we can save messages into the public log safely
-			$this->repoLog($repoId, self::LOG_TYPE_SCAN, "Scanning failure", false);			
+			$this->repoLog($repoId, self::LOG_TYPE_SCAN, "Scanning failure", false);
+			return false;
 		}
 
 		// Reschedule another scan
@@ -70,8 +71,10 @@ class GitImporter
 		catch (\Exception $e)
 		{
 			// @todo Catch a specific exception for which we can save messages into the public log safely
-			$this->repoLog($repoId, self::LOG_TYPE_RESCHED, "Failed to reschedule repo", false);			
+			$this->repoLog($repoId, self::LOG_TYPE_RESCHED, "Failed to reschedule repo", false);
 		}
+
+		return true;
 	}
 
 	public function doClone($url)
@@ -91,7 +94,7 @@ class GitImporter
 
 		if ($return)
 		{
-			throw new \Exception("Problem when cloning");
+			throw new Exceptions\SeriousException("Problem when cloning");
 		}
 
 		$this->writeDebug("System command: $command");
@@ -111,7 +114,7 @@ class GitImporter
 		// Let's bork if the query failed
 		if (!$ok)
 		{
-			throw new \Exception("Updating the repo path failed");
+			throw new Exceptions\SeriousException("Updating the repo path failed");
 		}
 
 		$this->writeDebug("Update path '{$newPath}' for repo #{$repoId}");
@@ -125,7 +128,7 @@ class GitImporter
 
 			if ($return)
 			{
-				throw new \Exception("Problem when deleting the old repo");
+				throw new Exceptions\SeriousException("Problem when deleting the old repo");
 			}
 
 			$this->writeDebug("Remove old location '{$oldPath}' for repo #{$repoId}");
@@ -152,8 +155,22 @@ class GitImporter
 		foreach ($regex as $file)
 		{
 			$reportPath = $file[0];
-			$this->scanReport($repoId, $reportPath);
-			$this->writeDebug("\tFound report ..." . substr($reportPath, -80));
+			try
+			{
+				$this->scanReport($repoId, $reportPath);
+				$this->writeDebug("\tFound report ..." . substr($reportPath, -80));
+			}
+			catch (Exceptions\TrivialException $e)
+			{
+				// Counting trivial exceptions still contributes to failure/stop limit
+				$this->repoLog($repoId, self::LOG_TYPE_SCAN, $e->getMessage(), false);
+				$this->doesErrorCountRequireHalting($repoId);
+			}
+			// For serious/other exceptions, rethrow
+			catch (\Exception $e)
+			{
+				throw $e;
+			}
 		}
 	}
 
@@ -171,7 +188,7 @@ class GitImporter
 		// Unlikely to happen, we just scanned!
 		if (!file_exists($reportPath))
 		{
-			throw new \Exception('File cannot be found');
+			throw new Exceptions\SeriousException('File cannot be found');
 		}
 
 		// Let's get this in array form
@@ -200,8 +217,17 @@ class GitImporter
 				$report->update();
 				break;
 			default:
-				throw new \Exception("Unrecognised version number");
+				throw new Exceptions\TrivialException("Unrecognised version number");
 		}
+	}
+
+	/**
+	 * 
+	 * @param integer $repoId
+	 */
+	protected function doesErrorCountRequireHalting($repoId)
+	{
+		// if there are 5 errors recently, throw Exceptions\SeriousException
 	}
 
 	/**

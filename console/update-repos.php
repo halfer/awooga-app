@@ -12,6 +12,8 @@ $repoRoot = $root . '/filesystem/mount';
 // Load library files
 require_once $root . '/src/classes/GitImporter.php';
 require_once $root . '/src/classes/Report.php';
+require_once $root . '/src/classes/SeriousException.php';
+require_once $root . '/src/classes/TrivialException.php';
 
 // Connect to the database
 // @todo Pull this from env config
