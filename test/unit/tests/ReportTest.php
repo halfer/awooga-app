@@ -12,8 +12,8 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 		$root = $this->getProjectRoot();
 
 		require_once $root . '/src/classes/Report.php';
-		require_once $root . '/src/classes/SeriousException.php';
-		require_once $root . '/src/classes/TrivialException.php';
+		require_once $root . '/src/classes/Exceptions/SeriousException.php';
+		require_once $root . '/src/classes/Exceptions/TrivialException.php';
 		require_once $root . '/test/unit/classes/ReportTestChild.php';
 	}
 
@@ -85,11 +85,12 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 	public function testSetArrayContainingEmptyUrls()
 	{
 		$report = new ReportTestChild(1);
-		$urls = array(
-			'',
-			'http://example.com/two',
+		$report->setUrl(
+			array(
+				'',
+				'http://example.com/two',
+			)
 		);
-		$report->setUrl($urls);
 	}
 
 	/**
@@ -100,12 +101,12 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 	public function testSetArrayContainingUrlsOfWrongType()
 	{
 		$report = new ReportTestChild(1);
-		$urls = array(
-			'http://example.com/something',
-			5,
+		$report->setUrl(
+			array(
+				'http://example.com/something',
+				5,
+			)
 		);
-		$report->setUrl($urls);
-		
 	}
 
 	/**

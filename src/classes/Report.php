@@ -20,10 +20,6 @@ class Report
 	 */
 	public function __construct($repoId)
 	{
-		if (!$repoId)
-		{
-			echo 'Here';
-		}
 		$this->repoId = $repoId;
 	}
 
