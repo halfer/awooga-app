@@ -27,6 +27,11 @@ class Report
 		$this->repoId = $repoId;
 	}
 
+	/**
+	 * Sets a string title
+	 * 
+	 * @param string $title
+	 */
 	public function setTitle($title)
 	{
 		$this->isRequired($title);
@@ -35,6 +40,14 @@ class Report
 		$this->title = $title;
 	}
 
+	/**
+	 * Sets a URL or an array of URLs
+	 * 
+	 * @todo Throw an exception if a URL array contains dups
+	 * 
+	 * @param string|array $url
+	 * @throws Exceptions\TrivialException
+	 */
 	public function setUrl($url)
 	{
 		// Turn strings into an array
@@ -71,6 +84,11 @@ class Report
 		$this->urls = $url;
 	}
 
+	/**
+	 * Sets a string description
+	 * 
+	 * @param string $description
+	 */
 	public function setDescription($description)
 	{
 		$this->isRequired($description);
@@ -81,6 +99,8 @@ class Report
 
 	/**
 	 * Setter to accept the issue array
+	 * 
+	 * @todo Throw an exception if an issue code appears more than once
 	 * 
 	 * @param array $issues
 	 */
@@ -155,8 +175,6 @@ class Report
 
 	/**
 	 * Sets an optional author notified date
-	 * 
-	 * @todo Throw a trivial exception if the date is invalid
 	 * 
 	 * @param string $notifiedDate
 	 */
@@ -344,6 +362,11 @@ class Report
 	 * Swaps out a parameter for a SQL NULL value if required
 	 * 
 	 * @todo If I use a null value in a execute, does this not swap NULL in correctly?
+	 * 
+	 * @param array $params
+	 * @param string $sql
+	 * @param string $column
+	 * @param mixed $value
 	 */
 	protected function addNullableColumn(array &$params, &$sql, $column, $value)
 	{
@@ -357,11 +380,21 @@ class Report
 		}		
 	}
 
+	/**
+	 * Returns the author notified date in YYYY-mm-dd format, or null
+	 * 
+	 * @return string
+	 */
 	protected function getAuthorNotifiedDateAsString()
 	{
 		return $this->notifiedDate ? $this->notifiedDate->format('Y-m-d') : null;
 	}
 
+	/**
+	 * Inserts issues against the specified report ID
+	 * 
+	 * @param integer $reportId
+	 */
 	protected function insertIssues($reportId)
 	{
 		$sqlTemplate = "
@@ -387,6 +420,12 @@ class Report
 		}
 	}
 
+	/**
+	 * Converts an issue code into an ID
+	 * 
+	 * @param string $code
+	 * @return integer
+	 */
 	protected function getIssueIdForCode($code)
 	{
 		$sql = "SELECT id FROM issue WHERE code = :code";
@@ -396,6 +435,11 @@ class Report
 		return $statement->fetchColumn();
 	}
 
+	/**
+	 * Inserts the current URLs against the specified report ID
+	 * 
+	 * @param integer $reportId
+	 */
 	protected function insertUrls($reportId)
 	{
 		$sql = "
@@ -448,7 +492,7 @@ class Report
 					if ($row['report_id'] != $reportId)
 					{
 						throw new Exceptions\TrivialException(
-							"URLs split over multiple reports cannot appear on the same report"
+							"URLs split over multiple reports cannot be updated by a single report"
 						);
 					}
 				}

@@ -4,6 +4,9 @@ namespace Awooga\Testing;
 
 class ReportTest extends \PHPUnit_Framework_TestCase
 {
+	/**
+	 * Set-up routine for every test method
+	 */
 	public function setUp()
 	{
 		$root = $this->getProjectRoot();
@@ -14,6 +17,9 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 		require_once $root . '/test/unit/classes/ReportTestChild.php';
 	}
 
+	/**
+	 * A test to check that setting a string title is OK
+	 */
 	public function testSetTitle()
 	{
 		$report = new ReportTestChild(1);
@@ -57,6 +63,9 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals($url, $report->getUrl());
 	}
 
+	/**
+	 * Check to ensure URLs can be set
+	 */
 	public function testSetGoodUrlArray()
 	{
 		$report = new ReportTestChild(1);
@@ -465,9 +474,42 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 		}
 	}
 
+	/**
+	 * Saving a report with URLs that cross multiple reports must be disallowed
+	 * 
+	 * @expectedException \Awooga\Exceptions\TrivialException
+	 */
 	public function testUrlArrayCannotUpdateMultipleReports()
 	{
-		
+		$pdo = $this->getDriver();
+		$repoId = $this->buildDatabase($pdo);
+
+		// Create a report
+		$report = new ReportTestChild($repoId);
+		$report->setDriver($pdo);
+		$report->setUrl($url1 = 'http://example.com');
+		$report->setTitle('Title');
+		$report->setDescription('Description');
+		$report->setIssues(array(array('issue_cat_code' => 'xss', ),));
+		$report->save();
+
+		// Create another report
+		$report2 = new ReportTestChild($repoId);
+		$report2->setDriver($pdo);
+		$report2->setUrl($url2 = 'http://example.com/different');
+		$report2->setTitle('Title');
+		$report2->setDescription('Description');
+		$report2->setIssues(array(array('issue_cat_code' => 'xss', ),));
+		$report2->save();
+
+		// Try to create a report that would span these two URLs
+		$report3 = new ReportTestChild($repoId);
+		$report3->setDriver($pdo);
+		$report3->setUrl(array($url1, $url2));
+		$report3->setTitle('Title');
+		$report3->setDescription('Description');
+		$report3->setIssues(array(array('issue_cat_code' => 'xss', ),));
+		$report3->save();
 	}
 
 	/**
