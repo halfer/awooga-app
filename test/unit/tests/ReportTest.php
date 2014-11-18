@@ -122,7 +122,7 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 				'http://example.com/something',
 				'http://example.com/something',
 			)
-		);			
+		);
 	}
 
 	/**
@@ -264,7 +264,7 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 	public function testSetAuthorNotifiedDateWrongType()
 	{
 		$report = new ReportTestChild(1);
-		$report->setAuthorNotifiedDate(new \stdClass());		
+		$report->setAuthorNotifiedDate(new \stdClass());
 	}
 
 	/**
@@ -275,7 +275,7 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 	public function testSetAuthorNotifiedDateWrongFormat()
 	{
 		$report = new ReportTestChild(1);
-		$report->setAuthorNotifiedDate('18/11/2014');		
+		$report->setAuthorNotifiedDate('18/11/2014');
 	}
 
 	public function testSaveNewReport()
@@ -369,7 +369,7 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 				r.repository_id = :repo_id
 			ORDER BY
 				u.url
-		";		
+		";
 	}
 
 	/**
@@ -389,7 +389,7 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testSaveNewReportWithNoDescription()
 	{
-		$this->trySavingNewReportWithMissingField('description');		
+		$this->trySavingNewReportWithMissingField('description');
 	}
 
 	/**
@@ -399,7 +399,7 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testSaveNewReportWithNoUrls()
 	{
-		$this->trySavingNewReportWithMissingField('urls');		
+		$this->trySavingNewReportWithMissingField('urls');
 	}
 
 	/**
@@ -409,7 +409,7 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testSaveNewReportWithNoIssues()
 	{
-		$this->trySavingNewReportWithMissingField('issues');		
+		$this->trySavingNewReportWithMissingField('issues');
 	}
 
 	protected function trySavingNewReportWithMissingField($field)
@@ -444,7 +444,7 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 			);
 		}
 
-		$report->save();		
+		$report->save();
 	}
 
 	/**
