@@ -39,8 +39,6 @@ class Report
 	/**
 	 * Sets a URL or an array of URLs
 	 * 
-	 * @todo Throw an exception if a URL array contains dups
-	 * 
 	 * @param string|array $url
 	 * @throws Exceptions\TrivialException
 	 */
@@ -77,6 +75,14 @@ class Report
 			);
 		}
 
+		// Check for duplicates, these are not allowed
+		if (array_unique($url) != $url)
+		{
+			throw new Exceptions\TrivialException(
+				"URL arrays may not contain duplicates"
+			);			
+		}
+
 		$this->urls = $url;
 	}
 
@@ -96,8 +102,6 @@ class Report
 	/**
 	 * Setter to accept the issue array
 	 * 
-	 * @todo Throw an exception if an issue code appears more than once
-	 * 
 	 * @param array $issues
 	 */
 	public function setIssues($issues)
@@ -107,6 +111,10 @@ class Report
 
 		// Valid entries are copied to an output array
 		$issuesOut = array();
+
+		// Keep track of issue codes, to detect dups
+		$issueCodes = array();
+
 		foreach ($issues as $issue)
 		{
 			// If the issue doesn't have a issue_cat_code, bomb out
@@ -118,7 +126,8 @@ class Report
 			}
 
 			// If the issue doesn't have a valid code, bomb out also
-			if (!$this->validateIssueCatCode($issue['issue_cat_code']))
+			$issueCode = $issue['issue_cat_code'];
+			if (!$this->validateIssueCatCode($issueCode))
 			{
 				throw new Exceptions\TrivialException(
 					"Issues must have a valid issue_cat_code"
@@ -135,15 +144,24 @@ class Report
 				}
 			}
 
+			// Add the issue code to the list
+			$issueCodes[] = $issueCode;
+
 			// Strip out empty descriptions and any unrecognised keys
-			$issueOut = array(
-				'issue_cat_code' => $issue['issue_cat_code'],
-			);
+			$issueOut = array('issue_cat_code' => $issueCode, );
 			if (isset($issue['description']) && $issue['description'])
 			{
 				$issueOut['description'] = $issue['description'];
 			}
 			$issuesOut[] = $issueOut;
+		}
+
+		// Check for duplicates, these are not allowed
+		if (array_unique($issueCodes) != $issueCodes)
+		{
+			throw new Exceptions\TrivialException(
+				"Issue codes may not be duplicated in a report"
+			);			
 		}
 
 		$this->issues = $issuesOut;
@@ -499,6 +517,11 @@ class Report
 		return $reportId;
 	}
 
+	/**
+	 * Sets the PDO driver
+	 * 
+	 * @param \PDO $pdo
+	 */
 	public function setDriver(\PDO $pdo)
 	{
 		$this->pdo = $pdo;

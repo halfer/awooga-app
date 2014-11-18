@@ -110,6 +110,22 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 	}
 
 	/**
+	 * Make sure duplicate URLs are rejected
+	 * 
+	 * @expectedException \Awooga\Exceptions\TrivialException
+	 */
+	public function testSetArrayContainingDuplicateUrls()
+	{
+		$report = new ReportTestChild(1);
+		$report->setUrl(
+			array(
+				'http://example.com/something',
+				'http://example.com/something',
+			)
+		);			
+	}
+
+	/**
 	 * Checks the report can accept and store a description string
 	 */
 	public function testSetGoodDescription()
@@ -178,6 +194,22 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 	{
 		$report = new ReportTestChild(1);
 		$report->setIssues(array());
+	}
+
+	/**
+	 * Make sure duplicate issues are rejected
+	 * 
+	 * @expectedException \Awooga\Exceptions\TrivialException
+	 */
+	public function testSetArrayContainingDuplicateIssues()
+	{
+		$report = new ReportTestChild(1);
+		$report->setIssues(
+			array(
+				array('issue_cat_code' => 'xss', 'description' => 'Description goes here', ),
+				array('issue_cat_code' => 'xss', 'description' => 'Different description does not matter', ),
+			)
+		);
 	}
 
 	/**
