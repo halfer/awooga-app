@@ -195,6 +195,10 @@ class GitImporter
 		$data = json_decode(file_get_contents($reportPath), true, 4);
 
 		// If this is not an array, throw a trivial exception
+		if (!is_array($data))
+		{
+			throw new Exceptions\TrivialException("Could not parse report into an array");
+		}
 
 		// Parse the data
 		$version = $this->grabElement($data, 'version');
@@ -228,7 +232,7 @@ class GitImporter
 	 */
 	protected function doesErrorCountRequireHalting($repoId)
 	{
-		// if there are 5 errors recently, throw Exceptions\SeriousException
+		// @todo if there are 5 errors recently, throw Exceptions\SeriousException
 	}
 
 	/**
@@ -245,7 +249,7 @@ class GitImporter
 
 	protected function rescheduleRepo($repoId)
 	{
-		
+		// @todo
 	}
 
 	public function repoLog($repoId, $logType, $message = null, $isSuccess = true)

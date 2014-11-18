@@ -33,8 +33,6 @@ class Report
 
 	public function setUrl($url)
 	{
-		$this->isRequired($url);
-
 		// Turn strings into an array
 		if (is_string($url))
 		{
@@ -47,6 +45,7 @@ class Report
 		{
 			foreach ($url as $urlItem)
 			{
+				$this->isRequired($urlItem);
 				if (!is_string($urlItem))
 				{
 					$formatFail = true;
@@ -376,7 +375,7 @@ class Report
 	{
 		if (!is_string($string))
 		{
-			throw new Exception("This field is expected to be a string");			
+			throw new Exceptions\TrivialException("This field is expected to be a string");			
 		}
 	}
 
@@ -384,7 +383,7 @@ class Report
 	{
 		if (!$data)
 		{
-			throw new Exception("This field is required");
+			throw new Exceptions\TrivialException("This field is required");
 		}		
 	}
 }
