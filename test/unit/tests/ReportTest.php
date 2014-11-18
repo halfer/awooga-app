@@ -210,7 +210,7 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 		$report = new ReportTestChild(1);
 		$notifiedDate = '2014-11-18';
 		$report->setAuthorNotifiedDate($notifiedDate);
-		$this->assertEquals($notifiedDate, $report->getAuthorNotifiedDateAsSqlPublic());
+		$this->assertEquals($notifiedDate, $report->getAuthorNotifiedDateAsStringPublic());
 	}
 
 	/**
@@ -235,25 +235,108 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 		$report->setAuthorNotifiedDate('18/11/2014');		
 	}
 
-	public function testSave()
+	public function testSaveNewReport()
 	{
-		$this->buildDatabase();
+		$pdo = $this->getDriver();
+		$repoId = $this->buildDatabase($pdo);
+		$report = new ReportTestChild($repoId);
+		$report->setDriver($pdo);
+
+		$report->setTitle('Example title');
+		$report->setDescription('Example description');
+		$report->setUrl('http://example.com/one');
+		$report->setIssues(
+			array(
+				array('issue_cat_code' => 'xss', )
+			)
+		);
+		$report->save();
+
+		$sql = "
+			SELECT
+				*
+			FROM
+				report r
+				/*
+				INNER JOIN report_issue i ON (r.id = i.report_id)
+				INNER JOIN resource_url u ON (r.id = u.report_id)
+				*/
+			WHERE
+				r.repository_id = :repo_id
+		";
+		$statement = $pdo->prepare($sql);
+		$ok = $statement->execute(array(':repo_id' => $repoId, ));
+
+		if ($ok === false)
+		{
+			throw new Exception("Database call failed");
+		}
+
+		$data = $statement->fetchAll(\PDO::FETCH_ASSOC);
+		print_r($data);
 	}
 
-	protected function buildDatabase()
+	public function testUpdateOldReport()
 	{
-		$this->runSql($this->getProjectRoot() . '/test/build/init.sql');
-		$this->runSql($this->getProjectRoot() . '/build/create.sql');
+		
 	}
 
-	protected function runSql($sqlPath)
+	public function testUrlArrayCannotUpdateMultipleReports()
 	{
-		$sql = file_get_contents($sqlPath);
+		
+	}
 
+	/**
+	 * Gets a PDO driver
+	 * 
+	 * @return \PDO
+	 */
+	protected function getDriver()
+	{
 		// Connect to the database
 		// @todo Pull this from env config
 		$dsn = 'mysql:dbname=awooga_test;host=localhost;username=awooga_user_test;password=password';
 		$pdo = new \PDO($dsn, 'awooga_user_test', 'password');
+
+		return $pdo;
+	}
+
+	/**
+	 * Creates the test database
+	 * 
+	 * @param \PDO $pdo
+	 * @return integer Repository ID
+	 */
+	protected function buildDatabase(\PDO $pdo)
+	{
+		$this->runSql($pdo, $this->getProjectRoot() . '/test/build/init.sql');
+		$this->runSql($pdo, $this->getProjectRoot() . '/build/create.sql');
+		$repoId = $this->buildRepo($pdo, 1);
+
+		return $repoId;
+	}
+
+	/**
+	 * Creates a dummy repo account
+	 * 
+	 * @param \PDO $pdo
+	 */
+	protected function buildRepo(\PDO $pdo)
+	{
+		$sql = "
+			INSERT INTO
+				repository
+			(url, created_at)
+			VALUES ('http://example.com/repo.git', '2014-11-18')
+		";
+		$pdo->exec($sql);
+
+		return $pdo->lastInsertId();
+	}
+
+	protected function runSql(\PDO $pdo, $sqlPath)
+	{
+		$sql = file_get_contents($sqlPath);
 		$rows = $pdo->exec($sql);
 
 		if ($rows === false)

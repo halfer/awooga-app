@@ -179,6 +179,8 @@ class Report
 	 */
 	public function save()
 	{
+		$this->validateBeforeSave();
+
 		// See if we are editing a report or creating a new one
 		if ($reportId = $this->getCurrentReport())
 		{
@@ -241,6 +243,11 @@ class Report
 		return $ok;
 	}
 
+	protected function validateBeforeSave()
+	{
+		
+	}
+
 	/**
 	 * Internal save command to do an update
 	 *
@@ -269,6 +276,8 @@ class Report
 	 */
 	protected function insert()
 	{
+		// @todo Why is author_notified_at not being set to null?
+
 		$sql = "
 			INSERT INTO report
 			(repository_id, title, description, author_notified_at)
@@ -291,9 +300,11 @@ class Report
 		$params = array(
 			':repo_id' => $this->repoId,
 			':title' => $this->title,
-			':description' => $this->description,
-			':notified_at' => $this->getAuthorNotifiedDateAsSql(),
 		);
+		// Swap these things out for a null if required
+		$this->addNullableColumn($params, $sql, ':description', $this->description);
+		$this->addNullableColumn($params, $sql, ':notified_at', $this->getAuthorNotifiedDateAsString());
+
 		if ($reportId)
 		{
 			$params[':report_id'] = $reportId;
@@ -304,9 +315,21 @@ class Report
 		return $statement->execute($params);
 	}
 
-	protected function getAuthorNotifiedDateAsSql()
+	protected function addNullableColumn(array &$params, &$sql, $column, $value)
 	{
-		return $this->notifiedDate ? $this->notifiedDate->format('Y-m-d') : 'NULL';
+		if ($value)
+		{
+			$params[$column] = $value;
+		}
+		else
+		{
+			$sql = str_replace($column, 'NULL', $sql);
+		}		
+	}
+
+	protected function getAuthorNotifiedDateAsString()
+	{
+		return $this->notifiedDate ? $this->notifiedDate->format('Y-m-d') : null;
 	}
 
 	protected function insertIssues($reportId)

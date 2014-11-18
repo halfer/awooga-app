@@ -31,8 +31,8 @@ class ReportTestChild extends \Awooga\Report
 	 * 
 	 * @return string
 	 */
-	public function getAuthorNotifiedDateAsSqlPublic()
+	public function getAuthorNotifiedDateAsStringPublic()
 	{
-		return $this->getAuthorNotifiedDateAsSql();
+		return $this->getAuthorNotifiedDateAsString();
 	}
 }
