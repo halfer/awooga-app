@@ -20,6 +20,10 @@ class Report
 	 */
 	public function __construct($repoId)
 	{
+		if (!$repoId)
+		{
+			echo 'Here';
+		}
 		$this->repoId = $repoId;
 	}
 
@@ -189,7 +193,7 @@ class Report
 			$this->deleteUrls($reportId);
 
 			// Do update here
-			$this->update();
+			$this->update($reportId);
 		}
 		else
 		{
@@ -209,7 +213,7 @@ class Report
 	 */
 	protected function deleteIssues($reportId)
 	{
-		return $this->deleteReportThing('report_issue', $reportId);
+		$this->deleteReportThing('report_issue', $reportId);
 	}
 
 	/**
@@ -219,7 +223,7 @@ class Report
 	 */
 	protected function deleteUrls($reportId)
 	{
-		return $this->deleteReportThing('report_url', $reportId);
+		$this->deleteReportThing('resource_url', $reportId);
 	}
 
 	/**
@@ -231,21 +235,33 @@ class Report
 	protected function deleteReportThing($table, $reportId)
 	{
 		// For extra safety
-		$tableQuoted = $this->getDriver()->quote($table);
+		$tableUntainted = preg_replace('/[^A-Z_]/i', '', $table);
 		
 		$sql = "
-			DELETE FROM {$tableQuoted}
+			DELETE FROM {$tableUntainted}
 			WHERE report_id = :report_id
 		";
 		$statement = $this->getDriver()->prepare($sql);
 		$ok = $statement->execute(array(':report_id' => $reportId, ));
 
-		return $ok;
+		// Bork if there is an issue
+		if ($ok === false)
+		{
+			throw new Exceptions\SeriousException(
+				"Could not delete rows from $tableUntainted"
+			);
+		}
 	}
 
+	/**
+	 * Uses the setter validations to prevent incomplete reports from being saved
+	 */
 	protected function validateBeforeSave()
 	{
-		
+		$this->setTitle($this->title);
+		$this->setDescription($this->description);
+		$this->setUrl($this->urls);
+		$this->setIssues($this->issues);
 	}
 
 	/**
@@ -284,7 +300,9 @@ class Report
 			VALUES (:repo_id, :title, :description, :notified_at)
 		";
 
-		return $this->runSaveCommand($sql);
+		$this->runSaveCommand($sql);
+
+		return $this->getDriver()->lastInsertId();
 	}
 
 	/**
@@ -312,7 +330,14 @@ class Report
 
 		$statement = $this->getDriver()->prepare($sql);
 
-		return $statement->execute($params);
+		// Run command and check result
+		$ok = $statement->execute($params);
+		if ($ok === false)
+		{
+			throw new Exceptions\TrivialException(
+				'Save operation failed: ' . print_r($statement->errorInfo(), true)
+			);
+		}
 	}
 
 	/**
@@ -410,21 +435,23 @@ class Report
 		$reportId = null;
 		foreach ($this->urls as $url)
 		{
-			$row = $statement->execute(
+			$ok = $statement->execute(
 				array(':repo_id' => $this->repoId, ':url' => $url, )
 			);
-			// If we have a report ID, check this is not different
-			if ($reportId)
+			// If we have some rows returned from the query
+			if ($statement->rowCount())
 			{
-				if ($row['report_id'] != $reportId)
+				$row = $statement->fetch(\PDO::FETCH_ASSOC);
+				// If we have already encountered a report ID, check this is not different
+				if ($reportId)
 				{
-					throw new Exceptions\TrivialException(
-						"URLs split over multiple reports cannot appear on the same report"
-					);
+					if ($row['report_id'] != $reportId)
+					{
+						throw new Exceptions\TrivialException(
+							"URLs split over multiple reports cannot appear on the same report"
+						);
+					}
 				}
-			}
-			else
-			{
 				$reportId = $row['report_id'];
 			}
 		}

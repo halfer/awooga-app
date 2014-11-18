@@ -9,6 +9,7 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 		$root = $this->getProjectRoot();
 
 		require_once $root . '/src/classes/Report.php';
+		require_once $root . '/src/classes/SeriousException.php';
 		require_once $root . '/src/classes/TrivialException.php';
 		require_once $root . '/test/unit/classes/ReportTestChild.php';
 	}
@@ -329,9 +330,139 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 		";		
 	}
 
+	/**
+	 * Saving without a title should not be disallowed
+	 * 
+	 * @expectedException \Awooga\Exceptions\TrivialException
+	 */
+	public function testSaveNewReportWithNoTitle()
+	{
+		$this->trySavingNewReportWithMissingField('title');
+	}
+
+	/**
+	 * Saving without a description should not be disallowed
+	 * 
+	 * @expectedException \Awooga\Exceptions\TrivialException
+	 */
+	public function testSaveNewReportWithNoDescription()
+	{
+		$this->trySavingNewReportWithMissingField('description');		
+	}
+
+	/**
+	 * Saving without urls should not be disallowed
+	 * 
+	 * @expectedException \Awooga\Exceptions\TrivialException
+	 */
+	public function testSaveNewReportWithNoUrls()
+	{
+		$this->trySavingNewReportWithMissingField('urls');		
+	}
+
+	/**
+	 * Saving without issues should not be disallowed
+	 * 
+	 * @expectedException \Awooga\Exceptions\TrivialException
+	 */
+	public function testSaveNewReportWithNoIssues()
+	{
+		$this->trySavingNewReportWithMissingField('issues');		
+	}
+
+	protected function trySavingNewReportWithMissingField($field)
+	{
+		$pdo = $this->getDriver();
+		$repoId = $this->buildDatabase($pdo);
+		$report = new ReportTestChild($repoId);
+		$report->setDriver($pdo);
+
+		// Skip one of the fields here
+		if ($field != 'title')
+		{
+			$report->setTitle('Example title');
+		}
+		if ($field != 'description')
+		{
+			$report->setDescription('Example description');
+		}
+		if ($field != 'urls')
+		{
+			$report->setUrl(
+				array('http://example.com/one', 'http://example.com/two', )
+			);
+		}
+		if ($field != 'issues')
+		{
+			$report->setIssues(
+				array(
+					array('issue_cat_code' => 'sql-injection', ),
+					array('issue_cat_code' => 'xss', ),
+				)
+			);
+		}
+
+		$report->save();		
+	}
+
+	/**
+	 * Check that a repo ID and URL match updates a report, rather than creating a new one
+	 * 
+	 * @throws \Exception
+	 */
 	public function testUpdateOldReport()
 	{
-		
+		$pdo = $this->getDriver();
+		$repoId = $this->buildDatabase($pdo);
+
+		// Create a report
+		$report = new ReportTestChild($repoId);
+		$report->setDriver($pdo);
+		$report->setUrl('http://example.com');
+		$report->setTitle('Title');
+		$report->setDescription('Description');
+		$report->setIssues(array(array('issue_cat_code' => 'xss', ),));
+		$report->save();
+
+		// Resave the +same+ report
+		$report2 = new ReportTestChild($repoId);
+		$report2->setDriver($pdo);
+		$report2->setUrl($url = 'http://example.com');
+		// Change all the data here, it's still the same report
+		$report2->setTitle($title = 'Different title');
+		$report2->setDescription($description = 'Different description');
+		$report2->setIssues(
+			$issues = array(array('issue_cat_code' => 'sql-injection', ),)
+		);
+		$report2->save();
+
+		// Get the reports for this repo
+		$statement = $pdo->prepare($this->getRetrieveIssuesSql());
+		$ok = $statement->execute(array(':repo_id' => $repoId, ));
+		if ($ok === false)
+		{
+			throw new \Exception(
+				"Database call failed:" . print_r($statement->errorInfo(), true)
+			);
+		}
+
+		// Ensure we only have one report
+		$issuesData = $statement->fetchAll(\PDO::FETCH_ASSOC);
+		$this->assertEquals(
+			1,
+			count($issuesData),
+			"Check number of reports in this repo"
+		);
+
+		// Check the report was updated and not duplicated
+		foreach ($issuesData as $issueData)
+		{
+			$this->assertEquals($issueData['title'], $title);
+			$this->assertEquals($issueData['description'], $description);
+			$issue = current($issues);
+			$this->assertEquals($issue['issue_cat_code'], $issueData['issue_code']);
+			next($issues);
+		}
 	}
 
 	public function testUrlArrayCannotUpdateMultipleReports()
@@ -370,21 +501,22 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * Creates a dummy repo account
+	 * Creates a dummy repo account (hardwired ID for now)
 	 * 
 	 * @param \PDO $pdo
 	 */
 	protected function buildRepo(\PDO $pdo)
 	{
+		$repoId = 1;
 		$sql = "
 			INSERT INTO
 				repository
-			(url, created_at)
-			VALUES ('http://example.com/repo.git', '2014-11-18')
+			(id, url, created_at)
+			VALUES ($repoId, 'http://example.com/repo.git', '2014-11-18')
 		";
 		$pdo->exec($sql);
 
-		return $pdo->lastInsertId();
+		return $repoId;
 	}
 
 	protected function runSql(\PDO $pdo, $sqlPath)
