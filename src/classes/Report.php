@@ -315,6 +315,11 @@ class Report
 		return $statement->execute($params);
 	}
 
+	/**
+	 * Swaps out a parameter for a SQL NULL value if required
+	 * 
+	 * @todo If I use a null value in a execute, does this not swap NULL in correctly?
+	 */
 	protected function addNullableColumn(array &$params, &$sql, $column, $value)
 	{
 		if ($value)
@@ -334,12 +339,36 @@ class Report
 
 	protected function insertIssues($reportId)
 	{
-		$sql = "
+		$sqlTemplate = "
 			INSERT INTO report_issue
 			(report_id, description, issue_id)
 			VALUES (:report_id, :description, :issue_id)
 		";
-		// @todo Finish this
+		foreach ($this->issues as $issue)
+		{
+			$params = array(
+				':report_id' => $reportId,
+				':issue_id' => $this->getIssueIdForCode($issue['issue_cat_code']),
+			);
+			$sql = $sqlTemplate;
+			$this->addNullableColumn(
+				$params,
+				$sql,
+				':description',
+				isset($issue['description']) ? $issue['description'] : null
+			);
+			$statement = $this->getDriver()->prepare($sql);
+			$statement->execute($params);
+		}
+	}
+
+	protected function getIssueIdForCode($code)
+	{
+		$sql = "SELECT id FROM issue WHERE code = :code";
+		$statement = $this->getDriver()->prepare($sql);
+		$ok = $statement->execute(array(':code' => $code, ));
+
+		return $statement->fetchColumn();
 	}
 
 	protected function insertUrls($reportId)
@@ -349,7 +378,13 @@ class Report
 			(report_id, url)
 			VALUES (:report_id, :url)
 		";
-		// @todo Finish this
+		$statement = $this->getDriver()->prepare($sql);
+		foreach ($this->urls as $url)
+		{
+			$statement->execute(
+				array('report_id' => $reportId, 'url' => $url, )
+			);
+		}
 	}
 
 	/**

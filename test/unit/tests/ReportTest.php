@@ -242,38 +242,91 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 		$report = new ReportTestChild($repoId);
 		$report->setDriver($pdo);
 
-		$report->setTitle('Example title');
-		$report->setDescription('Example description');
-		$report->setUrl('http://example.com/one');
+		$report->setTitle($title = 'Example title');
+		$report->setDescription($description = 'Example description');
+		$report->setUrl(
+			$urls = array('http://example.com/one', 'http://example.com/two', )
+		);
 		$report->setIssues(
-			array(
-				array('issue_cat_code' => 'xss', )
+			$issues = array(
+				array('issue_cat_code' => 'sql-injection', ),
+				array('issue_cat_code' => 'xss', ),
 			)
 		);
 		$report->save();
 
-		$sql = "
-			SELECT
-				*
-			FROM
-				report r
-				/*
-				INNER JOIN report_issue i ON (r.id = i.report_id)
-				INNER JOIN resource_url u ON (r.id = u.report_id)
-				*/
-			WHERE
-				r.repository_id = :repo_id
-		";
-		$statement = $pdo->prepare($sql);
+		// Check issues
+		$statement = $pdo->prepare($this->getRetrieveIssuesSql());
 		$ok = $statement->execute(array(':repo_id' => $repoId, ));
-
 		if ($ok === false)
 		{
-			throw new Exception("Database call failed");
+			throw new \Exception(
+				"Database call failed:" . print_r($statement->errorInfo(), true)
+			);
 		}
 
-		$data = $statement->fetchAll(\PDO::FETCH_ASSOC);
-		print_r($data);
+		$issuesData = $statement->fetchAll(\PDO::FETCH_ASSOC);
+		foreach ($issuesData as $issueData)
+		{
+			$this->assertEquals($issueData['title'], $title);
+			$this->assertEquals($issueData['description'], $description);
+			$issue = current($issues);
+			$this->assertEquals($issue['issue_cat_code'], $issueData['issue_code']);
+			next($issues);
+		}
+
+		// Check urls
+		$statement2 = $pdo->prepare($this->getRetrieveUrlsSql());
+		$ok2 = $statement2->execute(array(':repo_id' => $repoId, ));
+		if ($ok2 === false)
+		{
+			throw new \Exception(
+				"Database call failed:" . print_r($statement->errorInfo(), true)
+			);
+		}
+
+		$urlsData = $statement2->fetchAll(\PDO::FETCH_ASSOC);
+		foreach ($urlsData as $urlData)
+		{
+			$this->assertEquals($urlData['title'], $title);
+			$this->assertEquals($urlData['description'], $description);
+			$this->assertEquals(current($urls), $urlData['url']);
+			next($urls);
+		}
+	}
+
+	protected function getRetrieveIssuesSql()
+	{
+		return "
+			SELECT
+				r.*,
+				ri.description issue_description,
+				i.code issue_code
+			FROM
+				report r
+				INNER JOIN report_issue ri ON (r.id = ri.report_id)
+				INNER JOIN issue i ON (ri.issue_id = i.id)
+			WHERE
+				r.repository_id = :repo_id
+			ORDER BY
+				i.code				
+		";
+	}
+
+	protected function getRetrieveUrlsSql()
+	{
+		return "
+			SELECT
+				r.*,
+				u.url
+			FROM
+				report r
+				INNER JOIN resource_url u ON (r.id = u.report_id)
+			WHERE
+				r.repository_id = :repo_id
+			ORDER BY
+				u.url
+		";		
 	}
 
 	public function testUpdateOldReport()
