@@ -3,3 +3,8 @@ filesystem/
 
 # Ignore IDE stuff
 nbproject/
+
+# Ignore Composer and vendors
+vendor/
+composer.lock
+composer.phar
