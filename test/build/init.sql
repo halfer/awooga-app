@@ -1,11 +1,5 @@
-/* Run this file as MySQL root */
+/* Run this file as a highly permissioned user, root is fine */
 
+DROP DATABASE IF EXISTS awooga_test;
 CREATE DATABASE awooga_test DEFAULT CHARACTER SET utf8;
 USE awooga_test;
-
-DROP USER awooga_user_test@localhost;
-CREATE USER 'awooga_user_test'@'localhost' IDENTIFIED BY 'password';
-GRANT
-	* ON awooga.*
-	TO 'awooga_user_test'@'localhost' WITH GRANT OPTION;
-FLUSH PRIVILEGES;
