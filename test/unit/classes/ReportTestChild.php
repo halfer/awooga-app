@@ -25,4 +25,14 @@ class ReportTestChild extends \Awooga\Report
 			return $this->urls;
 		}
 	}
+
+	/**
+	 * Makes a protected method public
+	 * 
+	 * @return string
+	 */
+	public function getAuthorNotifiedDateAsSqlPublic()
+	{
+		return $this->getAuthorNotifiedDateAsSql();
+	}
 }

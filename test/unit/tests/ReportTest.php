@@ -6,7 +6,7 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
-		$root = realpath(__DIR__ . '/../../..');
+		$root = $this->getProjectRoot();
 
 		require_once $root . '/src/classes/Report.php';
 		require_once $root . '/src/classes/TrivialException.php';
@@ -120,6 +120,11 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 		$report->setDescription(null);
 	}
 
+	/**
+	 * Make sure non-string descriptions are rejected
+	 * 
+	 * @expectedException \Awooga\Exceptions\TrivialException
+	 */
 	public function testSetDescriptionOfBadType()
 	{
 		$report = new ReportTestChild(1);
@@ -128,26 +133,140 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 
 	public function testSetGoodIssues()
 	{
-		
+		$report = new ReportTestChild(1);
+		$issues = array(
+			array(
+				'issue_cat_code' => 'xss'
+			),
+			array(
+				'issue_cat_code' => 'sql-injection',
+				'description' => 'A valid description string',
+			)
+		);
+		$report->setIssues($issues);
+		$this->assertEquals($issues, $report->getProperty('issues'));
 	}
 
-	public function testSetEmptyIssues()
+	/**
+	 * Make sure null issues are rejected
+	 * 
+	 * @expectedException \Awooga\Exceptions\TrivialException
+	 */
+	public function testSetNullIssues()
 	{
-		
+		$report = new ReportTestChild(1);
+		$report->setIssues(null);
 	}
 
+	/**
+	 * Make sure null issues are rejected
+	 * 
+	 * @expectedException \Awooga\Exceptions\TrivialException
+	 */
+	public function testSetEmptyIssueDescription()
+	{
+		$report = new ReportTestChild(1);
+		$report->setIssues(array());
+	}
+
+	/**
+	 * Check that all these issue codes are regarded as valid
+	 */
+	public function testValidIssueCatCodes()
+	{
+		$report = new ReportTestChild(1);
+		$issues = array(
+			array('issue_cat_code' => 'xss', ),
+			array('issue_cat_code' => 'sql-injection', ),
+			array('issue_cat_code' => 'password-clear', ),
+			array('issue_cat_code' => 'password-inadequate-hashing', ),
+			array('issue_cat_code' => 'deprecated-library', ),
+			array('issue_cat_code' => 'sql-needs-parameterisation', ),
+			array('issue_cat_code' => 'uncategorised', ),
+		);
+		$report->setIssues($issues);
+		$this->assertEquals($issues, $report->getProperty('issues'));
+	}
+
+	/**
+	 * Check that an invalid code throws an exception
+	 * 
+	 * @expectedException \Awooga\Exceptions\TrivialException
+	 */
+	public function testInvalidIssueCatCode()
+	{
+		$report = new ReportTestChild(1);
+		$issues = array(
+			array('issue_cat_code' => 'this-does-not-exist', ),
+		);
+		$report->setIssues($issues);
+	}
+
+	/**
+	 * Sets a notified date that should be accepted and recorded
+	 */
 	public function testSetGoodAuthorNotifiedDate()
 	{
-		
+		$report = new ReportTestChild(1);
+		$notifiedDate = '2014-11-18';
+		$report->setAuthorNotifiedDate($notifiedDate);
+		$this->assertEquals($notifiedDate, $report->getAuthorNotifiedDateAsSqlPublic());
 	}
 
-	public function testSetBadAuthorNotifiedDate()
+	/**
+	 * Sets a notified date, of the wrong type, that should be thrown out
+	 * 
+	 * @expectedException \Awooga\Exceptions\TrivialException
+	 */
+	public function testSetAuthorNotifiedDateWrongType()
 	{
-		
+		$report = new ReportTestChild(1);
+		$report->setAuthorNotifiedDate(new \stdClass());		
+	}
+
+	/**
+	 * Sets a notified date, of the wrong string format, that should be thrown out
+	 * 
+	 * @expectedException \Awooga\Exceptions\TrivialException
+	 */
+	public function testSetAuthorNotifiedDateWrongFormat()
+	{
+		$report = new ReportTestChild(1);
+		$report->setAuthorNotifiedDate('18/11/2014');		
 	}
 
 	public function testSave()
 	{
-		
+		$this->buildDatabase();
+	}
+
+	protected function buildDatabase()
+	{
+		$this->runSql($this->getProjectRoot() . '/test/build/init.sql');
+		$this->runSql($this->getProjectRoot() . '/build/create.sql');
+	}
+
+	protected function runSql($sqlPath)
+	{
+		$sql = file_get_contents($sqlPath);
+
+		// Connect to the database
+		// @todo Pull this from env config
+		$dsn = 'mysql:dbname=awooga_test;host=localhost;username=awooga_user_test;password=password';
+		$pdo = new \PDO($dsn, 'awooga_user_test', 'password');
+		$rows = $pdo->exec($sql);
+
+		if ($rows === false)
+		{
+			print_r($pdo->errorInfo());
+			throw new \Exception(
+				"Could not initialise the database"
+			);
+		}		
+	}
+
+	protected function getProjectRoot()
+	{
+		return realpath(__DIR__ . '/../../..');
 	}
 }

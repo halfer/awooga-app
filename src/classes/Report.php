@@ -78,13 +78,12 @@ class Report
 	/**
 	 * Setter to accept the issue array
 	 * 
-	 * @todo Does the array type-hint throw a catchable error?
-	 * 
 	 * @param array $issues
 	 */
-	public function setIssues(array $issues)
+	public function setIssues($issues)
 	{
 		$this->isRequired($issues);
+		$this->isArray($issues);
 
 		// Valid entries are copied to an output array
 		$issuesOut = array();
@@ -116,22 +115,38 @@ class Report
 				}
 			}
 
+			// Strip out empty descriptions and any unrecognised keys
 			$issueOut = array(
 				'issue_cat_code' => $issue['issue_cat_code'],
-				'description' => isset($issue['description']) && $issue['description'] ?
-					$issue['description'] :
-					null
 			);
+			if (isset($issue['description']) && $issue['description'])
+			{
+				$issueOut['description'] = $issue['description'];
+			}
 			$issuesOut[] = $issueOut;
 		}
 
 		$this->issues = $issuesOut;
 	}
 
+	/**
+	 * Determines if the passed issue code is valid
+	 * 
+	 * @param string $catCode
+	 * @return boolean
+	 */
 	protected function validateIssueCatCode($catCode)
 	{
-		// @todo Needs writing
-		return true;
+		$issueCodes = array(
+			'xss', 'sql-injection',
+			'password-clear',
+			'password-inadequate-hashing',
+			'deprecated-library',
+			'sql-needs-parameterisation',
+			'uncategorised',
+		);
+
+		return in_array($catCode, $issueCodes, true);
 	}
 
 	/**
@@ -143,7 +158,16 @@ class Report
 	 */
 	public function setAuthorNotifiedDate($notifiedDate)
 	{
-		$this->notifiedDate = \DateTime::createFromFormat('Y-M-j', $notifiedDate);
+		$this->isRequired($notifiedDate);
+		$this->isString($notifiedDate);
+
+		$notifiedDate = \DateTime::createFromFormat('Y-m-d', $notifiedDate);
+		if (!$notifiedDate)
+		{
+			throw new Exceptions\TrivialException("Invalid author notification date passed");
+		}
+
+		$this->notifiedDate = $notifiedDate;
 	}
 
 	/**
@@ -377,6 +401,14 @@ class Report
 		{
 			throw new Exceptions\TrivialException("This field is expected to be a string");			
 		}
+	}
+
+	protected function isArray($array)
+	{
+		if (!is_array($array))
+		{
+			throw new Exceptions\TrivialException("This field is expected to be an array");			
+		}		
 	}
 
 	protected function isRequired($data)
