@@ -372,6 +372,39 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 		";
 	}
 
+	public function testSaveWithNullAuthorNotificationDate()
+	{
+		$pdo = $this->getDriver();
+		$repoId = $this->buildDatabase($pdo);
+		$report = new ReportTestChild($repoId);
+		$report->setDriver($pdo);
+
+		// Set some fields
+		$report->setTitle('Example title');
+		$report->setDescription('Example description');
+		$report->setUrl(
+			array('http://example.com/one', 'http://example.com/two', )
+		);
+		$report->setIssues(
+			array(
+				array('issue_cat_code' => 'sql-injection', ),
+				array('issue_cat_code' => 'xss', ),
+			)
+		);
+		$report->save();
+
+		// Check date is null
+		$sql = "
+			SELECT 1 FROM report
+			WHERE
+				repository_id = :repo_id
+				AND author_notified_at IS NULL
+		";
+		$statement = $pdo->prepare($sql);
+		$statement->execute(array('repo_id' => $repoId, ));
+		$this->assertEquals(1, $statement->rowCount());
+	}
+
 	/**
 	 * Saving without a title should not be disallowed
 	 * 

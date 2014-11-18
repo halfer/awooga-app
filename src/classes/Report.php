@@ -324,8 +324,6 @@ class Report
 	 */
 	protected function insert()
 	{
-		// @todo Why is author_notified_at not being set to null?
-
 		$sql = "
 			INSERT INTO report
 			(repository_id, title, description, author_notified_at)
