@@ -9,6 +9,8 @@ class GitImporter
 	const LOG_TYPE_SCAN = 'scan';
 	const LOG_TYPE_RESCHED = 'resched';
 
+	const MAX_FAILS_BEFORE_DISABLE = 5;
+
 	protected $pdo;
 	protected $repoRoot;
 	protected $debug;
@@ -47,6 +49,7 @@ class GitImporter
 		}
 
 		// Scan repo
+		$exitEarly = false;
 		try
 		{
 			$this->pdo->beginTransaction();
@@ -56,16 +59,20 @@ class GitImporter
 		}
 		catch (Exceptions\SeriousException $e)
 		{
-			// These errors are always OK to save directly into the log
-			$this->pdo->rollBack();
-			$this->repoLog($repoId, self::LOG_TYPE_SCAN, $e->getMessage(), false);
-			$this->disableRepo($repoId);
+			// We'll already have logged, so no need to do it again
+			$exitEarly = true;
 		}
 		catch (\Exception $e)
 		{
 			// Let's not add these to the public log
-			$this->pdo->rollBack();
 			$this->repoLog($repoId, self::LOG_TYPE_SCAN, "Scanning failure", false);
+			$exitEarly = true;
+		}
+
+		// A common handler for exiting early
+		if ($exitEarly)
+		{
+			$this->pdo->rollBack();
 			return false;
 		}
 
@@ -223,25 +230,38 @@ class GitImporter
 		$regex = new \RegexIterator($iterator, '/^.+\.json$/i', \RecursiveRegexIterator::GET_MATCH);
 
 		$this->writeDebug("Finding files in repo:");
-		foreach ($regex as $file)
+
+		try
 		{
-			$reportPath = $file[0];
-			try
+			foreach ($regex as $file)
 			{
-				$this->scanReport($repoId, $reportPath);
-				$this->writeDebug("\tFound report ..." . substr($reportPath, -80));
+				$reportPath = $file[0];
+				try
+				{
+					$this->scanReport($repoId, $reportPath);
+					$this->writeDebug("\tFound report ..." . substr($reportPath, -80));
+				}
+				catch (Exceptions\TrivialException $e)
+				{
+					// Counting trivial exceptions still contributes to failure/stop limit
+					$this->repoLog($repoId, self::LOG_TYPE_SCAN, $e->getMessage(), false);
+					$this->doesErrorCountRequireHalting($repoId);
+				}
+				// For serious/other exceptions, rethrow
+				catch (\Exception $e)
+				{
+					throw $e;
+				}
 			}
-			catch (Exceptions\TrivialException $e)
-			{
-				// Counting trivial exceptions still contributes to failure/stop limit
-				$this->repoLog($repoId, self::LOG_TYPE_SCAN, $e->getMessage(), false);
-				$this->doesErrorCountRequireHalting($repoId);
-			}
-			// For serious/other exceptions, rethrow
-			catch (\Exception $e)
-			{
-				throw $e;
-			}
+		}
+		catch (Exceptions\SeriousException $e)
+		{
+			// These errors are always OK to save directly into the log
+			$this->repoLog($repoId, self::LOG_TYPE_SCAN, $e->getMessage(), false);
+			$this->disableRepo($repoId);
+
+			// Rethrow for benefit of caller
+			throw $e;
 		}
 	}
 
@@ -304,7 +324,7 @@ class GitImporter
 	 */
 	protected function doesErrorCountRequireHalting($repoId)
 	{
-		// If there are 5 errors recently, throw Exceptions\SeriousException
+		// If there are too many errors recently, throw Exceptions\SeriousException
 		$sql = "
 			SELECT COUNT(*) count
 			FROM repository_log
@@ -316,7 +336,7 @@ class GitImporter
 		$statement = $this->pdo->prepare($sql);
 		$ok = $statement->execute(array(':repo_id' => $repoId, ));
 
-		if ($statement->fetchColumn() > 5)
+		if ($statement->fetchColumn() > self::MAX_FAILS_BEFORE_DISABLE)
 		{
 			throw new Exceptions\SeriousException(
 				"Too many failures with this repo recently, please see log"
@@ -334,12 +354,16 @@ class GitImporter
 		$sql = "
 			UPDATE repository
 			SET is_enabled = false
-				WHERE repository_id = :repo_id
+				WHERE id = :repo_id
 		";
 		$statement = $this->pdo->prepare($sql);
 		$ok = $statement->execute(array(':repo_id' => $repoId, ));
+		if (!$ok)
+		{
+			throw new \Exception('Failed disabling this repo');
+		}
 
-		return $ok !== false;
+		return $ok;
 	}
 
 	/**

@@ -1,6 +1,9 @@
 # Ignore file system source/mount-point
 filesystem/
 
+# Ignore test temp folder
+test/unit/tmp/
+
 # Ignore IDE stuff
 nbproject/
 

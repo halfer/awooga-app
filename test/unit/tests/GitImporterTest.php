@@ -8,15 +8,14 @@ require_once realpath(__DIR__ . '/..') . '/classes/TestCase.php';
 class GitImporterTest extends TestCase
 {
 	/**
-	 * Set up database
+	 * Loads the classes we need
 	 */
 	public function setUp()
 	{
-		$root = $this->getProjectRoot();
+		parent::setUp();
 
+		$root = $this->getProjectRoot();
 		require_once $root . '/src/classes/GitImporter.php';
-		require_once $root . '/src/classes/Report.php';
-		require_once $root . '/src/classes/Exceptions/SeriousException.php';
 		// @todo Rename this to GitImporterTestHarness
 		require_once $root . '/test/unit/classes/GitImporterHarness.php';
 	}
@@ -27,7 +26,7 @@ class GitImporterTest extends TestCase
 	public function testCloneSuccess()
 	{
 		$relativePath = 'success';
-		$importer = $this->getImporterInstance($relativePath);
+		$importer = $this->getImporterInstance();
 		$importer->setCheckoutPath($relativePath);
 
 		// Do a fake clone
@@ -38,11 +37,10 @@ class GitImporterTest extends TestCase
 	/**
 	 * Returns a new importer instance pointing to the current test repo
 	 * 
-	 * @param string $repoPath Relative path to repository
 	 * @param string $repoRoot Fully-qualified path to repository (optional)
 	 * @return \Awooga\Testing\GitImporterHarness
 	 */
-	protected function getImporterInstance($repoPath, $repoRoot = null)
+	protected function getImporterInstance($repoRoot = null)
 	{
 		return new GitImporterHarness(
 			$this->getDriver(),
@@ -58,7 +56,7 @@ class GitImporterTest extends TestCase
 	public function testCloneGitFailure()
 	{
 		$relativePath = 'success';
-		$importer = $this->getImporterInstance($relativePath);
+		$importer = $this->getImporterInstance();
 		$importer->setCheckoutPath($relativePath);
 
 		// Get the fake clone to fail
@@ -81,7 +79,7 @@ class GitImporterTest extends TestCase
 		$repoId = $this->buildDatabase($pdo);
 
 		$relativePath = 'success';
-		$importer = $this->getImporterInstance($relativePath);
+		$importer = $this->getImporterInstance();
 		$importer->setCheckoutPath($relativePath);
 
 		// Let's check the mount path first, make sure it starts as null
@@ -105,12 +103,11 @@ class GitImporterTest extends TestCase
 	 */
 	public function testMoveRepoSuccess()
 	{
-		$pdo = $this->getDriver();
-		$repoId = $this->buildDatabase($pdo);
+		$repoId = $this->buildDatabase($this->getDriver());
 
 		$newRelativePath = 'success';
 		$tempRoot = $this->getTempFolder();
-		$importer = $this->getImporterInstance($newRelativePath, $tempRoot);
+		$importer = $this->getImporterInstance($tempRoot);
 
 		// Let's create a folder we can delete
 		$oldRelativePath = 'path' . rand(1, 9999999) . time();
@@ -134,14 +131,13 @@ class GitImporterTest extends TestCase
 	 */
 	public function testMoveThrowsExceptionOnEmptyRootPath()
 	{
-		$pdo = $this->getDriver();
-		$repoId = $this->buildDatabase($pdo);
+		$repoId = $this->buildDatabase($this->getDriver());
 
 		// Temporary path to delete (it won't actually happen, so it does not need to exist)
 		$oldPath = 'dummy1';
 		$newPath = 'dummy2';
 
-		$importer = $this->getImporterInstance('success', $repoRoot = '');
+		$importer = $this->getImporterInstance($repoRoot = '');
 		$importer->moveRepoLocation($repoId, $oldPath, $newPath);
 	}
 
@@ -152,15 +148,14 @@ class GitImporterTest extends TestCase
 	 */
 	public function testMoveRepoLocationFileSystemFailure()
 	{
-		$pdo = $this->getDriver();
-		$repoId = $this->buildDatabase($pdo);
+		$repoId = $this->buildDatabase($this->getDriver());
 
 		$newRelativePath = 'success';
 		$tempRoot = $this->getTempFolder();
-		$importer = $this->getImporterInstance($newRelativePath, $tempRoot);
+		$importer = $this->getImporterInstance($tempRoot);
 
 		// Let's NOT create a folder, so a file system error is caused
-		$oldRelativePath = 'path' . rand(1, 9999999) . time();
+		$oldRelativePath = $this->randomLeafname();
 
 		// Now let's do a "move" set up to fail
 		$importer->makeMoveFail();
@@ -172,12 +167,15 @@ class GitImporterTest extends TestCase
 	 */
 	public function testScanRepoSuccess()
 	{
-		$pdo = $this->getDriver();
-		$repoId = $this->buildDatabase($pdo);
+		$repoId = $this->buildDatabase($this->getDriver());
 
-		$newRelativePath = 'success';
-		$importer = $this->getImporterInstance($newRelativePath);
-		$importer->scanRepo($repoId, $newRelativePath);
+		// Scan everything in this repo
+		$importer = $this->getImporterInstance();
+		$importer->scanRepo($repoId, $newRelativePath = 'success');
+
+		// Check the numbers of scanned vs successful
+		$this->checkFilesSeen($importer, 2);
+		$this->checkReportsSuccessful($repoId, 2);
 	}
 
 	/**
@@ -185,23 +183,69 @@ class GitImporterTest extends TestCase
 	 */
 	public function testScanRepoTrivialExceptionRaised()
 	{
-		
+		$repoId = $this->buildDatabase($this->getDriver());
+
+		// Scan everything in this repo
+		$importer = $this->getImporterInstance();
+		$importer->scanRepo($repoId, $newRelativePath = 'fail');
+
+		// Check the numbers of scanned vs successful
+		$this->checkFilesSeen($importer, 1);
+		$this->checkReportsSuccessful($repoId, 0);
 	}
 
 	/**
-	 * Check that a number of trivial exceptions stops the scan of the whole repo
+	 * Check that a number of trivial exceptions stops the scan of, and disables, the whole repo
 	 */
-	public function testScanRepoBombOutAfterExcessExceptionsRaised()
+	public function testRepoAfterExcessExceptionsRaised()
 	{
-		
-	}
+		$pdo = $this->getDriver();
+		$repoId = $this->buildDatabase($pdo);
 
-	/**
-	 * Ensure that a report that cannot be decoded is handled correctly
-	 */
-	public function testFailOnBadJsonReport()
-	{
-		
+		// Set up a pretend repo
+		$tempRoot = $this->getTempFolder();
+		$importer = $this->getImporterInstance($tempRoot);
+
+		// Create a repo...
+		$relativePath = $this->randomLeafname();
+		$absolutePath = $tempRoot . '/' . $relativePath;
+		mkdir($absolutePath);
+
+		// ... and a few bad reports
+		$maxFails = \Awooga\GitImporter::MAX_FAILS_BEFORE_DISABLE;
+		for ($i = 0; $i < $maxFails * 2; $i++)
+		{
+			file_put_contents(
+				$absolutePath . '/' . $i . '.json',
+				'Bad report'
+			);
+		}
+
+		// Try scanning the resulting mess, fail test if it does not raise exception
+		$throwsException = false;
+		try
+		{
+			$importer->scanRepo($repoId, $relativePath);
+		}
+		catch (\Awooga\Exceptions\SeriousException $e)
+		{
+			$throwsException = true;
+		}
+		$this->assertTrue($throwsException, "Make sure a serious exception is thrown");
+
+		// Make sure the repo is now disabled
+		$isEnabled = (boolean) $this->fetchColumn(
+			$pdo,
+			"SELECT is_enabled FROM repository WHERE id = :repo_id",
+			array(':repo_id' => $repoId, )
+		);
+		$this->assertFalse($isEnabled, "Check the repository is now disabled");
+
+		// Check that the number of files seen is less than the total
+		$this->checkFilesSeen($importer, $maxFails + 1);
+
+		// Delete the folder
+		exec("rm -rf {$absolutePath}");
 	}
 
 	/**
@@ -213,11 +257,46 @@ class GitImporterTest extends TestCase
 	}
 
 	/**
+	 * Check that a repo may not contain two reports that refer to the same URL
+	 */
+	public function testFailOnDuplicateReportUrlsInRepo()
+	{
+		
+	}
+
+	/**
 	 * Checks the repo logger works
 	 */
 	public function testRepoLog()
 	{
 		
+	}
+
+	protected function randomLeafname()
+	{
+		return 'path' . rand(1, 9999999) . time();
+	}
+
+	protected function checkFilesSeen(\Awooga\GitImporter $importer, $expectedCount)
+	{
+		// Check we've scanned the right number of reports
+		$this->assertEquals(
+			$expectedCount,
+			$importer->getReportCount(),
+			"Check we've processed the right number of reports"
+		);
+	}
+
+	protected function checkReportsSuccessful($repoId, $expectedCount)
+	{
+		$sql = "SELECT COUNT(*) FROM report WHERE repository_id = :repo_id";
+		$count = $this->fetchColumn($this->getDriver(), $sql, array('repo_id' => $repoId, ));
+
+		$this->assertEquals(
+			$expectedCount,
+			$count,
+			"Check we've saved the right number of successful reports"
+		);
 	}
 
 	protected function getTestRepoRoot()

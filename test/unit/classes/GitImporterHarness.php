@@ -12,6 +12,7 @@ class GitImporterHarness extends \Awooga\GitImporter
 
 	protected $nextGitFails = false;
 	protected $nextMoveFails = false;
+	protected $reportCount = 0;
 	protected $scanMode = self::SCAN_MODE_NORMAL;
 	protected $checkoutPath;
 
@@ -71,9 +72,21 @@ class GitImporterHarness extends \Awooga\GitImporter
 		parent::scanRepo($repoId, $repoPath);
 	}
 
+	/**
+	 * Used to count the reports processed
+	 * 
+	 * @param integer $repoId
+	 * @param string $reportPath
+	 */
 	public function scanReport($repoId, $reportPath)
 	{
+		$this->reportCount++;
 		parent::scanReport($repoId, $reportPath);
+	}
+
+	public function getReportCount()
+	{
+		return $this->reportCount;
 	}
 
 	/**

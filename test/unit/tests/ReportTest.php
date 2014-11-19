@@ -12,11 +12,9 @@ class ReportTest extends TestCase
 	 */
 	public function setUp()
 	{
-		$root = $this->getProjectRoot();
+		parent::setUp();
 
-		require_once $root . '/src/classes/Report.php';
-		require_once $root . '/src/classes/Exceptions/SeriousException.php';
-		require_once $root . '/src/classes/Exceptions/TrivialException.php';
+		$root = $this->getProjectRoot();
 		require_once $root . '/test/unit/classes/ReportTestHarness.php';
 	}
 

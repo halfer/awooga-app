@@ -2,8 +2,19 @@
 
 namespace Awooga\Testing;
 
-class TestCase extends \PHPUnit_Framework_TestCase
+abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
+	/**
+	 * Common library loading for all test classes
+	 */
+	public function setUp()
+	{
+		$root = $this->getProjectRoot();
+		require_once $root . '/src/classes/Report.php';
+		require_once $root . '/src/classes/Exceptions/SeriousException.php';
+		require_once $root . '/src/classes/Exceptions/TrivialException.php';		
+	}
+
 	/**
 	 * Gets a PDO driver
 	 * 
