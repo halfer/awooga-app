@@ -2,7 +2,10 @@
 
 namespace Awooga\Testing;
 
-class GitImporterTest extends \PHPUnit_Framework_TestCase
+// Load the parent relative to dir location
+require_once realpath(__DIR__ . '/..') . '/classes/TestCase.php';
+
+class GitImporterTest extends TestCase
 {
 	/**
 	 * Set up database
