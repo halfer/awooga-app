@@ -12,7 +12,12 @@ class GitImporterTest extends TestCase
 	 */
 	public function setUp()
 	{
-		$root = realpath(__DIR__ . '/../../..');
+		$root = $this->getProjectRoot();
+
+		require_once $root . '/src/classes/GitImporter.php';
+		require_once $root . '/src/classes/Exceptions/SeriousException.php';
+		// @todo Rename this to GitImporterTestHarness
+		require_once $root . '/test/unit/classes/GitImporterHarness.php';
 	}
 
 	/**
@@ -20,15 +25,43 @@ class GitImporterTest extends TestCase
 	 */
 	public function testCloneSuccess()
 	{
-		
+		$relativePath = 'success';
+		$importer = $this->getImporterInstance($relativePath);
+		$importer->setCheckoutPath($relativePath);
+
+		// Do a fake clone
+		$actualPath = $importer->doClone($url = 'dummy');
+		$this->assertEquals($relativePath, $actualPath, "Ensure an ordinary clone is OK");
+	}
+
+	/**
+	 * Returns a new importer instance pointing to the current test repo
+	 * 
+	 * @param string $repoPath
+	 * @return \Awooga\Testing\GitImporterHarness
+	 */
+	protected function getImporterInstance($repoPath)
+	{
+		return new GitImporterHarness(
+			$this->getDriver(),
+			$this->getTestRepoRoot($repoPath)
+		);		
 	}
 
 	/**
 	 * Check that git failure in doClone causes an exception
+	 * 
+	 * @expectedException \Awooga\Exceptions\SeriousException
 	 */
 	public function testCloneGitFailure()
 	{
-		
+		$relativePath = 'success';
+		$importer = $this->getImporterInstance($relativePath);
+		$importer->setCheckoutPath($relativePath);
+
+		// Get the fake clone to fail
+		$importer->makeGitFail();
+		$importer->doClone($url = 'dummy');
 	}
 	
 	/**
@@ -93,5 +126,10 @@ class GitImporterTest extends TestCase
 	public function testRepoLog()
 	{
 		
+	}
+
+	protected function getTestRepoRoot($repoName)
+	{
+		return $this->getProjectRoot() . '/test/unit/repos/' . $repoName;
 	}
 }

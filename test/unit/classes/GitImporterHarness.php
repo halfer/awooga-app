@@ -8,8 +8,9 @@ namespace Awooga\Testing;
 class GitImporterHarness extends \Awooga\GitImporter
 {
 	protected $nextGitFails = false;
+	protected $checkoutPath;
 
-	protected function makeGitFail()
+	public function makeGitFail()
 	{
 		$this->nextGitFails = true;
 	}
@@ -34,13 +35,31 @@ class GitImporterHarness extends \Awooga\GitImporter
 	}
 
 	/**
-	 * Creates a relative path that points to a test repo
+	 * Returns a relative path that points to a test repo
 	 * 
-	 * @param type $url
-	 * @return type
+	 * @param string $url
+	 * @return string
 	 */
 	protected function getCheckoutPath($url)
 	{
-		return parent::getCheckoutPath($url);
+		// Only allow this test harness feature if it's been set
+		if (!$this->checkoutPath)
+		{
+			throw new \Exception(
+				"No checkout path set"
+			);
+		}
+
+		return $this->checkoutPath;
+	}
+
+	/**
+	 * Resets the checkout path seen by the Git command method
+	 * 
+	 * @param string $checkoutPath
+	 */
+	public function setCheckoutPath($checkoutPath)
+	{
+		$this->checkoutPath = $checkoutPath;
 	}
 }
