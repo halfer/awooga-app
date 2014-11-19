@@ -87,7 +87,7 @@ class GitImporter
 	public function doClone($url)
 	{
 		// Create new checkout path
-		$target = sha1($url . rand(1, 99999) . time());
+		$target = $this->getCheckoutPath($url);
 
 		// Turn relative target into fully qualified path
 		$fqTarget = $this->repoRoot . '/' . $target;
@@ -99,6 +99,17 @@ class GitImporter
 		}
 
 		return $target;
+	}
+
+	/**
+	 * Returns relative checkout path
+	 * 
+	 * @param string $url
+	 * @return string
+	 */
+	protected function getCheckoutPath($url)
+	{
+		return sha1($url . rand(1, 99999) . time());
 	}
 
 	/**

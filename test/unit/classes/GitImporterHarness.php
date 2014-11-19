@@ -7,8 +7,40 @@ namespace Awooga\Testing;
  */
 class GitImporterHarness extends \Awooga\GitImporter
 {
-	protected function runGitCommand()
+	protected $nextGitFails = false;
+
+	protected function makeGitFail()
 	{
-		// @todo Add in Git replacement in here
+		$this->nextGitFails = true;
+	}
+
+	/**
+	 * We can dummy Git, since we've set the path to a test repo anyway
+	 * 
+	 * @param string $url
+	 * @param string $path
+	 * @return boolean
+	 */
+	protected function runGitCommand($url, $path)
+	{
+		// If we've asked for a failure, provide it
+		if ($this->nextGitFails)
+		{
+			$this->nextGitFails = false;
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Creates a relative path that points to a test repo
+	 * 
+	 * @param type $url
+	 * @return type
+	 */
+	protected function getCheckoutPath($url)
+	{
+		return parent::getCheckoutPath($url);
 	}
 }
