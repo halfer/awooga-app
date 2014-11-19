@@ -155,6 +155,14 @@ class GitImporter
 		// Delete the old location if there is one
 		if ($oldPath)
 		{
+			// Halt if there's no root, to avoid a dangerous command :)
+			if (!$this->repoRoot)
+			{
+				throw new Exceptions\SeriousException(
+					"No repository root set, cannot delete old repo"
+				);
+			}
+
 			$output = $return = null;
 			$command = "rm -rf {$this->repoRoot}/{$oldPath}";
 			exec($command, $output, $return);

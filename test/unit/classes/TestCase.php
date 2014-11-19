@@ -64,7 +64,25 @@ class TestCase extends \PHPUnit_Framework_TestCase
 			throw new \Exception(
 				"Could not initialise the database"
 			);
-		}		
+		}
+	}
+
+	public function fetchResults(\PDO $pdo, $sql, array $params)
+	{
+		return $this->runStatement($pdo, $sql, $params)->fetchAll(\PDO::FETCH_ASSOC);
+	}
+
+	public function fetchColumn(\PDO $pdo, $sql, array $params)
+	{
+		return $this->runStatement($pdo, $sql, $params)->fetchColumn();		
+	}
+
+	protected function runStatement(\PDO $pdo, $sql, array $params)
+	{
+		$statement = $ok = $pdo->prepare($sql);
+		$ok = $statement->execute($params);
+
+		return $statement;
 	}
 
 	protected function getProjectRoot()
