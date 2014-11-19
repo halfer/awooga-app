@@ -34,8 +34,8 @@ class ReportTestHarness extends \Awooga\Report
 	 * 
 	 * @return string
 	 */
-	public function getAuthorNotifiedDateAsStringPublic()
+	public function getAuthorNotifiedDateAsString()
 	{
-		return $this->getAuthorNotifiedDateAsString();
+		return parent::getAuthorNotifiedDateAsString();
 	}
 }

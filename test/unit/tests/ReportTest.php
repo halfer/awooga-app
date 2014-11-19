@@ -256,7 +256,7 @@ class ReportTest extends TestCase
 		$report = $this->getDummyReport();
 		$notifiedDate = '2014-11-18';
 		$report->setAuthorNotifiedDate($notifiedDate);
-		$this->assertEquals($notifiedDate, $report->getAuthorNotifiedDateAsStringPublic());
+		$this->assertEquals($notifiedDate, $report->getAuthorNotifiedDateAsString());
 	}
 
 	/**
