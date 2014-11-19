@@ -135,6 +135,17 @@ class GitImporter
 		return $return === 0;
 	}
 
+	/**
+	 * Updates the location and deletes the old one if necessary
+	 *
+	 * @todo Wouldn't this be better if it deleted the repo referenced in the database?
+	 * We'd then not need the $oldPath parameter at all, presumably.
+	 *  
+	 * @param integer $repoId
+	 * @param string $oldPath
+	 * @param string $newPath
+	 * @throws Exceptions\SeriousException
+	 */
 	public function moveRepoLocation($repoId, $oldPath, $newPath)
 	{
 		// Update the row with the new location
@@ -174,6 +185,19 @@ class GitImporter
 
 			$this->writeDebug("Remove old location '{$oldPath}' for repo #{$repoId}");
 		}
+	}
+
+	/**
+	 * Updates the database copy of this repo's relative path
+	 * 
+	 * @todo Move the query in moveRepoLocation here? Useful elsewhere.
+	 * 
+	 * @param integer $repoId
+	 * @param string $repoPath
+	 */
+	protected function updateRepoLocation($repoId, $repoPath)
+	{
+		
 	}
 
 	/**

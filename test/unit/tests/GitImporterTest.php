@@ -37,15 +37,16 @@ class GitImporterTest extends TestCase
 	/**
 	 * Returns a new importer instance pointing to the current test repo
 	 * 
-	 * @param string $repoPath
+	 * @param string $repoPath Relative path to repository
+	 * @param string $repoRoot Fully-qualified path to repository (optional)
 	 * @return \Awooga\Testing\GitImporterHarness
 	 */
-	protected function getImporterInstance($repoPath)
+	protected function getImporterInstance($repoPath, $repoRoot = null)
 	{
 		return new GitImporterHarness(
 			$this->getDriver(),
-			$this->getTestRepoRoot($repoPath)
-		);		
+			is_null($repoRoot) ? $this->getTestRepoRoot($repoPath) : $repoRoot
+		);
 	}
 
 	/**
@@ -69,9 +70,9 @@ class GitImporterTest extends TestCase
 	 * 
 	 * Strategy:
 	 * 
-	 * Create a repo in data with a null path
-	 * Point to a new location
-	 * Check the database now reads correctly
+	 * - Create a repo in data with a (default) null path
+	 * - Point to a new location
+	 * - Check the database now reads correctly
 	 */
 	public function testUpdateRepoSuccess()
 	{
@@ -89,7 +90,7 @@ class GitImporterTest extends TestCase
 
 		// Let's update the location
 		$expectedPath = 'new-path';
-		$importer->moveRepoLocation($repoId, $oldPath = 'dummy', $expectedPath);
+		$importer->moveRepoLocation($repoId, $oldPath = null, $expectedPath);
 		$newMountPath = $this->fetchColumn($pdo, $sql, array(':repo_id' => $repoId, ));
 		$this->assertEquals($expectedPath, $newMountPath, "Check repo path is reset");
 	}
@@ -97,16 +98,50 @@ class GitImporterTest extends TestCase
 	/**
 	 * Check an existing repo has its location updated and old repo removed
 	 * 
-	 * Same as above, but point to temp location that can be deleted
+	 * Strategy:
+	 * 
+	 * - Same as testUpdateRepoSuccess, but create a temp location that can be deleted
 	 */
 	public function testMoveRepoSuccess()
 	{
-		
+		$pdo = $this->getDriver();
+		$repoId = $this->buildDatabase($pdo);
+
+		$newRelativePath = 'success';
+		$tempRoot = $this->getTempFolder();
+		$importer = $this->getImporterInstance($newRelativePath, $tempRoot);
+
+		// Let's create a folder we can delete
+		$oldRelativePath = 'path' . rand(1, 9999999) . time();
+		$oldPath = $tempRoot . '/' . $oldRelativePath;
+		mkdir($oldPath);
+
+		// Check that the folder exists here, to avoid permissions issues making it pass
+		$this->assertTrue(file_exists($oldPath), "Check new folder actually exists");
+
+		// Now let's do a "move", so that this folder is deleted
+		$importer->moveRepoLocation($repoId, $oldRelativePath, $newRelativePath);
+
+		// Check that the folder is now gone
+		$this->assertFalse(file_exists($oldPath), "Check the folder has now been zapped");		
 	}
 
-	public function testMoveThrowsExceptionOnMissingRootPath()
+	/**
+	 * Ensures the move method borks if it doesn't have a repo root
+	 * 
+	 * @expectedException \Awooga\Exceptions\SeriousException
+	 */
+	public function testMoveThrowsExceptionOnEmptyRootPath()
 	{
-		
+		$pdo = $this->getDriver();
+		$repoId = $this->buildDatabase($pdo);
+
+		// Temporary path to delete (it won't actually happen, so it does not need to exist)
+		$oldPath = 'dummy1';
+		$newPath = 'dummy2';
+
+		$importer = $this->getImporterInstance('success', $repoRoot = '');
+		$importer->moveRepoLocation($repoId, $oldPath, $newPath);
 	}
 
 	public function testMoveThrowsExceptionOnMissingOldPath()
@@ -173,5 +208,10 @@ class GitImporterTest extends TestCase
 	protected function getTestRepoRoot($repoName)
 	{
 		return $this->getProjectRoot() . '/test/unit/repos/' . $repoName;
+	}
+
+	protected function getTempFolder()
+	{
+		return $this->getProjectRoot() . '/test/unit/tmp';		
 	}
 }
