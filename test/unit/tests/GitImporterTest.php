@@ -15,6 +15,7 @@ class GitImporterTest extends TestCase
 		$root = $this->getProjectRoot();
 
 		require_once $root . '/src/classes/GitImporter.php';
+		require_once $root . '/src/classes/Report.php';
 		require_once $root . '/src/classes/Exceptions/SeriousException.php';
 		// @todo Rename this to GitImporterTestHarness
 		require_once $root . '/test/unit/classes/GitImporterHarness.php';
@@ -45,7 +46,7 @@ class GitImporterTest extends TestCase
 	{
 		return new GitImporterHarness(
 			$this->getDriver(),
-			is_null($repoRoot) ? $this->getTestRepoRoot($repoPath) : $repoRoot
+			is_null($repoRoot) ? $this->getTestRepoRoot() : $repoRoot
 		);
 	}
 
@@ -171,7 +172,12 @@ class GitImporterTest extends TestCase
 	 */
 	public function testScanRepoSuccess()
 	{
-		
+		$pdo = $this->getDriver();
+		$repoId = $this->buildDatabase($pdo);
+
+		$newRelativePath = 'success';
+		$importer = $this->getImporterInstance($newRelativePath);
+		$importer->scanRepo($repoId, $newRelativePath);
 	}
 
 	/**
@@ -214,9 +220,9 @@ class GitImporterTest extends TestCase
 		
 	}
 
-	protected function getTestRepoRoot($repoName)
+	protected function getTestRepoRoot()
 	{
-		return $this->getProjectRoot() . '/test/unit/repos/' . $repoName;
+		return $this->getProjectRoot() . '/test/unit/repos';
 	}
 
 	protected function getTempFolder()

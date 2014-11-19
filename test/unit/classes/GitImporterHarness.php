@@ -7,8 +7,12 @@ namespace Awooga\Testing;
  */
 class GitImporterHarness extends \Awooga\GitImporter
 {
+	const SCAN_MODE_NORMAL = 1;
+	const SCAN_MODE_COUNT = 2;
+
 	protected $nextGitFails = false;
 	protected $nextMoveFails = false;
+	protected $scanMode = self::SCAN_MODE_NORMAL;
 	protected $checkoutPath;
 
 	public function makeGitFail()
@@ -49,6 +53,27 @@ class GitImporterHarness extends \Awooga\GitImporter
 		}
 
 		return parent::deleteOldRepo($oldPath);
+	}
+
+	public function setScanMode($scanMode)
+	{
+		$this->scanMode = $scanMode;
+	}
+
+	/**
+	 * A public entry point for this method
+	 * 
+	 * @param integer $repoId
+	 * @param string $repoPath
+	 */
+	public function scanRepo($repoId, $repoPath)
+	{
+		parent::scanRepo($repoId, $repoPath);
+	}
+
+	public function scanReport($repoId, $reportPath)
+	{
+		parent::scanReport($repoId, $reportPath);
 	}
 
 	/**

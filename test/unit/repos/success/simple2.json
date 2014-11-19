@@ -1,0 +1,12 @@
+{
+    "version": 1,
+    "title": "Title 2",
+    "url": "http:\/\/www.example.com\/two",
+    "description": "Description 2 goes here.",
+    "issues": [
+        {
+            "issue_cat_code": "sql-injection"
+        }
+    ],
+    "author_notified_date": "2014-10-31"
+}

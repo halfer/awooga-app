@@ -1,0 +1,12 @@
+{
+    "version": 1,
+    "title": "Title 1",
+    "url": "http:\/\/www.example.com\/one",
+    "description": "Description 1 goes here.",
+    "issues": [
+        {
+            "issue_cat_code": "xss"
+        }
+    ],
+    "author_notified_date": "2014-10-31"
+}
