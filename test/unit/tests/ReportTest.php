@@ -17,7 +17,7 @@ class ReportTest extends TestCase
 		require_once $root . '/src/classes/Report.php';
 		require_once $root . '/src/classes/Exceptions/SeriousException.php';
 		require_once $root . '/src/classes/Exceptions/TrivialException.php';
-		require_once $root . '/test/unit/classes/ReportTestChild.php';
+		require_once $root . '/test/unit/classes/ReportTestHarness.php';
 	}
 
 	/**
@@ -38,7 +38,7 @@ class ReportTest extends TestCase
 	 */
 	public function testNoTitle()
 	{
-		$report = $this->getDummyRepo();
+		$report = $this->getDummyReport();
 		$report->setTitle(null);
 	}
 
@@ -49,7 +49,7 @@ class ReportTest extends TestCase
 	 */
 	public function testTitleOfBadType()
 	{
-		$report = $this->getDummyRepo();
+		$report = $this->getDummyReport();
 		$report->setTitle(null);
 		$report->setTitle(new \stdClass());
 	}
@@ -59,7 +59,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetUrlString()
 	{
-		$report = $this->getDummyRepo();
+		$report = $this->getDummyReport();
 		$url = 'http://example.com/thing';
 		$report->setUrl($url);
 
@@ -71,7 +71,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetGoodUrlArray()
 	{
-		$report = $this->getDummyRepo();
+		$report = $this->getDummyReport();
 		$urls = array(
 			'http://example.com/one',
 			'http://example.com/two',
@@ -87,7 +87,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetArrayContainingEmptyUrls()
 	{
-		$report = $this->getDummyRepo();
+		$report = $this->getDummyReport();
 		$report->setUrl(
 			array(
 				'',
@@ -103,7 +103,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetArrayContainingUrlsOfWrongType()
 	{
-		$report = $this->getDummyRepo();
+		$report = $this->getDummyReport();
 		$report->setUrl(
 			array(
 				'http://example.com/something',
@@ -119,7 +119,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetArrayContainingDuplicateUrls()
 	{
-		$report = $this->getDummyRepo();
+		$report = $this->getDummyReport();
 		$report->setUrl(
 			array(
 				'http://example.com/something',
@@ -133,7 +133,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetGoodDescription()
 	{
-		$report = $this->getDummyRepo();
+		$report = $this->getDummyReport();
 		$description = 'This is a description';
 		$report->setDescription($description);
 		$this->assertEquals($description, $report->getProperty('description'));
@@ -146,7 +146,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetEmptyDescription()
 	{
-		$report = $this->getDummyRepo();
+		$report = $this->getDummyReport();
 		$report->setDescription(null);
 	}
 
@@ -157,13 +157,13 @@ class ReportTest extends TestCase
 	 */
 	public function testSetDescriptionOfBadType()
 	{
-		$report = $this->getDummyRepo();
+		$report = $this->getDummyReport();
 		$report->setDescription(6);		
 	}
 
 	public function testSetGoodIssues()
 	{
-		$report = $this->getDummyRepo();
+		$report = $this->getDummyReport();
 		$issues = array(
 			array(
 				'issue_cat_code' => 'xss'
@@ -184,7 +184,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetNullIssues()
 	{
-		$report = $this->getDummyRepo();
+		$report = $this->getDummyReport();
 		$report->setIssues(null);
 	}
 
@@ -195,7 +195,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetEmptyIssueDescription()
 	{
-		$report = $this->getDummyRepo();
+		$report = $this->getDummyReport();
 		$report->setIssues(array());
 	}
 
@@ -206,7 +206,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetArrayContainingDuplicateIssues()
 	{
-		$report = $this->getDummyRepo();
+		$report = $this->getDummyReport();
 		$report->setIssues(
 			array(
 				array('issue_cat_code' => 'xss', 'description' => 'Description goes here', ),
@@ -220,7 +220,7 @@ class ReportTest extends TestCase
 	 */
 	public function testValidIssueCatCodes()
 	{
-		$report = $this->getDummyRepo();
+		$report = $this->getDummyReport();
 		$issues = array(
 			array('issue_cat_code' => 'xss', ),
 			array('issue_cat_code' => 'sql-injection', ),
@@ -241,7 +241,7 @@ class ReportTest extends TestCase
 	 */
 	public function testInvalidIssueCatCode()
 	{
-		$report = $this->getDummyRepo();
+		$report = $this->getDummyReport();
 		$issues = array(
 			array('issue_cat_code' => 'this-does-not-exist', ),
 		);
@@ -253,7 +253,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetGoodAuthorNotifiedDate()
 	{
-		$report = $this->getDummyRepo();
+		$report = $this->getDummyReport();
 		$notifiedDate = '2014-11-18';
 		$report->setAuthorNotifiedDate($notifiedDate);
 		$this->assertEquals($notifiedDate, $report->getAuthorNotifiedDateAsStringPublic());
@@ -285,7 +285,7 @@ class ReportTest extends TestCase
 	{
 		$pdo = $this->getDriver();
 		$repoId = $this->buildDatabase($pdo);
-		$report = new ReportTestChild($repoId);
+		$report = new ReportTestHarness($repoId);
 		$report->setDriver($pdo);
 
 		$report->setTitle($title = 'Example title');
@@ -379,7 +379,7 @@ class ReportTest extends TestCase
 	{
 		$pdo = $this->getDriver();
 		$repoId = $this->buildDatabase($pdo);
-		$report = new ReportTestChild($repoId);
+		$report = new ReportTestHarness($repoId);
 		$report->setDriver($pdo);
 
 		// Set some fields
@@ -452,7 +452,7 @@ class ReportTest extends TestCase
 	{
 		$pdo = $this->getDriver();
 		$repoId = $this->buildDatabase($pdo);
-		$report = new ReportTestChild($repoId);
+		$report = new ReportTestHarness($repoId);
 		$report->setDriver($pdo);
 
 		// Skip one of the fields here
@@ -494,7 +494,7 @@ class ReportTest extends TestCase
 		$repoId = $this->buildDatabase($pdo);
 
 		// Create a report
-		$report = new ReportTestChild($repoId);
+		$report = new ReportTestHarness($repoId);
 		$report->setDriver($pdo);
 		$report->setUrl('http://example.com');
 		$report->setTitle('Title');
@@ -503,7 +503,7 @@ class ReportTest extends TestCase
 		$report->save();
 
 		// Resave the +same+ report
-		$report2 = new ReportTestChild($repoId);
+		$report2 = new ReportTestHarness($repoId);
 		$report2->setDriver($pdo);
 		$report2->setUrl($url = 'http://example.com');
 		// Change all the data here, it's still the same report
@@ -554,7 +554,7 @@ class ReportTest extends TestCase
 		$repoId = $this->buildDatabase($pdo);
 
 		// Create a report
-		$report = new ReportTestChild($repoId);
+		$report = new ReportTestHarness($repoId);
 		$report->setDriver($pdo);
 		$report->setUrl($url1 = 'http://example.com');
 		$report->setTitle('Title');
@@ -563,7 +563,7 @@ class ReportTest extends TestCase
 		$report->save();
 
 		// Create another report
-		$report2 = new ReportTestChild($repoId);
+		$report2 = new ReportTestHarness($repoId);
 		$report2->setDriver($pdo);
 		$report2->setUrl($url2 = 'http://example.com/different');
 		$report2->setTitle('Title');
@@ -572,7 +572,7 @@ class ReportTest extends TestCase
 		$report2->save();
 
 		// Try to create a report that would span these two URLs
-		$report3 = new ReportTestChild($repoId);
+		$report3 = new ReportTestHarness($repoId);
 		$report3->setDriver($pdo);
 		$report3->setUrl(array($url1, $url2));
 		$report3->setTitle('Title');
@@ -583,6 +583,6 @@ class ReportTest extends TestCase
 
 	protected function getDummyReport()
 	{
-		return new ReportTestChild(1);
+		return new ReportTestHarness(1);
 	}
 }

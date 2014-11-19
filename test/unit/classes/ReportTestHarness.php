@@ -2,7 +2,7 @@
 
 namespace Awooga\Testing;
 
-class ReportTestChild extends \Awooga\Report
+class ReportTestHarness extends \Awooga\Report
 {
 	public function getProperty($property)
 	{
