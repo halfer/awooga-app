@@ -348,10 +348,9 @@ class Report
 		$params = array(
 			':repo_id' => $this->repoId,
 			':title' => $this->title,
+			':description' => $this->description,
+			':notified_at' => $this->getAuthorNotifiedDateAsString(),
 		);
-		// Swap these things out for a null if required
-		$this->addNullableColumn($params, $sql, ':description', $this->description);
-		$this->addNullableColumn($params, $sql, ':notified_at', $this->getAuthorNotifiedDateAsString());
 
 		if ($reportId)
 		{
@@ -371,28 +370,6 @@ class Report
 	}
 
 	/**
-	 * Swaps out a parameter for a SQL NULL value if required
-	 * 
-	 * @todo If I use a null value in a execute, does this not swap NULL in correctly?
-	 * 
-	 * @param array $params
-	 * @param string $sql
-	 * @param string $column
-	 * @param mixed $value
-	 */
-	protected function addNullableColumn(array &$params, &$sql, $column, $value)
-	{
-		if ($value)
-		{
-			$params[$column] = $value;
-		}
-		else
-		{
-			$sql = str_replace($column, 'NULL', $sql);
-		}		
-	}
-
-	/**
 	 * Returns the author notified date in YYYY-mm-dd format, or null
 	 * 
 	 * @return string
@@ -409,23 +386,20 @@ class Report
 	 */
 	protected function insertIssues($reportId)
 	{
-		$sqlTemplate = "
+		$sql = "
 			INSERT INTO report_issue
 			(report_id, description, issue_id)
 			VALUES (:report_id, :description, :issue_id)
 		";
 		foreach ($this->issues as $issue)
 		{
+			$description = isset($issue['description']) && $issue['description'] ?
+				$issue['description'] :
+				null;
 			$params = array(
 				':report_id' => $reportId,
 				':issue_id' => $this->getIssueIdForCode($issue['issue_cat_code']),
-			);
-			$sql = $sqlTemplate;
-			$this->addNullableColumn(
-				$params,
-				$sql,
-				':description',
-				isset($issue['description']) ? $issue['description'] : null
+				':description' => $description,
 			);
 			$statement = $this->getDriver()->prepare($sql);
 			$statement->execute($params);
