@@ -77,6 +77,14 @@ class GitImporterTest extends \PHPUnit_Framework_TestCase
 	}
 
 	/**
+	 * Ensure that an overly large report causes failure
+	 */
+	public function testFailOnMassiveJsonReport()
+	{
+		
+	}
+
+	/**
 	 * Checks the repo logger works
 	 */
 	public function testRepoLog()

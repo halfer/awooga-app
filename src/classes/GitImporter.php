@@ -54,10 +54,17 @@ class GitImporter
 			$this->pdo->commit();
 			$this->repoLog($repoId, self::LOG_TYPE_SCAN);
 		}
+		catch (Exceptions\SeriousException $e)
+		{
+			// These errors are always OK to save directly into the log
+			$this->pdo->rollBack();
+			$this->repoLog($repoId, self::LOG_TYPE_SCAN, $e->getMessage(), false);
+			$this->disableRepo($repoId);
+		}
 		catch (\Exception $e)
 		{
+			// Let's not add these to the public log
 			$this->pdo->rollBack();
-			// @todo Catch a specific exception for which we can save messages into the public log safely
 			$this->repoLog($repoId, self::LOG_TYPE_SCAN, "Scanning failure", false);
 			return false;
 		}
@@ -177,7 +184,7 @@ class GitImporter
 	/**
 	 * Scans a single report and commits it to the database
 	 * 
-	 * @todo Review the JSON recursion limit, is this OK?
+	 * Review the JSON recursion limit, is this OK?
 	 * 
 	 * @param integer $repoId
 	 * @param string $reportPath
@@ -227,12 +234,48 @@ class GitImporter
 	}
 
 	/**
+	 * Bomb out if there's been too many errors recently
 	 * 
 	 * @param integer $repoId
 	 */
 	protected function doesErrorCountRequireHalting($repoId)
 	{
-		// @todo if there are 5 errors recently, throw Exceptions\SeriousException
+		// If there are 5 errors recently, throw Exceptions\SeriousException
+		$sql = "
+			SELECT COUNT(*) count
+			FROM repository_log
+			WHERE
+				repository_id = :repo_id
+				AND is_success = false
+				AND created_at > (DATE_SUB(CURDATE(), INTERVAL 4 HOUR))
+		";
+		$statement = $this->pdo->prepare($sql);
+		$ok = $statement->execute(array(':repo_id' => $repoId, ));
+
+		if ($statement->fetchColumn() > 5)
+		{
+			throw new Exceptions\SeriousException(
+				"Too many failures with this repo recently, please see log"
+			);
+		}
+	}
+
+	/**
+	 * Disables the specified repo
+	 * 
+	 * @param integer $repoId
+	 */
+	protected function disableRepo($repoId)
+	{
+		$sql = "
+			UPDATE repository
+			SET is_enabled = false
+				WHERE repository_id = :repo_id
+		";
+		$statement = $this->pdo->prepare($sql);
+		$ok = $statement->execute(array(':repo_id' => $repoId, ));
+
+		return $ok !== false;
 	}
 
 	/**
@@ -247,9 +290,24 @@ class GitImporter
 		return isset($data[$key]) ? $data[$key] : null;
 	}
 
+	/**
+	 * Readies this repo to be pulled in four hours from now
+	 * 
+	 * Maybe this should be configurable?
+	 * 
+	 * @param integer $repoId
+	 */
 	protected function rescheduleRepo($repoId)
 	{
-		// @todo
+		$sql = "
+			UPDATE repository
+				SET due_at = NOW() + INTERVAL 4 HOUR
+				WHERE id = :repo_id
+		";
+		$statement = $this->pdo->prepare($sql);
+		$ok = $statement->execute(array(':repo_id' => $repoId, ));
+
+		return $ok !== false;
 	}
 
 	public function repoLog($repoId, $logType, $message = null, $isSuccess = true)
