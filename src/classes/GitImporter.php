@@ -91,22 +91,37 @@ class GitImporter
 
 		// Turn relative target into fully qualified path
 		$fqTarget = $this->repoRoot . '/' . $target;
+		$ok = $this->runGitCommand($url, $fqTarget);
 
-		// Emptying HOME is to prevent Git trying to fetch config it doesn't have access to
-		$command = "HOME='' git clone --quiet \\
-			{$url} \\
-			{$fqTarget}";
-		$output = $return = null;
-		exec($command, $output, $return);
-
-		if ($return)
+		if (!$ok)
 		{
 			throw new Exceptions\SeriousException("Problem when cloning");
 		}
 
+		return $target;
+	}
+
+	/**
+	 * Clones the repo at the URL into the file system path
+	 * 
+	 * Emptying HOME is to prevent Git trying to fetch config it doesn't have access to
+	 * 
+	 * @param string $url
+	 * @param string $path
+	 * @return boolean True on successful clone
+	 */
+	protected function runGitCommand($url, $path)
+	{
+		$command = "HOME='' git clone --quiet \\
+			{$url} \\
+			{$path}";
+		$output = $return = null;
+		exec($command, $output, $return);
+
+		// Write debug to screen if required
 		$this->writeDebug("System command: $command");
 
-		return $target;
+		return $return === 0;
 	}
 
 	public function moveRepoLocation($repoId, $oldPath, $newPath)

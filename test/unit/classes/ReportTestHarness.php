@@ -2,6 +2,9 @@
 
 namespace Awooga\Testing;
 
+/**
+ * This class inherits from the real Report, making it more amenable to testing
+ */
 class ReportTestHarness extends \Awooga\Report
 {
 	public function getProperty($property)
