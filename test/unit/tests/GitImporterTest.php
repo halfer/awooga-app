@@ -144,17 +144,26 @@ class GitImporterTest extends TestCase
 		$importer->moveRepoLocation($repoId, $oldPath, $newPath);
 	}
 
-	public function testMoveThrowsExceptionOnMissingOldPath()
-	{
-		
-	}
-
 	/**
-	 * Check perm failure for moveRepoLocation
+	 * Check file system failure for moveRepoLocation
+	 * 
+	 * @expectedException \Awooga\Exceptions\SeriousException
 	 */
 	public function testMoveRepoLocationFileSystemFailure()
 	{
-		
+		$pdo = $this->getDriver();
+		$repoId = $this->buildDatabase($pdo);
+
+		$newRelativePath = 'success';
+		$tempRoot = $this->getTempFolder();
+		$importer = $this->getImporterInstance($newRelativePath, $tempRoot);
+
+		// Let's NOT create a folder, so a file system error is caused
+		$oldRelativePath = 'path' . rand(1, 9999999) . time();
+
+		// Now let's do a "move" set up to fail
+		$importer->makeMoveFail();
+		$importer->moveRepoLocation($repoId, $oldRelativePath, $newRelativePath);		
 	}
 
 	/**

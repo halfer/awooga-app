@@ -174,17 +174,23 @@ class GitImporter
 				);
 			}
 
-			$output = $return = null;
-			$command = "rm -rf {$this->repoRoot}/{$oldPath}";
-			exec($command, $output, $return);
-
-			if ($return)
+			$ok = $this->deleteOldRepo($oldPath);
+			if (!$ok)
 			{
 				throw new Exceptions\SeriousException("Problem when deleting the old repo");
 			}
 
 			$this->writeDebug("Remove old location '{$oldPath}' for repo #{$repoId}");
 		}
+	}
+
+	protected function deleteOldRepo($oldPath)
+	{
+		$output = $return = null;
+		$command = "rm -rf {$this->repoRoot}/{$oldPath}";
+		exec($command, $output, $return);
+
+		return $return === 0;
 	}
 
 	/**

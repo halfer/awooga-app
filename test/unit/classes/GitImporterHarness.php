@@ -8,6 +8,7 @@ namespace Awooga\Testing;
 class GitImporterHarness extends \Awooga\GitImporter
 {
 	protected $nextGitFails = false;
+	protected $nextMoveFails = false;
 	protected $checkoutPath;
 
 	public function makeGitFail()
@@ -32,6 +33,22 @@ class GitImporterHarness extends \Awooga\GitImporter
 		}
 
 		return true;
+	}
+
+	public function makeMoveFail()
+	{
+		$this->nextMoveFails = true;
+	}
+
+	protected function deleteOldRepo($oldPath)
+	{
+		if ($this->nextMoveFails)
+		{
+			$this->nextMoveFails = false;
+			return false;
+		}
+
+		return parent::deleteOldRepo($oldPath);
 	}
 
 	/**
