@@ -25,7 +25,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetTitle()
 	{
-		$report = new ReportTestChild(1);
+		$report = $this->getDummyReport();
 		$title = 'Set title';
 		$report->setTitle($title);
 		$this->assertEquals($title, $report->getProperty('title'));
@@ -38,7 +38,7 @@ class ReportTest extends TestCase
 	 */
 	public function testNoTitle()
 	{
-		$report = new ReportTestChild(1);
+		$report = $this->getDummyRepo();
 		$report->setTitle(null);
 	}
 
@@ -49,7 +49,7 @@ class ReportTest extends TestCase
 	 */
 	public function testTitleOfBadType()
 	{
-		$report = new ReportTestChild(1);
+		$report = $this->getDummyRepo();
 		$report->setTitle(null);
 		$report->setTitle(new \stdClass());
 	}
@@ -59,7 +59,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetUrlString()
 	{
-		$report = new ReportTestChild(1);
+		$report = $this->getDummyRepo();
 		$url = 'http://example.com/thing';
 		$report->setUrl($url);
 
@@ -71,7 +71,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetGoodUrlArray()
 	{
-		$report = new ReportTestChild(1);
+		$report = $this->getDummyRepo();
 		$urls = array(
 			'http://example.com/one',
 			'http://example.com/two',
@@ -87,7 +87,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetArrayContainingEmptyUrls()
 	{
-		$report = new ReportTestChild(1);
+		$report = $this->getDummyRepo();
 		$report->setUrl(
 			array(
 				'',
@@ -103,7 +103,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetArrayContainingUrlsOfWrongType()
 	{
-		$report = new ReportTestChild(1);
+		$report = $this->getDummyRepo();
 		$report->setUrl(
 			array(
 				'http://example.com/something',
@@ -119,7 +119,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetArrayContainingDuplicateUrls()
 	{
-		$report = new ReportTestChild(1);
+		$report = $this->getDummyRepo();
 		$report->setUrl(
 			array(
 				'http://example.com/something',
@@ -133,7 +133,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetGoodDescription()
 	{
-		$report = new ReportTestChild(1);
+		$report = $this->getDummyRepo();
 		$description = 'This is a description';
 		$report->setDescription($description);
 		$this->assertEquals($description, $report->getProperty('description'));
@@ -146,7 +146,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetEmptyDescription()
 	{
-		$report = new ReportTestChild(1);
+		$report = $this->getDummyRepo();
 		$report->setDescription(null);
 	}
 
@@ -157,13 +157,13 @@ class ReportTest extends TestCase
 	 */
 	public function testSetDescriptionOfBadType()
 	{
-		$report = new ReportTestChild(1);
+		$report = $this->getDummyRepo();
 		$report->setDescription(6);		
 	}
 
 	public function testSetGoodIssues()
 	{
-		$report = new ReportTestChild(1);
+		$report = $this->getDummyRepo();
 		$issues = array(
 			array(
 				'issue_cat_code' => 'xss'
@@ -184,7 +184,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetNullIssues()
 	{
-		$report = new ReportTestChild(1);
+		$report = $this->getDummyRepo();
 		$report->setIssues(null);
 	}
 
@@ -195,7 +195,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetEmptyIssueDescription()
 	{
-		$report = new ReportTestChild(1);
+		$report = $this->getDummyRepo();
 		$report->setIssues(array());
 	}
 
@@ -206,7 +206,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetArrayContainingDuplicateIssues()
 	{
-		$report = new ReportTestChild(1);
+		$report = $this->getDummyRepo();
 		$report->setIssues(
 			array(
 				array('issue_cat_code' => 'xss', 'description' => 'Description goes here', ),
@@ -220,7 +220,7 @@ class ReportTest extends TestCase
 	 */
 	public function testValidIssueCatCodes()
 	{
-		$report = new ReportTestChild(1);
+		$report = $this->getDummyRepo();
 		$issues = array(
 			array('issue_cat_code' => 'xss', ),
 			array('issue_cat_code' => 'sql-injection', ),
@@ -241,7 +241,7 @@ class ReportTest extends TestCase
 	 */
 	public function testInvalidIssueCatCode()
 	{
-		$report = new ReportTestChild(1);
+		$report = $this->getDummyRepo();
 		$issues = array(
 			array('issue_cat_code' => 'this-does-not-exist', ),
 		);
@@ -253,7 +253,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetGoodAuthorNotifiedDate()
 	{
-		$report = new ReportTestChild(1);
+		$report = $this->getDummyRepo();
 		$notifiedDate = '2014-11-18';
 		$report->setAuthorNotifiedDate($notifiedDate);
 		$this->assertEquals($notifiedDate, $report->getAuthorNotifiedDateAsStringPublic());
@@ -266,7 +266,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetAuthorNotifiedDateWrongType()
 	{
-		$report = new ReportTestChild(1);
+		$report = $this->getDummyReport();
 		$report->setAuthorNotifiedDate(new \stdClass());
 	}
 
@@ -277,7 +277,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetAuthorNotifiedDateWrongFormat()
 	{
-		$report = new ReportTestChild(1);
+		$report = $this->getDummyReport();
 		$report->setAuthorNotifiedDate('18/11/2014');
 	}
 
@@ -579,5 +579,10 @@ class ReportTest extends TestCase
 		$report3->setDescription('Description');
 		$report3->setIssues(array(array('issue_cat_code' => 'xss', ),));
 		$report3->save();
+	}
+
+	protected function getDummyReport()
+	{
+		return new ReportTestChild(1);
 	}
 }
