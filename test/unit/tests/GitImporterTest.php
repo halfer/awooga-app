@@ -27,7 +27,7 @@ class GitImporterTest extends TestCase
 	public function testCloneSuccess()
 	{
 		$relativePath = 'success';
-		$importer = $this->getImporterInstanceNoDatabase();
+		$importer = $this->getImporterInstance();
 		$importer->setCheckoutPath($relativePath);
 
 		// Do a fake clone
@@ -38,30 +38,15 @@ class GitImporterTest extends TestCase
 	/**
 	 * Returns a new importer instance pointing to the current test repo
 	 * 
+	 * @param \PDO $pdo Database connection
 	 * @param string $repoRoot Fully-qualified path to repository (optional)
 	 * @return \Awooga\Testing\GitImporterHarness
 	 */
-	protected function getImporterInstance($repoRoot = null)
+	protected function getImporterInstance(\PDO $pdo = null, $repoRoot = null)
 	{
 		return new GitImporterHarness(
 			is_null($repoRoot) ? $this->getTestRepoRoot() : $repoRoot,
-			$this->getDriver()
-		);
-	}
-
-	/**
-	 * Returns a new importer instance with no database configured
-	 * 
-	 * We could get away with passing a PDO connection with no database selected, but for ops
-	 * that actually don't need a connection at all, this seems more satisfying.
-	 * 
-	 * @param string $repoRoot
-	 * @return \Awooga\Testing\GitImporterHarness
-	 */
-	protected function getImporterInstanceNoDatabase($repoRoot = null)
-	{
-		return new GitImporterHarness(
-			is_null($repoRoot) ? $this->getTestRepoRoot() : $repoRoot
+			$pdo
 		);
 	}
 
@@ -73,7 +58,7 @@ class GitImporterTest extends TestCase
 	public function testCloneGitFailure()
 	{
 		$relativePath = 'success';
-		$importer = $this->getImporterInstanceNoDatabase();
+		$importer = $this->getImporterInstance();
 		$importer->setCheckoutPath($relativePath);
 
 		// Get the fake clone to fail
@@ -96,7 +81,7 @@ class GitImporterTest extends TestCase
 		$pdo = $this->getDriver();
 
 		$relativePath = 'success';
-		$importer = $this->getImporterInstance();
+		$importer = $this->getImporterInstance($pdo);
 		$importer->setCheckoutPath($relativePath);
 
 		// Let's check the mount path first, make sure it starts as null
@@ -124,7 +109,7 @@ class GitImporterTest extends TestCase
 
 		$newRelativePath = 'success';
 		$tempRoot = $this->getTempFolder();
-		$importer = $this->getImporterInstance($tempRoot);
+		$importer = $this->getImporterInstance($this->getDriver(), $tempRoot);
 
 		// Let's create a folder we can delete
 		$oldRelativePath = 'path' . rand(1, 9999999) . time();
@@ -154,7 +139,7 @@ class GitImporterTest extends TestCase
 		$oldPath = 'dummy1';
 		$newPath = 'dummy2';
 
-		$importer = $this->getImporterInstance($repoRoot = '');
+		$importer = $this->getImporterInstance($this->getDriver(), $repoRoot = '');
 		$importer->moveRepo($repoId, $oldPath, $newPath);
 	}
 
@@ -169,7 +154,7 @@ class GitImporterTest extends TestCase
 
 		$newRelativePath = 'success';
 		$tempRoot = $this->getTempFolder();
-		$importer = $this->getImporterInstance($tempRoot);
+		$importer = $this->getImporterInstance($this->getDriver(), $tempRoot);
 
 		// Let's NOT create a folder, so a file system error is caused
 		$oldRelativePath = $this->randomLeafname();
@@ -187,7 +172,7 @@ class GitImporterTest extends TestCase
 		$repoId = $this->buildDatabase($this->getDriver(false));
 
 		// Scan everything in this repo
-		$importer = $this->getImporterInstance();
+		$importer = $this->getImporterInstance($this->getDriver());
 		$importer->scanRepoWithLogging($repoId, $newRelativePath = 'success');
 
 		// Check the numbers of scanned vs successful
@@ -207,7 +192,7 @@ class GitImporterTest extends TestCase
 		$this->checkLogsGenerated($repoId, 0, 0);
 
 		// Scan everything in this repo
-		$importer = $this->getImporterInstance();
+		$importer = $this->getImporterInstance($this->getDriver());
 		$importer->scanRepo($repoId, $newRelativePath = 'fail');
 
 		// Check the numbers of scanned vs successful
@@ -228,7 +213,8 @@ class GitImporterTest extends TestCase
 
 		// Set up a pretend repo
 		$tempRoot = $this->getTempFolder();
-		$importer = $this->getImporterInstance($tempRoot);
+		$pdo = $this->getDriver();
+		$importer = $this->getImporterInstance($pdo, $tempRoot);
 
 		// Create a repo and a few bad reports
 		list($absolutePath, $relativePath) = $this->createTempRepoFolder();
@@ -255,7 +241,7 @@ class GitImporterTest extends TestCase
 
 		// Make sure the repo is now disabled
 		$isEnabled = (boolean) $this->fetchColumn(
-			$this->getDriver(),
+			$pdo,
 			"SELECT is_enabled FROM repository WHERE id = :repo_id",
 			array(':repo_id' => $repoId, )
 		);
@@ -283,7 +269,7 @@ class GitImporterTest extends TestCase
 
 		// Set up a pretend repo
 		$tempRoot = $this->getTempFolder();
-		$importer = $this->getImporterInstance($tempRoot);
+		$importer = $this->getImporterInstance($this->getDriver(), $tempRoot);
 
 		// Create a repo and one huge report that should fail
 		list($absolutePath, $relativePath) = $this->createTempRepoFolder();
