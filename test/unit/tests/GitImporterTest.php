@@ -27,7 +27,7 @@ class GitImporterTest extends TestCase
 	public function testCloneSuccess()
 	{
 		$relativePath = 'success';
-		$importer = $this->getImporterInstance();
+		$importer = $this->getImporterInstanceNoDatabase();
 		$importer->setCheckoutPath($relativePath);
 
 		// Do a fake clone
@@ -44,7 +44,23 @@ class GitImporterTest extends TestCase
 	protected function getImporterInstance($repoRoot = null)
 	{
 		return new GitImporterHarness(
-			$this->getDriver(),
+			is_null($repoRoot) ? $this->getTestRepoRoot() : $repoRoot,
+			$this->getDriver()
+		);
+	}
+
+	/**
+	 * Returns a new importer instance with no database configured
+	 * 
+	 * We could get away with passing a PDO connection with no database selected, but for ops
+	 * that actually don't need a connection at all, this seems more satisfying.
+	 * 
+	 * @param string $repoRoot
+	 * @return \Awooga\Testing\GitImporterHarness
+	 */
+	protected function getImporterInstanceNoDatabase($repoRoot = null)
+	{
+		return new GitImporterHarness(
 			is_null($repoRoot) ? $this->getTestRepoRoot() : $repoRoot
 		);
 	}
@@ -57,7 +73,7 @@ class GitImporterTest extends TestCase
 	public function testCloneGitFailure()
 	{
 		$relativePath = 'success';
-		$importer = $this->getImporterInstance();
+		$importer = $this->getImporterInstanceNoDatabase();
 		$importer->setCheckoutPath($relativePath);
 
 		// Get the fake clone to fail
@@ -76,8 +92,8 @@ class GitImporterTest extends TestCase
 	 */
 	public function testUpdateRepoSuccess()
 	{
+		$repoId = $this->buildDatabase($this->getDriver(false));
 		$pdo = $this->getDriver();
-		$repoId = $this->buildDatabase($pdo);
 
 		$relativePath = 'success';
 		$importer = $this->getImporterInstance();
@@ -104,7 +120,7 @@ class GitImporterTest extends TestCase
 	 */
 	public function testMoveRepoSuccess()
 	{
-		$repoId = $this->buildDatabase($this->getDriver());
+		$repoId = $this->buildDatabase($this->getDriver(false));
 
 		$newRelativePath = 'success';
 		$tempRoot = $this->getTempFolder();
@@ -132,7 +148,7 @@ class GitImporterTest extends TestCase
 	 */
 	public function testMoveThrowsExceptionOnEmptyRootPath()
 	{
-		$repoId = $this->buildDatabase($this->getDriver());
+		$repoId = $this->buildDatabase($this->getDriver(false));
 
 		// Temporary path to delete (it won't actually happen, so it does not need to exist)
 		$oldPath = 'dummy1';
@@ -149,7 +165,7 @@ class GitImporterTest extends TestCase
 	 */
 	public function testMoveRepoLocationFileSystemFailure()
 	{
-		$repoId = $this->buildDatabase($this->getDriver());
+		$repoId = $this->buildDatabase($this->getDriver(false));
 
 		$newRelativePath = 'success';
 		$tempRoot = $this->getTempFolder();
@@ -168,7 +184,7 @@ class GitImporterTest extends TestCase
 	 */
 	public function testScanRepoSuccess()
 	{
-		$repoId = $this->buildDatabase($this->getDriver());
+		$repoId = $this->buildDatabase($this->getDriver(false));
 
 		// Scan everything in this repo
 		$importer = $this->getImporterInstance();
@@ -185,7 +201,7 @@ class GitImporterTest extends TestCase
 	 */
 	public function testScanRepoTrivialExceptionRaised()
 	{
-		$repoId = $this->buildDatabase($this->getDriver());
+		$repoId = $this->buildDatabase($this->getDriver(false));
 
 		// Check we have no logs to start with
 		$this->checkLogsGenerated($repoId, 0, 0);
@@ -205,8 +221,7 @@ class GitImporterTest extends TestCase
 	 */
 	public function testRepoAfterExcessExceptionsRaised()
 	{
-		$pdo = $this->getDriver();
-		$repoId = $this->buildDatabase($pdo);
+		$repoId = $this->buildDatabase($this->getDriver(false));
 
 		// Check we have no logs to start with
 		$this->checkLogsGenerated($repoId, 0, 0);
@@ -240,7 +255,7 @@ class GitImporterTest extends TestCase
 
 		// Make sure the repo is now disabled
 		$isEnabled = (boolean) $this->fetchColumn(
-			$pdo,
+			$this->getDriver(),
 			"SELECT is_enabled FROM repository WHERE id = :repo_id",
 			array(':repo_id' => $repoId, )
 		);
@@ -261,8 +276,7 @@ class GitImporterTest extends TestCase
 	 */
 	public function testFailOnMassiveJsonReport()
 	{
-		$pdo = $this->getDriver();
-		$repoId = $this->buildDatabase($pdo);
+		$repoId = $this->buildDatabase($this->getDriver(false));
 
 		// Check we have no logs to start with
 		$this->checkLogsGenerated($repoId, 0, 0);

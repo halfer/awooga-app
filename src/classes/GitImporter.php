@@ -16,10 +16,20 @@ class GitImporter
 	protected $repoRoot;
 	protected $debug;
 
-	public function __construct(\PDO $pdo, $repoRoot, $debug = false)
+	/**
+	 * Constructs an importer object
+	 * 
+	 * I've made the PDO instance optional as it makes for easier testing. However, to use this
+	 * end to end, a valid connection to a database will need to be supplied.
+	 * 
+	 * @param string $repoRoot
+	 * @param \PDO $pdo
+	 * @param boolean $debug
+	 */
+	public function __construct($repoRoot, \PDO $pdo = null, $debug = false)
 	{
-		$this->pdo = $pdo;
 		$this->repoRoot = $repoRoot;
+		$this->pdo = $pdo;
 		$this->debug = $debug;
 	}
 
@@ -523,5 +533,10 @@ class GitImporter
 		{
 			echo $message . "\n";
 		}
+	}
+
+	protected function getDriver()
+	{
+		// Needs to bork if a driver has not been supplied
 	}
 }
