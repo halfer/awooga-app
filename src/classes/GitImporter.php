@@ -10,6 +10,7 @@ class GitImporter
 	const LOG_TYPE_RESCHED = 'resched';
 
 	const MAX_FAILS_BEFORE_DISABLE = 5;
+	const MAX_REPORT_SIZE = 60000;
 
 	protected $pdo;
 	protected $repoRoot;
@@ -216,8 +217,6 @@ class GitImporter
 	/**
 	 * Scans a folder for JSON reports
 	 * 
-	 * @todo Need to have a file size filter here - anything over 256K?
-	 * 
 	 * @param integer $repoId
 	 * @param string $repoPath
 	 * @throws Exception
@@ -280,6 +279,12 @@ class GitImporter
 		if (!file_exists($reportPath))
 		{
 			throw new Exceptions\SeriousException('File cannot be found');
+		}
+
+		$size = filesize($reportPath);
+		if ($size > self::MAX_REPORT_SIZE)
+		{
+			throw new Exceptions\FileException('Report of ' . $size . ' bytes is too large');
 		}
 
 		// Let's get this in array form
@@ -395,7 +400,7 @@ class GitImporter
 		$statement = $this->pdo->prepare($sql);
 		$ok = $statement->execute(array(':repo_id' => $repoId, ));
 
-		return $ok !== false;
+		return $ok;
 	}
 
 	public function repoLog($repoId, $logType, $message = null, $isSuccess = true)
@@ -425,7 +430,6 @@ class GitImporter
 				':message' => $message, ':is_success' => $isSuccess,
 			)
 		);
-
 		if (!$ok)
 		{
 			throw new \Exception('Adding a log message seems to have failed');

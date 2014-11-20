@@ -16,6 +16,7 @@ class GitImporterTest extends TestCase
 
 		$root = $this->getProjectRoot();
 		require_once $root . '/src/classes/GitImporter.php';
+		require_once $root . '/src/classes/Exceptions/FileException.php';
 		// @todo Rename this to GitImporterTestHarness
 		require_once $root . '/test/unit/classes/GitImporterHarness.php';
 	}
@@ -206,12 +207,8 @@ class GitImporterTest extends TestCase
 		$tempRoot = $this->getTempFolder();
 		$importer = $this->getImporterInstance($tempRoot);
 
-		// Create a repo...
-		$relativePath = $this->randomLeafname();
-		$absolutePath = $tempRoot . '/' . $relativePath;
-		mkdir($absolutePath);
-
-		// ... and a few bad reports
+		// Create a repo and a few bad reports
+		list($absolutePath, $relativePath) = $this->createTempRepoFolder();
 		$maxFails = \Awooga\GitImporter::MAX_FAILS_BEFORE_DISABLE;
 		for ($i = 0; $i < $maxFails * 2; $i++)
 		{
@@ -253,7 +250,35 @@ class GitImporterTest extends TestCase
 	 */
 	public function testFailOnMassiveJsonReport()
 	{
-		
+		$pdo = $this->getDriver();
+		$repoId = $this->buildDatabase($pdo);
+
+		// Set up a pretend repo
+		$tempRoot = $this->getTempFolder();
+		$importer = $this->getImporterInstance($tempRoot);
+
+		// Create a repo and one huge report that should fail
+		list($absolutePath, $relativePath) = $this->createTempRepoFolder();
+		$report = array(
+			'version' => 1,
+			'title' => 'Demo title',
+			'url' => 'http://example.com/very_large',
+			'description' => str_repeat('abcdefghij', 6001),
+			'issues' => array(
+				'issue-cat-code' => 'sql-injection',
+			),
+		);
+		file_put_contents(
+			$absolutePath . '/big-report.json',
+			json_encode($report)
+		);
+
+		// Do some scanning!
+		$importer->scanRepo($repoId, $relativePath);
+
+		// Check the numbers of scanned vs successful
+		$this->checkFilesSeen($importer, 1);
+		$this->checkReportsSuccessful($repoId, 0);
 	}
 
 	/**
@@ -270,6 +295,15 @@ class GitImporterTest extends TestCase
 	public function testRepoLog()
 	{
 		
+	}
+
+	protected function createTempRepoFolder()
+	{
+		$relativePath = $this->randomLeafname();
+		$absolutePath = $this->getTempFolder() . '/' . $relativePath;
+		mkdir($absolutePath);
+
+		return array($absolutePath, $relativePath);
 	}
 
 	protected function randomLeafname()
