@@ -31,7 +31,7 @@ class GitImporterTest extends TestCase
 		$importer->setCheckoutPath($relativePath);
 
 		// Do a fake clone
-		$actualPath = $importer->doClone($url = 'dummy');
+		$actualPath = $importer->cloneRepo($url = 'dummy');
 		$this->assertEquals($relativePath, $actualPath, "Ensure an ordinary clone is OK");
 	}
 
@@ -62,7 +62,7 @@ class GitImporterTest extends TestCase
 
 		// Get the fake clone to fail
 		$importer->makeGitFail();
-		$importer->doClone($url = 'dummy');
+		$importer->cloneRepo($url = 'dummy');
 	}
 	
 	/**
@@ -90,7 +90,7 @@ class GitImporterTest extends TestCase
 
 		// Let's update the location
 		$expectedPath = 'new-path';
-		$importer->moveRepoLocation($repoId, $oldPath = null, $expectedPath);
+		$importer->moveRepo($repoId, $oldPath = null, $expectedPath);
 		$newMountPath = $this->fetchColumn($pdo, $sql, array(':repo_id' => $repoId, ));
 		$this->assertEquals($expectedPath, $newMountPath, "Check repo path is reset");
 	}
@@ -119,7 +119,7 @@ class GitImporterTest extends TestCase
 		$this->assertTrue(file_exists($oldPath), "Check new folder actually exists");
 
 		// Now let's do a "move", so that this folder is deleted
-		$importer->moveRepoLocation($repoId, $oldRelativePath, $newRelativePath);
+		$importer->moveRepo($repoId, $oldRelativePath, $newRelativePath);
 
 		// Check that the folder is now gone
 		$this->assertFalse(file_exists($oldPath), "Check the folder has now been zapped");		
@@ -139,7 +139,7 @@ class GitImporterTest extends TestCase
 		$newPath = 'dummy2';
 
 		$importer = $this->getImporterInstance($repoRoot = '');
-		$importer->moveRepoLocation($repoId, $oldPath, $newPath);
+		$importer->moveRepo($repoId, $oldPath, $newPath);
 	}
 
 	/**
@@ -160,7 +160,7 @@ class GitImporterTest extends TestCase
 
 		// Now let's do a "move" set up to fail
 		$importer->makeMoveFail();
-		$importer->moveRepoLocation($repoId, $oldRelativePath, $newRelativePath);		
+		$importer->moveRepo($repoId, $oldRelativePath, $newRelativePath);		
 	}
 
 	/**
@@ -344,7 +344,7 @@ class GitImporterTest extends TestCase
 		$statement->execute(array(':repo_id' => $repoId, ));
 		$logs = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
-		// We haven't called any log-generating methods yet
+		// @todo We haven't called any log-generating methods yet
 		//print_r($logs);
 	}
 

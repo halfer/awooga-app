@@ -23,75 +23,6 @@ class GitImporter
 		$this->debug = $debug;
 	}
 
-	public function processRepo($repoId, $url, $oldPath)
-	{
-		// Try a new clone
-		try
-		{
-			$newPath = $this->doClone($url);
-			$this->repoLog($repoId, self::LOG_TYPE_FETCH);
-		}
-		catch (\Exception $e)
-		{
-			$this->repoLog($repoId, self::LOG_TYPE_FETCH, 'Fetch failed', false);
-			return false;
-		}
-
-		// Try moving the clone into place
-		try
-		{
-			$this->moveRepoLocation($repoId, $oldPath, $newPath);
-			$this->repoLog($repoId, self::LOG_TYPE_MOVE);
-		}
-		catch (\Exception $e)
-		{
-			$this->repoLog($repoId, self::LOG_TYPE_MOVE, "Move from $oldPath to $newPath failed", false);
-			return false;
-		}
-
-		// Scan repo
-		$exitEarly = false;
-		try
-		{
-			$this->pdo->beginTransaction();
-			$this->scanRepo($repoId, $newPath);
-			$this->pdo->commit();
-			$this->repoLog($repoId, self::LOG_TYPE_SCAN);
-		}
-		catch (Exceptions\SeriousException $e)
-		{
-			// We'll already have logged, so no need to do it again
-			$exitEarly = true;
-		}
-		catch (\Exception $e)
-		{
-			// Let's not add these to the public log
-			$this->repoLog($repoId, self::LOG_TYPE_SCAN, "Scanning failure", false);
-			$exitEarly = true;
-		}
-
-		// A common handler for exiting early
-		if ($exitEarly)
-		{
-			$this->pdo->rollBack();
-			return false;
-		}
-
-		// Reschedule another scan
-		try
-		{
-			$this->rescheduleRepo($repoId);
-			$this->repoLog($repoId, self::LOG_TYPE_RESCHED);
-		}
-		catch (\Exception $e)
-		{
-			// @todo Catch a specific exception for which we can save messages into the public log safely
-			$this->repoLog($repoId, self::LOG_TYPE_RESCHED, "Failed to reschedule repo", false);
-		}
-
-		return true;
-	}
-
 	/**
 	 * Calls the various parts of an import process
 	 * 
@@ -100,19 +31,26 @@ class GitImporter
 	 * @param string $oldPath
 	 * @return boolean
 	 */
-	public function processRepoNew($repoId, $url, $oldPath)
+	public function processRepo($repoId, $url, $oldPath)
 	{
+		// If any part fails, the rest of it will (deliberately) not be called
 		return
-			($newPath = $this->repoCloneWithLogging($repoId, $url)) &&
-			$this->repoMoveWithLogging($repoId, $oldPath, $newPath) &&
-			$this->repoScanWithLogging($repoId, $newPath) &&
-			$this->repoRescheduleWithLogging($repoId)
+			($newPath = $this->cloneRepoWithLogging($repoId, $url)) &&
+			$this->moveRepoWithLogging($repoId, $oldPath, $newPath) &&
+			$this->scanRepoWithLogging($repoId, $newPath) &&
+			$this->rescheduleRepoWithLogging($repoId)
 		;
 	}
 
-	public function repoCloneWithLogging($repoId, $url)
+	/**
+	 * Tries to clone the specified repo, and logs the success/failure
+	 * 
+	 * @param integer $repoId
+	 * @param string $url
+	 * @return boolean
+	 */
+	public function cloneRepoWithLogging($repoId, $url)
 	{
-		// Try a new clone
 		try
 		{
 			$newPath = $this->doClone($url);
@@ -128,8 +66,15 @@ class GitImporter
 		return $newPath;
 	}
 
-	// @todo Rename $newPath to something more helpful
-	public function repoMoveWithLogging($repoId, $oldPath, $newPath)
+	/**
+	 * Tries to move a repository, and logs the success/failure
+	 * 
+	 * @param integer $repoId
+	 * @param string $oldPath
+	 * @param string $newPath
+	 * @return boolean
+	 */
+	public function moveRepoWithLogging($repoId, $oldPath, $newPath)
 	{
 		try
 		{
@@ -146,14 +91,20 @@ class GitImporter
 		return true;
 	}
 
-	// @todo Rename $newPath to something more helpful
-	public function repoScanWithLogging($repoId, $newPath)
+	/**
+	 * Tries to scan a repository, and logs the success/failure
+	 * 
+	 * @param integer $repoId
+	 * @param string $repoPath
+	 * @return boolean
+	 */
+	public function scanRepoWithLogging($repoId, $repoPath)
 	{
 		$exitEarly = false;
 		try
 		{
 			$this->pdo->beginTransaction();
-			$this->scanRepo($repoId, $newPath);
+			$this->scanRepo($repoId, $repoPath);
 			$this->pdo->commit();
 			$this->repoLog($repoId, self::LOG_TYPE_SCAN);
 		}
@@ -180,7 +131,13 @@ class GitImporter
 		return true;
 	}
 
-	public function repoRescheduleWithLogging($repoId)
+	/**
+	 * Tries to reschedule a repository, with success/failure logging
+	 * 
+	 * @param integer $repoId
+	 * @return boolean
+	 */
+	public function rescheduleRepoWithLogging($repoId)
 	{
 		try
 		{
@@ -201,13 +158,11 @@ class GitImporter
 	/**
 	 * Clones the repo
 	 * 
-	 * @todo Rename to match the logging version
-	 * 
 	 * @param type $url
 	 * @return type
 	 * @throws Exceptions\SeriousException
 	 */
-	public function doClone($url)
+	public function cloneRepo($url)
 	{
 		// Create new checkout path
 		$target = $this->getCheckoutPath($url);
@@ -264,14 +219,12 @@ class GitImporter
 	 * @todo Wouldn't this be better if it deleted the repo referenced in the database?
 	 * We'd then not need the $oldPath parameter at all, presumably.
 	 *  
-	 * @todo Rename to match the logging version
-	 * 
 	 * @param integer $repoId
 	 * @param string $oldPath
 	 * @param string $newPath
 	 * @throws Exceptions\SeriousException
 	 */
-	public function moveRepoLocation($repoId, $oldPath, $newPath)
+	public function moveRepo($repoId, $oldPath, $newPath)
 	{
 		// Update the row with the new location
 		$sql = "
@@ -333,8 +286,6 @@ class GitImporter
 
 	/**
 	 * Scans a folder for JSON reports
-	 * 
-	 * @todo Rename to match the logging version
 	 * 
 	 * @param integer $repoId
 	 * @param string $repoPath
