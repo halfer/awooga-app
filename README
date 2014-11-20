@@ -1,0 +1,19 @@
+Awooga primer
+-------------
+
+To build for the first time:
+
+	cat build/init.sql build/create.sql | mysql -u root -p
+
+Also run this to populate with test data:
+
+	cat build/repositories_local.sql | mysql -u root -p
+
+To delete:
+
+	cat build/destroy.sql | mysql -u root -p
+
+To run an update:
+
+	sudo -u awooga php console/update-repos.php
+
