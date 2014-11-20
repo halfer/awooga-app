@@ -38,8 +38,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	 */
 	protected function buildDatabase(\PDO $pdo)
 	{
-		$this->runSql($pdo, $this->getProjectRoot() . '/test/build/init.sql');
-		$this->runSql($pdo, $this->getProjectRoot() . '/build/create.sql');
+		$this->runSqlFile($pdo, $this->getProjectRoot() . '/test/build/init.sql');
+		$this->runSqlFile($pdo, $this->getProjectRoot() . '/build/create.sql');
 		$repoId = $this->buildRepo($pdo, 1);
 
 		return $repoId;
@@ -64,9 +64,15 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 		return $repoId;
 	}
 
-	protected function runSql(\PDO $pdo, $sqlPath)
+	protected function runSqlFile(\PDO $pdo, $sqlPath)
 	{
 		$sql = file_get_contents($sqlPath);
+
+		return $this->runSql($pdo, $sql);
+	}
+
+	protected function runSql(\PDO $pdo, $sql)
+	{
 		$rows = $pdo->exec($sql);
 
 		if ($rows === false)
