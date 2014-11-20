@@ -69,7 +69,7 @@ class GitImporterHarness extends \Awooga\GitImporter
 	 */
 	public function scanRepo($repoId, $repoPath)
 	{
-		parent::scanRepo($repoId, $repoPath);
+		return parent::scanRepo($repoId, $repoPath);
 	}
 
 	/**
@@ -81,7 +81,8 @@ class GitImporterHarness extends \Awooga\GitImporter
 	public function scanReport($repoId, $reportPath)
 	{
 		$this->reportCount++;
-		parent::scanReport($repoId, $reportPath);
+
+		return parent::scanReport($repoId, $reportPath);
 	}
 
 	public function getReportCount()

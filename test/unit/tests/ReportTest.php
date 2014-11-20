@@ -279,6 +279,13 @@ class ReportTest extends TestCase
 		$report->setAuthorNotifiedDate('18/11/2014');
 	}
 
+	/**
+	 * Saves a report
+	 * 
+	 * @todo Check the report ID comes back okay
+	 * 
+	 * @throws \Exception
+	 */
 	public function testSaveNewReport()
 	{
 		$pdo = $this->getDriver();

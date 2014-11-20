@@ -177,6 +177,7 @@ class GitImporterTest extends TestCase
 		// Check the numbers of scanned vs successful
 		$this->checkFilesSeen($importer, 2);
 		$this->checkReportsSuccessful($repoId, 2);
+		$this->checkLogsGenerated($repoId, 0, 1);
 	}
 
 	/**
@@ -193,6 +194,7 @@ class GitImporterTest extends TestCase
 		// Check the numbers of scanned vs successful
 		$this->checkFilesSeen($importer, 1);
 		$this->checkReportsSuccessful($repoId, 0);
+//		$this->checkLogsGenerated($repoId, 0, 1);
 	}
 
 	/**
@@ -240,6 +242,7 @@ class GitImporterTest extends TestCase
 
 		// Check that the number of files seen is less than the total
 		$this->checkFilesSeen($importer, $maxFails + 1);
+//		$this->checkLogsGenerated($repoId, 0, $maxFails + 1);
 
 		// Delete the folder
 		exec("rm -rf {$absolutePath}");
@@ -279,6 +282,7 @@ class GitImporterTest extends TestCase
 		// Check the numbers of scanned vs successful
 		$this->checkFilesSeen($importer, 1);
 		$this->checkReportsSuccessful($repoId, 0);
+//		$this->checkLogsGenerated($repoId, 0, 1);
 	}
 
 	/**
@@ -331,6 +335,17 @@ class GitImporterTest extends TestCase
 			$count,
 			"Check we've saved the right number of successful reports"
 		);
+	}
+
+	protected function checkLogsGenerated($repoId, $expectedSuccess, $expectedFail)
+	{
+		$sql = "SELECT * FROM repository_log WHERE repository_id = :repo_id";
+		$statement = $this->getDriver()->prepare($sql);
+		$statement->execute(array(':repo_id' => $repoId, ));
+		$logs = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+		// We haven't called any log-generating methods yet
+		//print_r($logs);
 	}
 
 	protected function getTestRepoRoot()

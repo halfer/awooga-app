@@ -92,6 +92,121 @@ class GitImporter
 		return true;
 	}
 
+	/**
+	 * Calls the various parts of an import process
+	 * 
+	 * @param integer $repoId
+	 * @param string $url
+	 * @param string $oldPath
+	 * @return boolean
+	 */
+	public function processRepoNew($repoId, $url, $oldPath)
+	{
+		return
+			($newPath = $this->repoCloneWithLogging($repoId, $url)) &&
+			$this->repoMoveWithLogging($repoId, $oldPath, $newPath) &&
+			$this->repoScanWithLogging($repoId, $newPath) &&
+			$this->repoRescheduleWithLogging($repoId)
+		;
+	}
+
+	public function repoCloneWithLogging($repoId, $url)
+	{
+		// Try a new clone
+		try
+		{
+			$newPath = $this->doClone($url);
+			$this->repoLog($repoId, self::LOG_TYPE_FETCH);
+		}
+		catch (\Exception $e)
+		{
+			$this->repoLog($repoId, self::LOG_TYPE_FETCH, 'Fetch failed', false);
+
+			return false;
+		}
+
+		return $newPath;
+	}
+
+	// @todo Rename $newPath to something more helpful
+	public function repoMoveWithLogging($repoId, $oldPath, $newPath)
+	{
+		try
+		{
+			$this->moveRepoLocation($repoId, $oldPath, $newPath);
+			$this->repoLog($repoId, self::LOG_TYPE_MOVE);
+		}
+		catch (\Exception $e)
+		{
+			$this->repoLog($repoId, self::LOG_TYPE_MOVE, "Move from $oldPath to $newPath failed", false);
+
+			return false;
+		}
+
+		return true;
+	}
+
+	// @todo Rename $newPath to something more helpful
+	public function repoScanWithLogging($repoId, $newPath)
+	{
+		$exitEarly = false;
+		try
+		{
+			$this->pdo->beginTransaction();
+			$this->scanRepo($repoId, $newPath);
+			$this->pdo->commit();
+			$this->repoLog($repoId, self::LOG_TYPE_SCAN);
+		}
+		catch (Exceptions\SeriousException $e)
+		{
+			// We'll already have logged, so no need to do it again
+			$exitEarly = true;
+		}
+		catch (\Exception $e)
+		{
+			// Let's not add these to the public log
+			$this->repoLog($repoId, self::LOG_TYPE_SCAN, "Scanning failure", false);
+
+			$exitEarly = true;
+		}
+
+		// A common handler for exiting early
+		if ($exitEarly)
+		{
+			$this->pdo->rollBack();
+			return false;
+		}
+
+		return true;
+	}
+
+	public function repoRescheduleWithLogging($repoId)
+	{
+		try
+		{
+			$this->rescheduleRepo($repoId);
+			$this->repoLog($repoId, self::LOG_TYPE_RESCHED);
+		}
+		catch (\Exception $e)
+		{
+			// @todo Catch a specific exception for which we can save messages into the public log safely
+			$this->repoLog($repoId, self::LOG_TYPE_RESCHED, "Failed to reschedule repo", false);
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Clones the repo
+	 * 
+	 * @todo Rename to match the logging version
+	 * 
+	 * @param type $url
+	 * @return type
+	 * @throws Exceptions\SeriousException
+	 */
 	public function doClone($url)
 	{
 		// Create new checkout path
@@ -149,6 +264,8 @@ class GitImporter
 	 * @todo Wouldn't this be better if it deleted the repo referenced in the database?
 	 * We'd then not need the $oldPath parameter at all, presumably.
 	 *  
+	 * @todo Rename to match the logging version
+	 * 
 	 * @param integer $repoId
 	 * @param string $oldPath
 	 * @param string $newPath
@@ -217,6 +334,8 @@ class GitImporter
 	/**
 	 * Scans a folder for JSON reports
 	 * 
+	 * @todo Rename to match the logging version
+	 * 
 	 * @param integer $repoId
 	 * @param string $repoPath
 	 * @throws Exception
@@ -230,6 +349,9 @@ class GitImporter
 
 		$this->writeDebug("Finding files in repo:");
 
+		// Keep a log of reports we create/update
+		$reportIds = array();
+
 		try
 		{
 			foreach ($regex as $file)
@@ -237,7 +359,7 @@ class GitImporter
 				$reportPath = $file[0];
 				try
 				{
-					$this->scanReport($repoId, $reportPath);
+					$reportIds[] = $this->scanReport($repoId, $reportPath);
 					$this->writeDebug("\tFound report ..." . substr($reportPath, -80));
 				}
 				catch (Exceptions\TrivialException $e)
@@ -262,6 +384,8 @@ class GitImporter
 			// Rethrow for benefit of caller
 			throw $e;
 		}
+
+		return $reportIds;
 	}
 
 	/**
@@ -315,11 +439,13 @@ class GitImporter
 				$report->setDescription($description);
 				$report->setIssues($issues);
 				$report->setAuthorNotifiedDate($notifiedDate);
-				$report->save();
+				$reportId = $report->save();
 				break;
 			default:
 				throw new Exceptions\TrivialException("Unrecognised version number");
 		}
+
+		return $reportId;
 	}
 
 	/**
@@ -390,6 +516,7 @@ class GitImporter
 	 * 
 	 * @param integer $repoId
 	 */
+	// @todo Rename
 	protected function rescheduleRepo($repoId)
 	{
 		$sql = "

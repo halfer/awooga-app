@@ -236,6 +236,8 @@ class Report
 		// (Re)insert issues and URLs
 		$this->insertIssues($reportId);
 		$this->insertUrls($reportId);
+
+		return $reportId;
 	}
 
 	/**
