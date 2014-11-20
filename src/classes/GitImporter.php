@@ -110,12 +110,13 @@ class GitImporter
 	 */
 	public function scanRepoWithLogging($repoId, $repoPath)
 	{
+		$pdo = $this->getDriver();
 		$exitEarly = false;
 		try
 		{
-			$this->pdo->beginTransaction();
+			$pdo->beginTransaction();
 			$this->scanRepo($repoId, $repoPath);
-			$this->pdo->commit();
+			$pdo->commit();
 			$this->repoLog($repoId, self::LOG_TYPE_SCAN);
 		}
 		catch (Exceptions\SeriousException $e)
@@ -134,7 +135,7 @@ class GitImporter
 		// A common handler for exiting early
 		if ($exitEarly)
 		{
-			$this->pdo->rollBack();
+			$pdo->rollBack();
 			return false;
 		}
 
@@ -240,7 +241,7 @@ class GitImporter
 		$sql = "
 			UPDATE repository SET mount_path = :path WHERE id = :id
 		";
-		$statement = $this->pdo->prepare($sql);
+		$statement = $this->getDriver()->prepare($sql);
 		$ok = $statement->execute(array(':path' => $newPath, ':id' => $repoId, ));
 
 		// Let's bork if the query failed
@@ -425,7 +426,7 @@ class GitImporter
 				AND is_success = false
 				AND created_at > (DATE_SUB(CURDATE(), INTERVAL 4 HOUR))
 		";
-		$statement = $this->pdo->prepare($sql);
+		$statement = $this->getDriver()->prepare($sql);
 		$ok = $statement->execute(array(':repo_id' => $repoId, ));
 
 		if ($statement->fetchColumn() > self::MAX_FAILS_BEFORE_DISABLE)
@@ -448,7 +449,7 @@ class GitImporter
 			SET is_enabled = false
 				WHERE id = :repo_id
 		";
-		$statement = $this->pdo->prepare($sql);
+		$statement = $this->getDriver()->prepare($sql);
 		$ok = $statement->execute(array(':repo_id' => $repoId, ));
 		if (!$ok)
 		{
@@ -485,7 +486,7 @@ class GitImporter
 				SET due_at = NOW() + INTERVAL 4 HOUR
 				WHERE id = :repo_id
 		";
-		$statement = $this->pdo->prepare($sql);
+		$statement = $this->getDriver()->prepare($sql);
 		$ok = $statement->execute(array(':repo_id' => $repoId, ));
 
 		return $ok;
@@ -511,7 +512,7 @@ class GitImporter
 			VALUES
 			(:repository_id, :log_type, :message, NOW(), :is_success)
 		";
-		$statement = $this->pdo->prepare($sql);
+		$statement = $this->getDriver()->prepare($sql);
 		$ok = $statement->execute(
 			array(
 				':repository_id' => $repoId, ':log_type' => $logType,
@@ -535,8 +536,16 @@ class GitImporter
 		}
 	}
 
+	/**
+	 * Gets the database driver, throwing an exception if it is not set
+	 */
 	protected function getDriver()
 	{
-		// Needs to bork if a driver has not been supplied
+		if (!$this->pdo)
+		{
+			throw new \Exception("No database driver has been set");
+		}
+
+		return $this->pdo;
 	}
 }

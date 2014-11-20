@@ -311,6 +311,14 @@ class GitImporterTest extends TestCase
 	}
 
 	/**
+	 * Checks that a serious exception rolls back changes in scanRepoWithLogging
+	 */
+	public function testRollbackOnSeriousException()
+	{
+		
+	}
+
+	/**
 	 * Check that a repo may not contain two reports that refer to the same URL
 	 */
 	public function testFailOnDuplicateReportUrlsInRepo()
