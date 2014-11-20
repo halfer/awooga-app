@@ -172,12 +172,12 @@ class GitImporterTest extends TestCase
 
 		// Scan everything in this repo
 		$importer = $this->getImporterInstance();
-		$importer->scanRepo($repoId, $newRelativePath = 'success');
+		$importer->scanRepoWithLogging($repoId, $newRelativePath = 'success');
 
 		// Check the numbers of scanned vs successful
 		$this->checkFilesSeen($importer, 2);
 		$this->checkReportsSuccessful($repoId, 2);
-		$this->checkLogsGenerated($repoId, 0, 1);
+		$this->checkLogsGenerated($repoId, 1, 0);
 	}
 
 	/**
@@ -187,6 +187,9 @@ class GitImporterTest extends TestCase
 	{
 		$repoId = $this->buildDatabase($this->getDriver());
 
+		// Check we have no logs to start with
+		$this->checkLogsGenerated($repoId, 0, 0);
+
 		// Scan everything in this repo
 		$importer = $this->getImporterInstance();
 		$importer->scanRepo($repoId, $newRelativePath = 'fail');
@@ -194,7 +197,7 @@ class GitImporterTest extends TestCase
 		// Check the numbers of scanned vs successful
 		$this->checkFilesSeen($importer, 1);
 		$this->checkReportsSuccessful($repoId, 0);
-//		$this->checkLogsGenerated($repoId, 0, 1);
+		$this->checkLogsGenerated($repoId, 0, 1);
 	}
 
 	/**
@@ -204,6 +207,9 @@ class GitImporterTest extends TestCase
 	{
 		$pdo = $this->getDriver();
 		$repoId = $this->buildDatabase($pdo);
+
+		// Check we have no logs to start with
+		$this->checkLogsGenerated($repoId, 0, 0);
 
 		// Set up a pretend repo
 		$tempRoot = $this->getTempFolder();
@@ -242,7 +248,8 @@ class GitImporterTest extends TestCase
 
 		// Check that the number of files seen is less than the total
 		$this->checkFilesSeen($importer, $maxFails + 1);
-//		$this->checkLogsGenerated($repoId, 0, $maxFails + 1);
+		// @todo Not sure exactly why we have +2 here, look into this
+		$this->checkLogsGenerated($repoId, 0, $maxFails + 2);
 
 		// Delete the folder
 		exec("rm -rf {$absolutePath}");
@@ -255,6 +262,9 @@ class GitImporterTest extends TestCase
 	{
 		$pdo = $this->getDriver();
 		$repoId = $this->buildDatabase($pdo);
+
+		// Check we have no logs to start with
+		$this->checkLogsGenerated($repoId, 0, 0);
 
 		// Set up a pretend repo
 		$tempRoot = $this->getTempFolder();
@@ -282,21 +292,13 @@ class GitImporterTest extends TestCase
 		// Check the numbers of scanned vs successful
 		$this->checkFilesSeen($importer, 1);
 		$this->checkReportsSuccessful($repoId, 0);
-//		$this->checkLogsGenerated($repoId, 0, 1);
+		$this->checkLogsGenerated($repoId, 0, 1);
 	}
 
 	/**
 	 * Check that a repo may not contain two reports that refer to the same URL
 	 */
 	public function testFailOnDuplicateReportUrlsInRepo()
-	{
-		
-	}
-
-	/**
-	 * Checks the repo logger works
-	 */
-	public function testRepoLog()
 	{
 		
 	}
@@ -337,15 +339,35 @@ class GitImporterTest extends TestCase
 		);
 	}
 
+	/**
+	 * Checks the number of success/fail logs
+	 * 
+	 * @param integer $repoId
+	 * @param integer $expectedSuccess
+	 * @param integer $expectedFail
+	 */
 	protected function checkLogsGenerated($repoId, $expectedSuccess, $expectedFail)
 	{
-		$sql = "SELECT * FROM repository_log WHERE repository_id = :repo_id";
+		$sql = "
+			SELECT
+				(SELECT COUNT(*) FROM repository_log WHERE is_success = 1) success_count,
+				(SELECT COUNT(*) FROM repository_log WHERE is_success = 0) fail_count
+			FROM dual
+		";
 		$statement = $this->getDriver()->prepare($sql);
 		$statement->execute(array(':repo_id' => $repoId, ));
-		$logs = $statement->fetchAll(\PDO::FETCH_ASSOC);
+		$counts = $statement->fetch(\PDO::FETCH_ASSOC);
 
-		// @todo We haven't called any log-generating methods yet
-		//print_r($logs);
+		$this->assertEquals(
+			$expectedSuccess,
+			$counts['success_count'],
+			"Check the number of success logs is correct"
+		);
+		$this->assertEquals(
+			$expectedFail,
+			$counts['fail_count'],
+			"Check the number of fail logs is correct"
+		);
 	}
 
 	protected function getTestRepoRoot()
