@@ -248,7 +248,8 @@ class GitImporterTest extends TestCase
 
 		// Check that the number of files seen is less than the total
 		$this->checkFilesSeen($importer, $maxFails + 1);
-		// @todo Not sure exactly why we have +2 here, look into this
+
+		// The extra row is the extra item to explain the repo has been disabled
 		$this->checkLogsGenerated($repoId, 0, $maxFails + 2);
 
 		// Delete the folder
