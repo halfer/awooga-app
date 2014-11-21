@@ -63,7 +63,7 @@ class GitImporter
 	{
 		try
 		{
-			$newPath = $this->doClone($url);
+			$newPath = $this->cloneRepo($url);
 			$this->repoLog($repoId, self::LOG_TYPE_FETCH);
 		}
 		catch (\Exception $e)
@@ -169,8 +169,8 @@ class GitImporter
 	/**
 	 * Clones the repo
 	 * 
-	 * @param type $url
-	 * @return type
+	 * @param string $url
+	 * @return string
 	 * @throws Exceptions\SeriousException
 	 */
 	public function cloneRepo($url)
