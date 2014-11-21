@@ -18,20 +18,15 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	/**
 	 * Gets a PDO driver
 	 * 
+	 * @todo Pull this from env config
+	 * 
 	 * @return \PDO
 	 */
 	protected function getDriver($selectDatabase = true)
 	{
 		// Connect to the database
-		// @todo Pull this from env config
-		if ($selectDatabase)
-		{
-			$dsn = 'mysql:dbname=awooga_test;host=localhost;username=awooga_user_test;password=password';
-		}
-		else
-		{
-			$dsn = 'mysql:host=localhost;username=awooga_user_test;password=password';			
-		}
+		$database = $selectDatabase ? 'dbname=awooga_test;' : '';
+		$dsn = "mysql:{$database}host=localhost;username=awooga_user_test;password=password";
 		$pdo = new \PDO($dsn, 'awooga_user_test', 'password');
 
 		return $pdo;

@@ -36,6 +36,10 @@ class GitImporter
 	/**
 	 * Calls the various parts of an import process
 	 * 
+	 * I need to think about how to reschedule on failure (presumably I don't want to retry
+	 * straight away?). Also if there is a large number of failures, let's disable the repo,
+	 * like in the scanRepo method.
+	 * 
 	 * @param integer $repoId
 	 * @param string $url
 	 * @param string $oldPath
@@ -334,7 +338,7 @@ class GitImporter
 					$this->repoLog($repoId, self::LOG_TYPE_SCAN, $e->getMessage(), false);
 					$this->doesErrorCountRequireHalting($repoId);
 				}
-				// For serious/other exceptions, rethrow
+				// For serious/other exceptions, rethrow to outer catch
 				catch (\Exception $e)
 				{
 					throw $e;
@@ -416,6 +420,8 @@ class GitImporter
 
 	/**
 	 * Bomb out if there's been too many errors recently
+	 * 
+	 * @todo Rather than the 4 hour window, use a run table for this
 	 * 
 	 * @param integer $repoId
 	 */
