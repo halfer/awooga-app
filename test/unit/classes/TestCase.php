@@ -91,12 +91,12 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 		}
 	}
 
-	public function fetchResults(\PDO $pdo, $sql, array $params)
+	public function fetchResults(\PDO $pdo, $sql, array $params = array())
 	{
 		return $this->runStatement($pdo, $sql, $params)->fetchAll(\PDO::FETCH_ASSOC);
 	}
 
-	public function fetchColumn(\PDO $pdo, $sql, array $params)
+	public function fetchColumn(\PDO $pdo, $sql, array $params = array())
 	{
 		return $this->runStatement($pdo, $sql, $params)->fetchColumn();		
 	}

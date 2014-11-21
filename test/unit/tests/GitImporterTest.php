@@ -373,6 +373,43 @@ class GitImporterTest extends TestCase
 		}
 	}
 
+	/**
+	 * Try an end to end test
+	 */
+	public function testEndToEnd()
+	{
+		// Set up repository and importer
+		$repoId = $this->buildDatabase($this->getDriver(false));
+		$pdo = $this->getDriver();
+		$importer = $this->getImporterInstance($pdo);
+
+		// This (plus the harness) means we don't actually do a file move (hmm, should we?)
+		$importer->setCheckoutPath($relativePath = 'success');
+
+		$importer->processRepo($repoId, 'http://example.com', '/dummy/old/path');
+		
+		$this->assertEquals(
+			2,
+			$this->fetchColumn($pdo, "SELECT COUNT(*) FROM report"),
+			"Check the number of reports is correct"
+		);
+		$this->assertEquals(
+			2,
+			$this->fetchColumn($pdo, "SELECT COUNT(*) FROM report_issue"),
+			"Check the number of issues is correct"
+		);
+		$this->assertEquals(
+			2,
+			$this->fetchColumn($pdo, "SELECT COUNT(*) FROM resource_url"),
+			"Check the number of URLs is correct"
+		);
+		$this->assertEquals(
+			4,
+			$this->fetchColumn($pdo, "SELECT COUNT(*) FROM repository_log"),
+			"Check the number of logs is correct"
+		);
+	}
+
 	protected function createTempRepoFolder()
 	{
 		$relativePath = $this->randomLeafname();

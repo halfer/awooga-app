@@ -88,7 +88,7 @@ class GitImporter
 	{
 		try
 		{
-			$this->moveRepoLocation($repoId, $oldPath, $newPath);
+			$this->moveRepo($repoId, $oldPath, $newPath);
 			$this->repoLog($repoId, self::LOG_TYPE_MOVE);
 		}
 		catch (\Exception $e)
@@ -229,7 +229,7 @@ class GitImporter
 	/**
 	 * Updates the location and deletes the old one if necessary
 	 *
-	 * @todo Wouldn't this be better if it deleted the repo referenced in the database?
+	 * @todo This would be better if it deleted the repo referenced in the database.
 	 * We'd then not need the $oldPath parameter at all, presumably.
 	 *  
 	 * @todo Does this need to be public?
