@@ -492,6 +492,17 @@ class GitImporter
 		return $ok;
 	}
 
+	/**
+	 * Logs a message against a repo
+	 * 
+	 * Does this need to be public?
+	 * 
+	 * @param integer $repoId
+	 * @param string $logType
+	 * @param string $message
+	 * @param boolean $isSuccess
+	 * @throws \Exception
+	 */
 	public function repoLog($repoId, $logType, $message = null, $isSuccess = true)
 	{
 		// Check the type is OK

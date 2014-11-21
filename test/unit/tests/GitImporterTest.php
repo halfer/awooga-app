@@ -298,6 +298,8 @@ class GitImporterTest extends TestCase
 
 	/**
 	 * Checks that a serious exception rolls back changes in scanRepoWithLogging
+	 * 
+	 * (This feature is not currently supported by the importer)
 	 */
 	public function testRollbackOnSeriousException()
 	{
@@ -310,6 +312,46 @@ class GitImporterTest extends TestCase
 	public function testFailOnDuplicateReportUrlsInRepo()
 	{
 		
+	}
+
+	public function testRescheduleRepo()
+	{
+		
+	}
+
+	/**
+	 * Checks the logging system seems to be working
+	 */
+	public function testLogMessage()
+	{
+		$repoId = $this->buildDatabase($this->getDriver(false));
+
+		// Check we have no logs to start with
+		$this->checkLogsGenerated($repoId, 0, 0);
+
+		$importer = $this->getImporterInstance($this->getDriver());
+
+		// Make success and fail logs of each type
+		$makeLogs = array(
+			\Awooga\GitImporter::LOG_TYPE_FETCH,
+			\Awooga\GitImporter::LOG_TYPE_MOVE,
+			\Awooga\GitImporter::LOG_TYPE_SCAN,
+			\Awooga\GitImporter::LOG_TYPE_RESCHED,
+		);
+		foreach ($makeLogs as $logType)
+		{
+			$importer->repoLog($repoId, $logType);
+			$importer->repoLog($repoId, $logType, null, false);
+		}
+
+		// Check they generated OK
+		foreach ($this->getLogs($repoId) as $ord => $actualLog)
+		{
+			$expectedType = $makeLogs[$ord / 2];
+			$expectedSuccess = !($ord % 2);
+			$this->assertEquals($expectedType, $actualLog['log_type']);
+			$this->assertEquals($expectedSuccess, (boolean) $actualLog['is_success']);
+		}
 	}
 
 	protected function createTempRepoFolder()
@@ -377,6 +419,21 @@ class GitImporterTest extends TestCase
 			$counts['fail_count'],
 			"Check the number of fail logs is correct"
 		);
+	}
+
+	protected function getLogs($repoId)
+	{
+		$sql = "
+			SELECT *
+			FROM repository_log
+			WHERE repository_id = :repo_id
+			ORDER BY id
+		";
+		$statement = $this->getDriver()->prepare($sql);
+		$statement->execute(array(':repo_id' => $repoId, ));
+		$logs = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+		return $logs;
 	}
 
 	protected function getTestRepoRoot()
