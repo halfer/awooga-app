@@ -62,7 +62,7 @@ class GitImporterHarness extends \Awooga\GitImporter
 	}
 
 	/**
-	 * A public entry point for this method
+	 * A public entry point for the scan method
 	 * 
 	 * @param integer $repoId
 	 * @param string $repoPath
@@ -88,6 +88,17 @@ class GitImporterHarness extends \Awooga\GitImporter
 	public function getReportCount()
 	{
 		return $this->reportCount;
+	}
+
+	/**
+	 * A public entry point for the reschedule method
+	 * 
+	 * @param integer $repoId
+	 * @return type
+	 */
+	public function rescheduleRepo($repoId)
+	{
+		return parent::rescheduleRepo($repoId);
 	}
 
 	/**

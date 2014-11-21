@@ -314,9 +314,28 @@ class GitImporterTest extends TestCase
 		
 	}
 
+	/**
+	 * Checks the rescheduler works
+	 */
 	public function testRescheduleRepo()
-	{
-		
+	{		
+		$repoId = $this->buildDatabase($this->getDriver(false));
+		$pdo = $this->getDriver();
+		$importer = $this->getImporterInstance($pdo);
+
+		// Check the due time is empty to start with
+		$sql = "SELECT due_at FROM repository WHERE id = :repo_id";
+		$this->assertNull(
+			$this->fetchColumn($pdo, $sql, array(':repo_id' => $repoId, )),
+			"Check the due time is empty"
+		);
+
+		$importer->rescheduleRepo($repoId);
+
+		$this->assertNotNull(
+			$this->fetchColumn($pdo, $sql, array(':repo_id' => $repoId, )),
+			"Check the due time is not empty"
+		);
 	}
 
 	/**

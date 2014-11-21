@@ -169,6 +169,8 @@ class GitImporter
 	/**
 	 * Clones the repo
 	 * 
+	 * @todo Does this need to be public?
+	 * 
 	 * @param string $url
 	 * @return string
 	 * @throws Exceptions\SeriousException
@@ -230,6 +232,8 @@ class GitImporter
 	 * @todo Wouldn't this be better if it deleted the repo referenced in the database?
 	 * We'd then not need the $oldPath parameter at all, presumably.
 	 *  
+	 * @todo Does this need to be public?
+	 * 
 	 * @param integer $repoId
 	 * @param string $oldPath
 	 * @param string $newPath
@@ -478,7 +482,6 @@ class GitImporter
 	 * 
 	 * @param integer $repoId
 	 */
-	// @todo Rename
 	protected function rescheduleRepo($repoId)
 	{
 		$sql = "
@@ -495,7 +498,7 @@ class GitImporter
 	/**
 	 * Logs a message against a repo
 	 * 
-	 * Does this need to be public?
+	 * @todo Does this need to be public?
 	 * 
 	 * @param integer $repoId
 	 * @param string $logType
