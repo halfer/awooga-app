@@ -44,10 +44,15 @@ class GitImporterTest extends TestCase
 	 */
 	protected function getImporterInstance(\PDO $pdo = null, $repoRoot = null)
 	{
-		return new GitImporterHarness(
-			is_null($repoRoot) ? $this->getTestRepoRoot() : $repoRoot,
-			$pdo
+		$importer = new GitImporterHarness(
+			is_null($repoRoot) ? $this->getTestRepoRoot() : $repoRoot
 		);
+		if ($pdo)
+		{
+			$importer->setDriver($pdo);
+		}
+
+		return $importer;
 	}
 
 	/**

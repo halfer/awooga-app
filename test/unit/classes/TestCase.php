@@ -10,6 +10,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	public function setUp()
 	{
 		$root = $this->getProjectRoot();
+		require_once $root . '/src/classes/Database.php';
 		require_once $root . '/src/classes/Report.php';
 		require_once $root . '/src/classes/Exceptions/SeriousException.php';
 		require_once $root . '/src/classes/Exceptions/TrivialException.php';		

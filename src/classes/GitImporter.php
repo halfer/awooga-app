@@ -12,24 +12,21 @@ class GitImporter
 	const MAX_FAILS_BEFORE_DISABLE = 5;
 	const MAX_REPORT_SIZE = 60000;
 
-	protected $pdo;
 	protected $repoRoot;
 	protected $debug;
 
+	use Database;
+
 	/**
 	 * Constructs an importer object
-	 * 
-	 * I've made the PDO instance optional as it makes for easier testing. However, to use this
-	 * end to end, a valid connection to a database will need to be supplied.
 	 * 
 	 * @param string $repoRoot
 	 * @param \PDO $pdo
 	 * @param boolean $debug
 	 */
-	public function __construct($repoRoot, \PDO $pdo = null, $debug = false)
+	public function __construct($repoRoot, $debug = false)
 	{
 		$this->repoRoot = $repoRoot;
-		$this->pdo = $pdo;
 		$this->debug = $debug;
 	}
 
@@ -567,18 +564,5 @@ class GitImporter
 		{
 			echo $message . "\n";
 		}
-	}
-
-	/**
-	 * Gets the database driver, throwing an exception if it is not set
-	 */
-	protected function getDriver()
-	{
-		if (!$this->pdo)
-		{
-			throw new \Exception("No database driver has been set");
-		}
-
-		return $this->pdo;
 	}
 }
