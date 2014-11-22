@@ -9,6 +9,10 @@ class GitImporter
 	const LOG_TYPE_SCAN = 'scan';
 	const LOG_TYPE_RESCHED = 'resched';
 
+	const LOG_LEVEL_SUCCESS = 'success';
+	const LOG_LEVEL_ERROR_TRIVIAL = 'trivial';
+	const LOG_LEVEL_ERROR_SERIOUS = 'serious';
+
 	const MAX_FAILS_BEFORE_DISABLE = 5;
 	const MAX_REPORT_SIZE = 60000;
 
@@ -77,7 +81,12 @@ class GitImporter
 		}
 		catch (\Exception $e)
 		{
-			$this->repoLog($repoId, self::LOG_TYPE_FETCH, 'Fetch failed', false);
+			$this->repoLog(
+				$repoId,
+				self::LOG_TYPE_FETCH,
+				'Fetch failed',
+				self::LOG_LEVEL_ERROR_SERIOUS
+			);
 
 			return false;
 		}
@@ -102,7 +111,12 @@ class GitImporter
 		}
 		catch (\Exception $e)
 		{
-			$this->repoLog($repoId, self::LOG_TYPE_MOVE, "Move from $oldPath to $newPath failed", false);
+			$this->repoLog(
+				$repoId,
+				self::LOG_TYPE_MOVE,
+				"Move from $oldPath to $newPath failed",
+				self::LOG_LEVEL_ERROR_SERIOUS
+			);
 
 			return false;
 		}
@@ -136,7 +150,12 @@ class GitImporter
 		catch (\Exception $e)
 		{
 			// Let's not add these to the public log
-			$this->repoLog($repoId, self::LOG_TYPE_SCAN, "Scanning failure", false);
+			$this->repoLog(
+				$repoId,
+				self::LOG_TYPE_SCAN,
+				"Scanning failure",
+				self::LOG_LEVEL_ERROR_SERIOUS
+			);
 
 			$exitEarly = true;
 		}
@@ -171,7 +190,12 @@ class GitImporter
 		catch (\Exception $e)
 		{
 			// @todo Catch a specific exception for which we can save messages into the public log safely
-			$this->repoLog($repoId, self::LOG_TYPE_RESCHED, "Failed to reschedule repo", false);
+			$this->repoLog(
+				$repoId,
+				self::LOG_TYPE_RESCHED,
+				"Failed to reschedule repo",
+				self::LOG_LEVEL_ERROR_SERIOUS
+			);
 
 			return false;
 		}
@@ -352,7 +376,7 @@ class GitImporter
 				catch (Exceptions\TrivialException $e)
 				{
 					// Counting trivial exceptions still contributes to failure/stop limit
-					$this->repoLog($repoId, self::LOG_TYPE_SCAN, $e->getMessage(), false);
+					$this->repoLog($repoId, self::LOG_TYPE_SCAN, $e->getMessage(), self::LOG_LEVEL_ERROR_TRIVIAL);
 					$this->doesErrorCountRequireHalting($repoId);
 				}
 				// For serious/other exceptions, rethrow to outer catch
@@ -365,7 +389,7 @@ class GitImporter
 		catch (Exceptions\SeriousException $e)
 		{
 			// These errors are always OK to save directly into the log
-			$this->repoLog($repoId, self::LOG_TYPE_SCAN, $e->getMessage(), false);
+			$this->repoLog($repoId, self::LOG_TYPE_SCAN, $e->getMessage(), self::LOG_LEVEL_ERROR_SERIOUS);
 			$this->disableRepo($repoId);
 
 			// Rethrow for benefit of caller
@@ -450,11 +474,22 @@ class GitImporter
 			FROM repository_log
 			WHERE
 				repository_id = :repo_id
-				AND is_success = false
+				AND log_level = :level_trivial
 				AND created_at > (DATE_SUB(CURDATE(), INTERVAL 4 HOUR))
 		";
 		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute(array(':repo_id' => $repoId, ));
+		$ok = $statement->execute(
+			array(
+				':repo_id' => $repoId,
+				':level_trivial' => self::LOG_LEVEL_ERROR_TRIVIAL,
+			)
+		);
+
+		// Make sure the query went ok
+		if (!$ok)
+		{
+			throw new \Exception('Query to count trivial errors did not run');
+		}
 
 		if ($statement->fetchColumn() > self::MAX_FAILS_BEFORE_DISABLE)
 		{
@@ -571,10 +606,10 @@ class GitImporter
 	 * @param integer $repoId
 	 * @param string $logType
 	 * @param string $message
-	 * @param boolean $isSuccess
+	 * @param string $logLevel
 	 * @throws \Exception
 	 */
-	public function repoLog($repoId, $logType, $message = null, $isSuccess = true)
+	public function repoLog($repoId, $logType, $message = null, $logLevel = self::LOG_LEVEL_SUCCESS)
 	{
 		// Check the type is OK
 		$allowedTypes = array(
@@ -590,15 +625,15 @@ class GitImporter
 
 		$sql = "
 			INSERT INTO repository_log
-			(repository_id, run_id, log_type, message, created_at, is_success)
+			(repository_id, run_id, log_type, message, created_at, log_level)
 			VALUES
-			(:repository_id, :run_id, :log_type, :message, NOW(), :is_success)
+			(:repository_id, :run_id, :log_type, :message, NOW(), :log_level)
 		";
 		$statement = $this->getDriver()->prepare($sql);
 		$ok = $statement->execute(
 			array(
 				':repository_id' => $repoId, ':run_id' => $this->runId,
-				':log_type' => $logType, ':message' => $message, ':is_success' => $isSuccess,
+				':log_type' => $logType, ':message' => $message, ':log_level' => $logLevel,
 			)
 		);
 		if (!$ok)
@@ -606,7 +641,7 @@ class GitImporter
 			throw new \Exception('Adding a log message seems to have failed');
 		}
 
-		$successType = $isSuccess ? 'success' : 'failure';
+		$successType = ($logLevel == self::LOG_LEVEL_SUCCESS) ? 'success' : 'failure';
 		$this->writeDebug("Adding {$successType} log message for '{$logType}' op");
 	}
 

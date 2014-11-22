@@ -198,7 +198,7 @@ class GitImporterTest extends TestCase
 		// Check the numbers of scanned vs successful
 		$this->checkFilesSeen($importer, 2);
 		$this->checkReportsSuccessful($repoId, 2);
-		$this->checkLogsGenerated($repoId, 1, 0);
+		$this->checkLogsGenerated(1, 0, 0);
 	}
 
 	/**
@@ -209,7 +209,7 @@ class GitImporterTest extends TestCase
 		$repoId = $this->buildDatabase($this->getDriver(false));
 
 		// Check we have no logs to start with
-		$this->checkLogsGenerated($repoId, 0, 0);
+		$this->checkLogsGenerated(0, 0, 0);
 
 		// Scan everything in this repo
 		$importer = $this->getImporterInstance($this->getDriver());
@@ -218,7 +218,7 @@ class GitImporterTest extends TestCase
 		// Check the numbers of scanned vs successful
 		$this->checkFilesSeen($importer, 1);
 		$this->checkReportsSuccessful($repoId, 0);
-		$this->checkLogsGenerated($repoId, 0, 1);
+		$this->checkLogsGenerated(0, 0, 1);
 	}
 
 	/**
@@ -229,7 +229,7 @@ class GitImporterTest extends TestCase
 		$repoId = $this->buildDatabase($this->getDriver(false));
 
 		// Check we have no logs to start with
-		$this->checkLogsGenerated($repoId, 0, 0);
+		$this->checkLogsGenerated(0, 0, 0);
 
 		// Set up a pretend repo
 		$tempRoot = $this->getTempFolder();
@@ -271,7 +271,7 @@ class GitImporterTest extends TestCase
 		$this->checkFilesSeen($importer, $maxFails + 1);
 
 		// The extra row is the extra item to explain the repo has been disabled
-		$this->checkLogsGenerated($repoId, 0, $maxFails + 2);
+		$this->checkLogsGenerated(0, 1, $maxFails + 1);
 
 		// Delete the folder
 		exec("rm -rf {$absolutePath}");
@@ -285,7 +285,7 @@ class GitImporterTest extends TestCase
 		$repoId = $this->buildDatabase($this->getDriver(false));
 
 		// Check we have no logs to start with
-		$this->checkLogsGenerated($repoId, 0, 0);
+		$this->checkLogsGenerated(0, 0, 0);
 
 		// Set up a pretend repo
 		$tempRoot = $this->getTempFolder();
@@ -313,7 +313,7 @@ class GitImporterTest extends TestCase
 		// Check the numbers of scanned vs successful
 		$this->checkFilesSeen($importer, 1);
 		$this->checkReportsSuccessful($repoId, 0);
-		$this->checkLogsGenerated($repoId, 0, 1);
+		$this->checkLogsGenerated(0, 0, 1);
 	}
 
 	/**
@@ -366,11 +366,18 @@ class GitImporterTest extends TestCase
 		$repoId = $this->buildDatabase($this->getDriver(false));
 
 		// Check we have no logs to start with
-		$this->checkLogsGenerated($repoId, 0, 0);
+		$this->checkLogsGenerated(0, 0, 0);
 
 		$importer = $this->getImporterInstance($this->getDriver());
 
-		// Make success and fail logs of each type
+		// These are the log levels we will test
+		$logLevels = array(
+			\Awooga\GitImporter::LOG_LEVEL_SUCCESS,
+			\Awooga\GitImporter::LOG_LEVEL_ERROR_TRIVIAL,
+			\Awooga\GitImporter::LOG_LEVEL_ERROR_SERIOUS
+		);
+
+		// Make success/trivial/serious logs of each type
 		$makeLogs = array(
 			\Awooga\GitImporter::LOG_TYPE_FETCH,
 			\Awooga\GitImporter::LOG_TYPE_MOVE,
@@ -380,16 +387,17 @@ class GitImporterTest extends TestCase
 		foreach ($makeLogs as $logType)
 		{
 			$importer->repoLog($repoId, $logType);
-			$importer->repoLog($repoId, $logType, null, false);
+			$importer->repoLog($repoId, $logType, null, $logLevels[1]);
+			$importer->repoLog($repoId, $logType, null, $logLevels[2]);
 		}
 
 		// Check they generated OK
 		foreach ($this->getLogs($repoId) as $ord => $actualLog)
 		{
-			$expectedType = $makeLogs[$ord / 2];
-			$expectedSuccess = !($ord % 2);
+			$expectedType = $makeLogs[$ord / 3];
+			$expectedLevel = $logLevels[$ord % 3];
 			$this->assertEquals($expectedType, $actualLog['log_type']);
-			$this->assertEquals($expectedSuccess, (boolean) $actualLog['is_success']);
+			$this->assertEquals($expectedLevel, $actualLog['log_level']);
 		}
 	}
 
@@ -443,7 +451,7 @@ class GitImporterTest extends TestCase
 		// Check that the rescheduling increases with each failure
 		$importer->makeGitFail();
 		$importer->processRepo($repoId, 'http://example.com', '/dummy/old/path');
-		$this->checkLogsGenerated($repoId, 1, 1);
+		$this->checkLogsGenerated(1, 1, 0);
 
 		/*
 		$sql = "SELECT * FROM repository WHERE id = 1";
@@ -493,22 +501,23 @@ class GitImporterTest extends TestCase
 	}
 
 	/**
-	 * Checks the number of success/fail logs
+	 * Checks the number of logs at different levels
 	 * 
-	 * @param integer $repoId
 	 * @param integer $expectedSuccess
-	 * @param integer $expectedFail
+	 * @param integer $expectedSerious
+	 * @param integer $expectedTrivial
 	 */
-	protected function checkLogsGenerated($repoId, $expectedSuccess, $expectedFail)
+	protected function checkLogsGenerated($expectedSuccess, $expectedSerious, $expectedTrivial)
 	{
 		$sql = "
 			SELECT
-				(SELECT COUNT(*) FROM repository_log WHERE is_success = 1) success_count,
-				(SELECT COUNT(*) FROM repository_log WHERE is_success = 0) fail_count
+				(SELECT COUNT(*) FROM repository_log WHERE log_level = 'success') success_count,
+				(SELECT COUNT(*) FROM repository_log WHERE log_level = 'serious') serious_count,
+				(SELECT COUNT(*) FROM repository_log WHERE log_level = 'trivial') trivial_count
 			FROM dual
 		";
 		$statement = $this->getDriver()->prepare($sql);
-		$statement->execute(array(':repo_id' => $repoId, ));
+		$statement->execute();
 		$counts = $statement->fetch(\PDO::FETCH_ASSOC);
 
 		$this->assertEquals(
@@ -517,8 +526,13 @@ class GitImporterTest extends TestCase
 			"Check the number of success logs is correct"
 		);
 		$this->assertEquals(
-			$expectedFail,
-			$counts['fail_count'],
+			$expectedSerious,
+			$counts['serious_count'],
+			"Check the number of fail logs is correct"
+		);
+		$this->assertEquals(
+			$expectedTrivial,
+			$counts['trivial_count'],
 			"Check the number of fail logs is correct"
 		);
 	}

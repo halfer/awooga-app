@@ -70,7 +70,7 @@ CREATE TABLE repository_log (
 	/* Successful ops probably don't need a log */
 	message VARCHAR(256),
 	created_at DATETIME NOT NULL,
-	is_success BOOLEAN NOT NULL,
+	log_level ENUM ('success', 'trivial', 'serious') NOT NULL,
 
 	CONSTRAINT repository_log_repo FOREIGN KEY (repository_id) REFERENCES repository (id)
 );
