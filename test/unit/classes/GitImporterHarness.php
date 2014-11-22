@@ -94,11 +94,12 @@ class GitImporterHarness extends \Awooga\GitImporter
 	 * A public entry point for the reschedule method
 	 * 
 	 * @param integer $repoId
+	 * @param boolean $wasSuccessful
 	 * @return type
 	 */
-	public function rescheduleRepo($repoId)
+	public function rescheduleRepo($repoId, $wasSuccessful)
 	{
-		return parent::rescheduleRepo($repoId);
+		return parent::rescheduleRepo($repoId, $wasSuccessful);
 	}
 
 	/**

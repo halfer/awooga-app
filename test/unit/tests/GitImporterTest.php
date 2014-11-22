@@ -330,7 +330,7 @@ class GitImporterTest extends TestCase
 			"Check the due time is empty"
 		);
 
-		$importer->rescheduleRepo($repoId);
+		$importer->rescheduleRepo($repoId, true);
 
 		$this->assertNotNull(
 			$this->fetchColumn($pdo, $sql, array(':repo_id' => $repoId, )),

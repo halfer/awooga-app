@@ -47,13 +47,16 @@ class GitImporter
 	 */
 	public function processRepo($repoId, $url, $oldPath)
 	{
-		// If any part fails, the rest of it will (deliberately) not be called
-		return
+		// If any part fails, the following will (deliberately) not be called
+		$ok =
 			($newPath = $this->cloneRepoWithLogging($repoId, $url)) &&
 			$this->moveRepoWithLogging($repoId, $oldPath, $newPath) &&
-			$this->scanRepoWithLogging($repoId, $newPath) &&
-			$this->rescheduleRepoWithLogging($repoId)
-		;
+			$this->scanRepoWithLogging($repoId, $newPath);
+
+		// We always reschedule
+		$rescheduleOk = $this->rescheduleRepoWithLogging($repoId, $ok);
+
+		return $ok;
 	}
 
 	/**
@@ -150,13 +153,14 @@ class GitImporter
 	 * Tries to reschedule a repository, with success/failure logging
 	 * 
 	 * @param integer $repoId
+	 * @param boolean $wasSuccessful
 	 * @return boolean
 	 */
-	public function rescheduleRepoWithLogging($repoId)
+	public function rescheduleRepoWithLogging($repoId, $wasSuccessful)
 	{
 		try
 		{
-			$this->rescheduleRepo($repoId);
+			$this->rescheduleRepo($repoId, $wasSuccessful);
 			$this->repoLog($repoId, self::LOG_TYPE_RESCHED);
 		}
 		catch (\Exception $e)
@@ -486,17 +490,26 @@ class GitImporter
 	 * 
 	 * Maybe this should be configurable?
 	 * 
+	 * @todo For failures, let's count the number of recent failed runs, and increase the sched time
+	 * 
 	 * @param integer $repoId
+	 * @param boolean $wasSuccessful
+	 * @return True if successful
 	 */
-	protected function rescheduleRepo($repoId)
+	protected function rescheduleRepo($repoId, $wasSuccessful)
 	{
 		$sql = "
 			UPDATE repository
-				SET due_at = NOW() + INTERVAL 4 HOUR
+				SET due_at = NOW() + INTERVAL :time_hours HOUR
 				WHERE id = :repo_id
 		";
 		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute(array(':repo_id' => $repoId, ));
+		$ok = $statement->execute(
+			array(
+				':repo_id' => $repoId,
+				':time_hours' => $wasSuccessful ? 4 : 1,
+			)
+		);
 
 		return $ok;
 	}
