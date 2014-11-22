@@ -12,6 +12,7 @@ class GitImporter
 	const MAX_FAILS_BEFORE_DISABLE = 5;
 	const MAX_REPORT_SIZE = 60000;
 
+	protected $runId;
 	protected $repoRoot;
 	protected $debug;
 
@@ -20,12 +21,16 @@ class GitImporter
 	/**
 	 * Constructs an importer object
 	 * 
+	 * @todo Repo ID should be a class-wide property
+	 * 
+	 * @param integer $runId
 	 * @param string $repoRoot
 	 * @param \PDO $pdo
 	 * @param boolean $debug
 	 */
-	public function __construct($repoRoot, $debug = false)
+	public function __construct($runId, $repoRoot, $debug = false)
 	{
+		$this->runId = $runId;
 		$this->repoRoot = $repoRoot;
 		$this->debug = $debug;
 	}
@@ -155,10 +160,13 @@ class GitImporter
 	 */
 	public function rescheduleRepoWithLogging($repoId, $wasSuccessful)
 	{
+		// Add in suitable message
+		$message = $wasSuccessful ? null : 'Repo processing failed, setting retry time';
+
 		try
 		{
 			$this->rescheduleRepo($repoId, $wasSuccessful);
-			$this->repoLog($repoId, self::LOG_TYPE_RESCHED);
+			$this->repoLog($repoId, self::LOG_TYPE_RESCHED, $message);
 		}
 		catch (\Exception $e)
 		{
@@ -282,6 +290,14 @@ class GitImporter
 		}
 	}
 
+	/**
+	 * Deletes a folder from the filing system
+	 * 
+	 * @todo Move the protection clause in moveRepo() to this method?
+	 * 
+	 * @param string $oldPath
+	 * @return boolean Success
+	 */
 	protected function deleteOldRepo($oldPath)
 	{
 		$output = $return = null;
@@ -512,6 +528,42 @@ class GitImporter
 	}
 
 	/**
+	 * @todo Finish me
+	 * 
+	 * @param integer $repoId
+	 */
+	protected function countRecentFails($repoId)
+	{
+		/*
+		 * Need SQL to return 0 per run per repo if anything failed. Or we could just scan in PHP,
+		 * much easier!
+		 * 
+		 * Also, we don't want to look at scan items - individual fails there are fine. If we
+		 * log those as trivial errors and others as serious, that might work out
+		 */
+		$sql = "
+			SELECT * FROM repository_log
+			WHERE
+				repository_id = :repo_id
+			ORDER BY
+				run_id DESC,
+				id DESC
+			LIMIT
+				10
+		";
+		$statement = $this->getDriver()->prepare($sql);
+		$ok = $statement->execute(
+			array('repo_id' => $repoId, )
+		);
+
+		// Loop through to count fails
+		while ($statement->fetch(\PDO::FETCH_ASSOC))
+		{
+			
+		}
+	}
+
+	/**
 	 * Logs a message against a repo
 	 * 
 	 * @todo Does this need to be public?
@@ -538,15 +590,15 @@ class GitImporter
 
 		$sql = "
 			INSERT INTO repository_log
-			(repository_id, log_type, message, created_at, is_success)
+			(repository_id, run_id, log_type, message, created_at, is_success)
 			VALUES
-			(:repository_id, :log_type, :message, NOW(), :is_success)
+			(:repository_id, :run_id, :log_type, :message, NOW(), :is_success)
 		";
 		$statement = $this->getDriver()->prepare($sql);
 		$ok = $statement->execute(
 			array(
-				':repository_id' => $repoId, ':log_type' => $logType,
-				':message' => $message, ':is_success' => $isSuccess,
+				':repository_id' => $repoId, ':run_id' => $this->runId,
+				':log_type' => $logType, ':message' => $message, ':is_success' => $isSuccess,
 			)
 		);
 		if (!$ok)

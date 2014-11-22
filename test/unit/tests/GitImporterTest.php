@@ -45,12 +45,27 @@ class GitImporterTest extends TestCase
 	protected function getImporterInstance(\PDO $pdo = null, $repoRoot = null)
 	{
 		$importer = new GitImporterHarness(
+			1,
 			is_null($repoRoot) ? $this->getTestRepoRoot() : $repoRoot
 		);
 		if ($pdo)
 		{
 			$importer->setDriver($pdo);
 		}
+
+		return $importer;
+	}
+
+	/**
+	 * Returns a new importer instance with a specific run ID
+	 * 
+	 * @param \PDO $pdo
+	 * @param integer $runId
+	 */
+	protected function getImporterInstanceWithRun(\PDO $pdo, $runId)
+	{
+		$importer = new GitImporterHarness($runId, $this->getTestRepoRoot());
+		$importer->setDriver($pdo);
 
 		return $importer;
 	}
@@ -413,6 +428,32 @@ class GitImporterTest extends TestCase
 			$this->fetchColumn($pdo, "SELECT COUNT(*) FROM repository_log"),
 			"Check the number of logs is correct"
 		);
+	}
+
+	public function testRepeatedFailsIncreasesRetry()
+	{
+		// Set up (bad) repository and importer
+		$repoId = $this->buildDatabase($this->getDriver(false));
+		$pdo = $this->getDriver();
+		$importer = $this->getImporterInstanceWithRun($pdo, 1);
+
+		// Set up a repo for a serious failure
+		$importer->setCheckoutPath($relativePath = 'success');
+
+		// Check that the rescheduling increases with each failure
+		$importer->makeGitFail();
+		$importer->processRepo($repoId, 'http://example.com', '/dummy/old/path');
+		$this->checkLogsGenerated($repoId, 1, 1);
+
+		/*
+		$sql = "SELECT * FROM repository WHERE id = 1";
+		print_r($this->fetchResults($pdo, $sql));
+
+		$sql = "SELECT * FROM repository_log WHERE repository_id = 1";
+		print_r($this->fetchResults($pdo, $sql));
+		*/
+		
+		// @todo Finish this off when we can filter logs on trivial/serious fail types
 	}
 
 	protected function createTempRepoFolder()

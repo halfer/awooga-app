@@ -10,6 +10,7 @@ CREATE TABLE repository (
 	created_at DATETIME NOT NULL,
 	/* If this is not set, it can be set to now, or in a few hours */
 	due_at DATETIME,
+	/* Are we using this? */
 	updated_at DATETIME
 );
 
@@ -39,7 +40,7 @@ CREATE TABLE resource_url (
 	FOREIGN KEY (report_id) REFERENCES report (id)
 );
 
-CREATE TABLE report_issue(
+CREATE TABLE report_issue (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL,
 	report_id INTEGER NOT NULL,
 	description VARCHAR(1024),
@@ -63,6 +64,7 @@ INSERT INTO issue (code) VALUES
 CREATE TABLE repository_log (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL,
 	repository_id INTEGER NOT NULL,
+	run_id INTEGER NOT NULL,
 	/* These are the phases associated with updating a repo */
     log_type ENUM('fetch', 'move', 'scan', 'resched'),
 	/* Successful ops probably don't need a log */
@@ -71,4 +73,9 @@ CREATE TABLE repository_log (
 	is_success BOOLEAN NOT NULL,
 
 	CONSTRAINT repository_log_repo FOREIGN KEY (repository_id) REFERENCES repository (id)
+);
+
+CREATE TABLE run (
+	id INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	created_at DATETIME NOT NULL,
 );
