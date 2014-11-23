@@ -546,20 +546,34 @@ class GitImporter
 	 */
 	protected function rescheduleRepo($repoId, $wasSuccessful)
 	{
+		$minutes = $wasSuccessful ? 4 * 60 : $this->getRetryInMinutes($repoId);
 		$sql = "
 			UPDATE repository
-				SET due_at = NOW() + INTERVAL :time_hours HOUR
+				SET due_at = NOW() + INTERVAL :time_minutes MINUTE
 				WHERE id = :repo_id
 		";
 		$statement = $this->getDriver()->prepare($sql);
 		$ok = $statement->execute(
 			array(
 				':repo_id' => $repoId,
-				':time_hours' => $wasSuccessful ? 4 : 1,
+				':time_minutes' => $minutes,
 			)
 		);
 
 		return $ok;
+	}
+
+	/**
+	 * Gives an exponential retry curve for persistent serious failures
+	 * 
+	 * @param integer $repoId
+	 * @return integer
+	 */
+	protected function getRetryInMinutes($repoId)
+	{
+		$fails = $this->countRecentFails($repoId);
+
+		return (int) pow($fails * 3, 2.3) * 3;
 	}
 
 	/**

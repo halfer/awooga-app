@@ -439,16 +439,62 @@ class GitImporterTest extends TestCase
 	}
 
 	/**
-	 * Ensure that contiguous serious errors progressively increases the retry time
+	 * Ensure that retry times increase on failure and reset on success
 	 */
-	public function testRepeatedFailsIncreasesRetry()
+	public function testRepeatedFailsIncreasesRetryInterval()
 	{
 		// Build database
 		$repoId = $this->buildDatabase($this->getDriver(false));
 		$pdo = $this->getDriver();
 
+		// Check increasing the fail count increases the retry time
+		$oldMinutes = $this->runRepeatedFails(
+			$repoId,
+			1,
+			10,
+			function($test, $minutes, $oldMinutes) {
+				$test->assertTrue(
+					$minutes > $oldMinutes,
+					"Ensure the wait time increases on each successive fail"
+				);
+			}
+		);
+
+		// Do a successful call
+		$importer = $this->getImporterInstanceWithRun($pdo, 11);
+		$importer->setCheckoutPath($relativePath = 'success');
+		$importer->processRepo($repoId, 'http://example.com', '/dummy/old/path');
+
+		// Now do another failed call, check the retry has been reset
+		$this->runRepeatedFails(
+			$repoId,
+			12,
+			1,
+			function($test, $minutes, $oldMinutes) {
+				$test->assertTrue(
+					$minutes < $oldMinutes,
+					"Ensure the wait time increases on each successive fail"
+				);
+			},
+			$oldMinutes
+		);
+	}
+
+	protected function runRepeatedFails($repoId, $startRunId, $count, callable $test, $oldMinutes = null)
+	{
+		$pdo = $this->getDriver();
+
+		// Get the last date (may be null)
+		$oldDate = \DateTime::createFromFormat(
+			'Y-m-d H:i:s', $this->fetchColumn(
+				$pdo,
+				"SELECT due_at FROM repository WHERE id = :repo_id",
+				array(':repo_id' => $repoId, )
+			)
+		);
+
 		// Do this across a number of faked runs (the run rows don't actually exist)
-		for($runId = 1; $runId <= 10; $runId++)
+		for($runId = $startRunId; $runId < $startRunId + $count; $runId++)
 		{
 			// Set up a repo for a serious failure
 			$importer = $this->getImporterInstanceWithRun($pdo, $runId);
@@ -456,12 +502,40 @@ class GitImporterTest extends TestCase
 			$importer->makeGitFail();
 			$importer->processRepo($repoId, 'http://example.com', '/dummy/old/path');
 
-			// Run ID = number of contiguous errors
-			$this->assertEquals($runId, $importer->countRecentFails($repoId));
+			// Check we have the right number of contiguous errors
+			$this->assertEquals(1 + $runId - $startRunId, $importer->countRecentFails($repoId));
 
 			// Check that the rescheduling increases with each failure
-			// @todo
+			$dueDate = $this->fetchColumn(
+				$pdo,
+				"SELECT due_at FROM repository WHERE id = :repo_id",
+				array(':repo_id' => $repoId, )
+			);
+
+			// Parse the date and fail if it is not created
+			$date = \DateTime::createFromFormat('Y-m-d H:i:s', $dueDate);
+			if (!$date)
+			{
+				throw new \Exception('Could not parse next due date');
+			}
+
+			/* @var $date \DateTime */
+			if ($oldDate)
+			{
+				$diff = $date->diff($oldDate);
+				$minutes =
+					$diff->d * 24 * 60 +
+					$diff->h * 60 +
+					$diff->i
+				;
+				// This calls the callback for the assertion
+				$test($this, $minutes, $oldMinutes);
+				$oldMinutes = $minutes;
+			}
+			$oldDate = $date;
 		}
+
+		return $oldMinutes;
 	}
 
 	protected function createTempRepoFolder()
