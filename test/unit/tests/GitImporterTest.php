@@ -36,41 +36,6 @@ class GitImporterTest extends TestCase
 	}
 
 	/**
-	 * Returns a new importer instance pointing to the current test repo
-	 * 
-	 * @param \PDO $pdo Database connection
-	 * @param string $repoRoot Fully-qualified path to repository (optional)
-	 * @return \Awooga\Testing\GitImporterHarness
-	 */
-	protected function getImporterInstance(\PDO $pdo = null, $repoRoot = null)
-	{
-		$importer = new GitImporterHarness(
-			1,
-			is_null($repoRoot) ? $this->getTestRepoRoot() : $repoRoot
-		);
-		if ($pdo)
-		{
-			$importer->setDriver($pdo);
-		}
-
-		return $importer;
-	}
-
-	/**
-	 * Returns a new importer instance with a specific run ID
-	 * 
-	 * @param \PDO $pdo
-	 * @param integer $runId
-	 */
-	protected function getImporterInstanceWithRun(\PDO $pdo, $runId)
-	{
-		$importer = new GitImporterHarness($runId, $this->getTestRepoRoot());
-		$importer->setDriver($pdo);
-
-		return $importer;
-	}
-
-	/**
 	 * Check that git failure in doClone causes an exception
 	 * 
 	 * @expectedException \Awooga\Exceptions\SeriousException
@@ -629,15 +594,5 @@ class GitImporterTest extends TestCase
 		$logs = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
 		return $logs;
-	}
-
-	protected function getTestRepoRoot()
-	{
-		return $this->getProjectRoot() . '/test/unit/repos';
-	}
-
-	protected function getTempFolder()
-	{
-		return $this->getProjectRoot() . '/test/unit/tmp';		
 	}
 }
