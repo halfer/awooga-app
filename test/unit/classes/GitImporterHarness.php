@@ -62,6 +62,27 @@ class GitImporterHarness extends \Awooga\GitImporter
 	}
 
 	/**
+	 * A public entry point for the clone method
+	 * 
+	 * @param string $url
+	 */
+	public function cloneRepo($url)
+	{
+		return parent::cloneRepo($url);
+	}
+
+	/**
+	 * A public entry point for the move method
+	 * 
+	 * @param integer $repoId
+	 * @param string $oldPath
+	 * @param string $newPath
+	 */
+	public function moveRepo($repoId, $oldPath, $newPath)
+	{
+		return parent::moveRepo($repoId, $oldPath, $newPath);
+	}
+	/**
 	 * A public entry point for the scan method
 	 * 
 	 * @param integer $repoId
@@ -111,6 +132,19 @@ class GitImporterHarness extends \Awooga\GitImporter
 	public function countRecentFails($repoId)
 	{
 		return parent::countRecentFails($repoId);
+	}
+
+	/**
+	 * A public entry point for the logging method
+	 * 
+	 * @param integer $repoId
+	 * @param string $logType
+	 * @param string $message
+	 * @param string $logLevel
+	 */
+	public function repoLog($repoId, $logType, $message = null, $logLevel = self::LOG_LEVEL_SUCCESS)
+	{
+		return parent::repoLog($repoId, $logType, $message, $logLevel);
 	}
 
 	/**

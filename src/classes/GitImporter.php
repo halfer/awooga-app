@@ -13,6 +13,7 @@ class GitImporter
 	const LOG_LEVEL_ERROR_TRIVIAL = 'trivial';
 	const LOG_LEVEL_ERROR_SERIOUS = 'serious';
 
+	// @todo Is this misnamed? Currently only throws exception, doesn't disable
 	const MAX_FAILS_BEFORE_DISABLE = 5;
 	const MAX_REPORT_SIZE = 60000;
 
@@ -42,9 +43,7 @@ class GitImporter
 	/**
 	 * Calls the various parts of an import process
 	 * 
-	 * I need to think about how to reschedule on failure (presumably I don't want to retry
-	 * straight away?). Also if there is a large number of failures, let's disable the repo,
-	 * like in the scanRepo method.
+	 * @todo Currently we aren't disabling the repo - what conditions should trigger that?
 	 * 
 	 * @param integer $repoId
 	 * @param string $url
@@ -206,13 +205,11 @@ class GitImporter
 	/**
 	 * Clones the repo
 	 * 
-	 * @todo Does this need to be public?
-	 * 
 	 * @param string $url
 	 * @return string
 	 * @throws Exceptions\SeriousException
 	 */
-	public function cloneRepo($url)
+	protected function cloneRepo($url)
 	{
 		// Create new checkout path
 		$target = $this->getCheckoutPath($url);
@@ -267,16 +264,14 @@ class GitImporter
 	 * Updates the location and deletes the old one if necessary
 	 *
 	 * @todo This would be better if it deleted the repo referenced in the database.
-	 * We'd then not need the $oldPath parameter at all, presumably.
+	 * We'd then not need the $oldPath parameter at all - that's read from the db anyway!
 	 *  
-	 * @todo Does this need to be public?
-	 * 
 	 * @param integer $repoId
 	 * @param string $oldPath
 	 * @param string $newPath
 	 * @throws Exceptions\SeriousException
 	 */
-	public function moveRepo($repoId, $oldPath, $newPath)
+	protected function moveRepo($repoId, $oldPath, $newPath)
 	{
 		// Update the row with the new location
 		$sql = "
@@ -296,14 +291,6 @@ class GitImporter
 		// Delete the old location if there is one
 		if ($oldPath)
 		{
-			// Halt if there's no root, to avoid a dangerous command :)
-			if (!$this->repoRoot)
-			{
-				throw new Exceptions\SeriousException(
-					"No repository root set, cannot delete old repo"
-				);
-			}
-
 			$ok = $this->deleteOldRepo($oldPath);
 			if (!$ok)
 			{
@@ -317,31 +304,25 @@ class GitImporter
 	/**
 	 * Deletes a folder from the filing system
 	 * 
-	 * @todo Move the protection clause in moveRepo() to this method?
-	 * 
 	 * @param string $oldPath
-	 * @return boolean Success
+	 * @return boolean True on success
+	 * @throws Exceptions\SeriousException
 	 */
 	protected function deleteOldRepo($oldPath)
 	{
+		// Halt if there's no root, to avoid a dangerous command :)
+		if (!$this->repoRoot)
+		{
+			throw new Exceptions\SeriousException(
+				"No repository root set, cannot delete old repo"
+			);
+		}
+
 		$output = $return = null;
 		$command = "rm -rf {$this->repoRoot}/{$oldPath}";
 		exec($command, $output, $return);
 
 		return $return === 0;
-	}
-
-	/**
-	 * Updates the database copy of this repo's relative path
-	 * 
-	 * @todo Move the query in moveRepoLocation here? Useful elsewhere.
-	 * 
-	 * @param integer $repoId
-	 * @param string $repoPath
-	 */
-	protected function updateRepoLocation($repoId, $repoPath)
-	{
-		
 	}
 
 	/**
@@ -636,15 +617,13 @@ class GitImporter
 	/**
 	 * Logs a message against a repo
 	 * 
-	 * @todo Does this need to be public?
-	 * 
 	 * @param integer $repoId
 	 * @param string $logType
 	 * @param string $message
 	 * @param string $logLevel
 	 * @throws \Exception
 	 */
-	public function repoLog($repoId, $logType, $message = null, $logLevel = self::LOG_LEVEL_SUCCESS)
+	protected function repoLog($repoId, $logType, $message = null, $logLevel = self::LOG_LEVEL_SUCCESS)
 	{
 		// Check the type is OK
 		$allowedTypes = array(
