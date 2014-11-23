@@ -314,12 +314,15 @@ class GitImporterTest extends TestCase
 		$this->checkFilesSeen($importer, 1);
 		$this->checkReportsSuccessful($repoId, 0);
 		$this->checkLogsGenerated(0, 0, 1);
+
+		// Remove temporary repo
+		$importer->deleteOldRepo($relativePath);
 	}
 
 	/**
 	 * Checks that a serious exception rolls back changes in scanRepoWithLogging
 	 * 
-	 * (This feature is not currently supported by the importer)
+	 * @todo Write this
 	 */
 	public function testRollbackOnSeriousException()
 	{
@@ -328,6 +331,8 @@ class GitImporterTest extends TestCase
 
 	/**
 	 * Check that a repo may not contain two reports that refer to the same URL
+	 * 
+	 * @todo Write this
 	 */
 	public function testFailOnDuplicateReportUrlsInRepo()
 	{

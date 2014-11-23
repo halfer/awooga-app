@@ -45,7 +45,13 @@ class GitImporterHarness extends \Awooga\GitImporter
 		$this->nextMoveFails = true;
 	}
 
-	protected function deleteOldRepo($oldPath)
+	/**
+	 * Fail-enabled delete operation, also grants public access level
+	 * 
+	 * @param string $oldPath
+	 * @return boolean
+	 */
+	public function deleteOldRepo($oldPath)
 	{
 		if ($this->nextMoveFails)
 		{
