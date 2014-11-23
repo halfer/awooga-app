@@ -438,30 +438,30 @@ class GitImporterTest extends TestCase
 		);
 	}
 
+	/**
+	 * Ensure that contiguous serious errors progressively increases the retry time
+	 */
 	public function testRepeatedFailsIncreasesRetry()
 	{
-		// Set up (bad) repository and importer
+		// Build database
 		$repoId = $this->buildDatabase($this->getDriver(false));
 		$pdo = $this->getDriver();
-		$importer = $this->getImporterInstanceWithRun($pdo, 1);
 
-		// Set up a repo for a serious failure
-		$importer->setCheckoutPath($relativePath = 'success');
+		// Do this across a number of faked runs (the run rows don't actually exist)
+		for($runId = 1; $runId <= 10; $runId++)
+		{
+			// Set up a repo for a serious failure
+			$importer = $this->getImporterInstanceWithRun($pdo, $runId);
+			$importer->setCheckoutPath($relativePath = 'success');
+			$importer->makeGitFail();
+			$importer->processRepo($repoId, 'http://example.com', '/dummy/old/path');
 
-		// Check that the rescheduling increases with each failure
-		$importer->makeGitFail();
-		$importer->processRepo($repoId, 'http://example.com', '/dummy/old/path');
-		$this->checkLogsGenerated(1, 1, 0);
+			// Run ID = number of contiguous errors
+			$this->assertEquals($runId, $importer->countRecentFails($repoId));
 
-		/*
-		$sql = "SELECT * FROM repository WHERE id = 1";
-		print_r($this->fetchResults($pdo, $sql));
-
-		$sql = "SELECT * FROM repository_log WHERE repository_id = 1";
-		print_r($this->fetchResults($pdo, $sql));
-		*/
-		
-		// @todo Finish this off when we can filter logs on trivial/serious fail types
+			// Check that the rescheduling increases with each failure
+			// @todo
+		}
 	}
 
 	protected function createTempRepoFolder()

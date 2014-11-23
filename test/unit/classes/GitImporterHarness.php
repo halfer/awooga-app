@@ -95,11 +95,22 @@ class GitImporterHarness extends \Awooga\GitImporter
 	 * 
 	 * @param integer $repoId
 	 * @param boolean $wasSuccessful
-	 * @return type
+	 * @return boolean True if successful
 	 */
 	public function rescheduleRepo($repoId, $wasSuccessful)
 	{
 		return parent::rescheduleRepo($repoId, $wasSuccessful);
+	}
+
+	/**
+	 * A public entry point for the error count method
+	 * 
+	 * @param integer $repoId
+	 * @return integer
+	 */
+	public function countRecentFails($repoId)
+	{
+		return parent::countRecentFails($repoId);
 	}
 
 	/**

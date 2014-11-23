@@ -542,7 +542,7 @@ class GitImporter
 	 * 
 	 * @param integer $repoId
 	 * @param boolean $wasSuccessful
-	 * @return True if successful
+	 * @return boolean True if successful
 	 */
 	protected function rescheduleRepo($repoId, $wasSuccessful)
 	{
@@ -563,39 +563,61 @@ class GitImporter
 	}
 
 	/**
-	 * @todo Finish me
+	 * Counts the number of recent consectuve serious failures in the logs
 	 * 
 	 * @param integer $repoId
 	 */
 	protected function countRecentFails($repoId)
 	{
-		/*
-		 * Need SQL to return 0 per run per repo if anything failed. Or we could just scan in PHP,
-		 * much easier!
-		 * 
-		 * Also, we don't want to look at scan items - individual fails there are fine. If we
-		 * log those as trivial errors and others as serious, that might work out
-		 */
+		// This clause gets the number of serious fails per run
 		$sql = "
-			SELECT * FROM repository_log
+			SELECT
+				run_id,
+				(
+					SELECT COUNT(*)
+					FROM repository_log l
+					WHERE
+						l.log_level = :log_level
+						AND l.run_id = repository_log.run_id
+						AND l.repository_id = repository_log.repository_id
+				) serious_count
+			FROM
+				repository_log
 			WHERE
 				repository_id = :repo_id
+			GROUP BY
+				run_id
 			ORDER BY
-				run_id DESC,
-				id DESC
+				run_id DESC
 			LIMIT
 				10
 		";
 		$statement = $this->getDriver()->prepare($sql);
 		$ok = $statement->execute(
-			array('repo_id' => $repoId, )
+			array(':repo_id' => $repoId, ':log_level' => self::LOG_LEVEL_ERROR_SERIOUS, )
 		);
+		if (!$ok)
+		{
+			throw new \Exception("Could not run the error count query");
+		}
 
 		// Loop through to count fails
-		while ($statement->fetch(\PDO::FETCH_ASSOC))
+		$failCount = 0;
+		while ($row = $statement->fetch(\PDO::FETCH_ASSOC))
 		{
-			
+			$thisFails = $row['serious_count'];
+			if ($thisFails)
+			{
+				$failCount++;
+			}
+			else
+			{
+				// As soon as we find a run with no serious errors, it's not contiguous
+				break;
+			}
 		}
+
+		return $failCount;
 	}
 
 	/**
