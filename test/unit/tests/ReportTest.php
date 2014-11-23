@@ -282,8 +282,6 @@ class ReportTest extends TestCase
 	/**
 	 * Saves a report
 	 * 
-	 * @todo Check the report ID comes back okay
-	 * 
 	 * @throws \Exception
 	 */
 	public function testSaveNewReport()
@@ -304,7 +302,18 @@ class ReportTest extends TestCase
 				array('issue_cat_code' => 'xss', ),
 			)
 		);
-		$report->save();
+		$reportId = $report->save();
+		
+		// Check report ID
+		$this->assertEquals(
+			1,
+			$this->fetchColumn(
+				$pdo,
+				"SELECT 1 FROM report WHERE id = :report_id",
+				array(':report_id' => $reportId, )
+			),
+			"Check report ID is generated OK"
+		);
 
 		// Check issues
 		$statement = $pdo->prepare($this->getRetrieveIssuesSql());
