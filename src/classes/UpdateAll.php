@@ -18,16 +18,9 @@ class UpdateAll
 
 	public function run()
 	{
+		// @todo We don't want to create a run if there is still something left of the old run
 		$repoRows = $this->getNextRepos(20);
-		if ($repoRows)
-		{
-			// Look up last repo id
-		}
-		else
-		{
-			$runId = $this->createRun();
-			$repoRows = $this->getFirstRepos(20);
-		}
+		$runId = $this->createRun();
 
 		$importer = new GitImporter($runId, $this->repoRoot);
 
@@ -47,23 +40,40 @@ class UpdateAll
 	 * 
 	 * @param integer $n
 	 */
-	public function getNextRepos($n)
+	public function getNextRepos($limit)
 	{
-		// I'm deliberately not filtering by success here, so as not to prioritise
-		// failed repos
-		$sql1 = "
+		$lastRepoId = $this->findMaxRepoId();
+		$repoRows = $this->fetchRemainingRows($lastRepoId, $limit);
+
+		// If there are no rows, read from the start
+		if (!$repoRows)
+		{
+			$repoRows = $this->getFirstRepos($limit);
+		}
+
+		return $repoRows;
+	}
+
+	protected function findMaxRepoId()
+	{
+		// Deliberately not filtering by success here, so as not to prioritise failed repos
+		$sql = "
 			SELECT repository_id
 			FROM repository_log
 			ORDER BY run_id DESC, repository_id DESC
 			LIMIT 1
 		";
-		$statement = $this->getDriver()->prepare($sql1);
-		$ok1 = $statement->execute();
+		$statement = $this->getDriver()->prepare($sql);
+		$ok = $statement->execute();
 		$lastRepoId = $statement->fetchColumn();
 
-		// Now let's get any rows after this
-		$intLimit = (int) $n;
-		$sql2 = "
+		return $lastRepoId;
+	}
+
+	protected function fetchRemainingRows($fromRepoId, $limit)
+	{
+		$intLimit = (int) $limit;
+		$sql = "
 			SELECT *
 			FROM repository
 			WHERE
@@ -71,29 +81,28 @@ class UpdateAll
 				AND id > :repo_id
 			LIMIT $intLimit
 		";
-		$statement2 = $this->getDriver()->prepare($sql2);
-		$ok2 = $statement2->execute(array(':repo_id' => $lastRepoId, ));
-		if (!$ok2)
+		$statement = $this->getDriver()->prepare($sql);
+		$ok = $statement->execute(array(':repo_id' => $fromRepoId, ));
+		if (!$ok)
 		{
 			print_r($statement->errorInfo(), true);
 		}
 
-		$repoRows = $statement2->fetchAll();
-
-		return $repoRows;
+		return $statement->fetchAll();
 	}
 
-	protected function getFirstRepos($n)
+	protected function getFirstRepos($limit)
 	{
+		$intLimit = (int) $limit;
 		$sql = "
 			SELECT *
 			FROM repository
 			WHERE
 				is_enabled = 1			
-			LIMIT :limit
+			LIMIT $intLimit
 		";
 		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute(array(':limit' => $n, ));
+		$ok = $statement->execute();
 		$repoRows = $statement->fetchAll();
 
 		return $repoRows;

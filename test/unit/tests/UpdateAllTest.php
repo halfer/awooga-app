@@ -74,10 +74,11 @@ class UpdateAllTest extends TestCase
 
 		// Request some repos and make sure we get the right number
 		$updater = new UpdateAllTestHarness($importer);
+		$processSize = 7;
 		$updater->setDriver($pdo);
-		$repos = $updater->getNextRepos(7);
+		$repos = $updater->getNextRepos($processSize);
 		$this->assertEquals(
-			7,
+			$processSize,
 			count($repos),
 			"Ensure the first set of repos is the right size"
 		);
@@ -89,11 +90,25 @@ class UpdateAllTest extends TestCase
 		}
 
 		// Request another 7, should get 4 more
-		$reposNext = $updater->getNextRepos(7);
+		$reposNext = $updater->getNextRepos($processSize);
 		$this->assertEquals(
 			4,
 			count($reposNext),
 			"Ensure the next set of repos is the right size"
+		);
+
+		// Let's now add success logs against all of them
+		foreach($reposNext as $repo)
+		{
+			$importer->repoLog($repo['id'], \Awooga\GitImporter::LOG_TYPE_FETCH);
+		}
+
+		// Ensure another request starts again
+		$reposLast = $updater->getNextRepos($processSize);
+		$this->assertEquals(
+			$processSize,
+			count($reposLast),
+			"Ensure the next set of repos, from the start, is the right size"
 		);
 	}
 
