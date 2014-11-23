@@ -53,6 +53,7 @@ class UpdateAllTest extends TestCase
 		";
 		$statement = $pdo->prepare($sql);
 
+		// ID 1 is taken, and this table isn't autocomplete for the time being
 		for($i = 2; $i <= 11; $i++)
 		{
 			$ok = $statement->execute(
@@ -72,17 +73,21 @@ class UpdateAllTest extends TestCase
 		// Create updater and importer classes, create a run
 		$updater = new UpdateAllTestHarness();
 		$updater->setDriver($pdo);
-		$importer = $this->getImporterInstanceWithRun($pdo, $updater->createRun());
+		$runId = $updater->createRun();
+		$importer = $this->getImporterInstanceWithRun($pdo, $runId);
 		$updater->setImporter($importer);
 
 		// Request some repos and make sure we get the right number
 		$processSize = 7;
-		$repos = $updater->getNextRepos($processSize);
+		list($firstRunId, $repos) = $updater->getNextRepos($processSize);
 		$this->assertEquals(
 			$processSize,
 			count($repos),
 			"Ensure the first set of repos is the right size"
 		);
+
+		// Check this is not on a run (since nothing has been logged against it yet)
+		$this->assertNull($firstRunId, "Checking first run ID is null");
 		
 		// Let's now add success logs against all of them
 		foreach($repos as $repo)
@@ -91,12 +96,15 @@ class UpdateAllTest extends TestCase
 		}
 
 		// Request another 7, should get 4 more
-		$reposNext = $updater->getNextRepos($processSize);
+		list($nextRunId, $reposNext) = $updater->getNextRepos($processSize);
 		$this->assertEquals(
 			4,
 			count($reposNext),
 			"Ensure the next set of repos is the right size"
 		);
+
+		// Check this is on a run
+		$this->assertEquals($runId, $nextRunId, "Checking returned run ID");
 
 		// Let's now add success logs against all of them
 		foreach($reposNext as $repo)
@@ -105,12 +113,15 @@ class UpdateAllTest extends TestCase
 		}
 
 		// Ensure another request starts again
-		$reposLast = $updater->getNextRepos($processSize);
+		list($lastRunId, $reposLast) = $updater->getNextRepos($processSize);
 		$this->assertEquals(
 			$processSize,
 			count($reposLast),
 			"Ensure the next set of repos, from the start, is the right size"
 		);
+
+		// Check this is not on a run
+		$this->assertNull($lastRunId, "Checking new set of repos has no run ID");
 	}
 
 	public function testUpdateSimple()

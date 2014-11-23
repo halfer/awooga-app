@@ -44,32 +44,46 @@ class UpdateAll
 	 */
 	public function getNextRepos($limit)
 	{
-		$lastRepoId = $this->findMaxRepoId();
+		list($lastRunId, $lastRepoId) = $this->findLastRunAndRepo();
 		$repoRows = $this->fetchRemainingRows($lastRepoId, $limit);
 
-		// If there are no rows, read from the start
+		// If there are no rows, read from the start,
+		// and null the run, since we need a new one
 		if (!$repoRows)
 		{
 			$repoRows = $this->getFirstRepos($limit);
+			$lastRunId = null;
 		}
 
-		return $repoRows;
+		return array($lastRunId, $repoRows);
 	}
 
-	protected function findMaxRepoId()
+	protected function findLastRunAndRepo()
 	{
-		// Deliberately not filtering by success here, so as not to prioritise failed repos
+		// Deliberately not filtering by success, so as not to prioritise failed repos
 		$sql = "
-			SELECT repository_id
-			FROM repository_log
-			ORDER BY run_id DESC, repository_id DESC
+			SELECT
+				run_id,
+				repository_id
+			FROM
+				repository_log
+			ORDER BY
+				run_id DESC, repository_id DESC
 			LIMIT 1
 		";
 		$statement = $this->getDriver()->prepare($sql);
 		$ok = $statement->execute();
-		$lastRepoId = $statement->fetchColumn();
+		if (!$ok)
+		{
+			throw new \Exception("Could not get last run/repo information");
+		}
 
-		return $lastRepoId;
+		$row = $statement->fetch(\PDO::FETCH_ASSOC);
+
+		return array(
+			isset($row['run_id']) ? $row['run_id'] : null,
+			isset($row['repository_id']) ? $row['repository_id'] : null,
+		);
 	}
 
 	protected function fetchRemainingRows($fromRepoId, $limit)
