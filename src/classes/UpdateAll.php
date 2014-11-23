@@ -4,19 +4,16 @@ namespace Awooga;
 
 class UpdateAll
 {
-	/**
-	 * - Create a run
-	 * - Scan through repos
-	 * - Method to count how many fails there are on this run
-	 */
+	protected $repoRoot;
 
 	use Database;
 
 	/**
 	 * Constructor for this class
 	 */
-	public function __construct()
+	public function __construct(GitImporter $importer = null, $repoRoot = null)
 	{
+		$this->repoRoot = $repoRoot;
 	}
 
 	public function run()
@@ -32,7 +29,7 @@ class UpdateAll
 			$repoRows = $this->getFirstRepos(20);
 		}
 
-		$importer = new GitImporter($runId, '/repo/root/here');
+		$importer = new GitImporter($runId, $this->repoRoot);
 
 		// Import each repository
 		foreach ($repoRows as $repoRow)
@@ -46,33 +43,42 @@ class UpdateAll
 	/**
 	 * Gets the next N repo rows
 	 * 
+	 * @todo Make this protected again
+	 * 
 	 * @param integer $n
 	 */
-	protected function getNextRepos($n)
+	public function getNextRepos($n)
 	{
-		// I'm deliberately not filtering by success here, so as not to prioritise failed repos
-		$sql = "
+		// I'm deliberately not filtering by success here, so as not to prioritise
+		// failed repos
+		$sql1 = "
 			SELECT repository_id
 			FROM repository_log
 			ORDER BY run_id DESC, repository_id DESC
 			LIMIT 1
 		";
-		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute();
+		$statement = $this->getDriver()->prepare($sql1);
+		$ok1 = $statement->execute();
 		$lastRepoId = $statement->fetchColumn();
 
 		// Now let's get any rows after this
-		$sql = "
+		$intLimit = (int) $n;
+		$sql2 = "
 			SELECT *
 			FROM repository
 			WHERE
 				is_enabled = 1
 				AND id > :repo_id
-			LIMIT :limit
+			LIMIT $intLimit
 		";
-		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute(array(':limit' => $n, ));
-		$repoRows = $statement->fetchAll();
+		$statement2 = $this->getDriver()->prepare($sql2);
+		$ok2 = $statement2->execute(array(':repo_id' => $lastRepoId, ));
+		if (!$ok2)
+		{
+			print_r($statement->errorInfo(), true);
+		}
+
+		$repoRows = $statement2->fetchAll();
 
 		return $repoRows;
 	}

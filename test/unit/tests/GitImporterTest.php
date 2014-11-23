@@ -15,8 +15,8 @@ class GitImporterTest extends TestCase
 		parent::setUp();
 
 		$root = $this->getProjectRoot();
-		require_once $root . '/src/classes/GitImporter.php';
 		require_once $root . '/src/classes/Exceptions/FileException.php';
+		require_once $root . '/src/classes/GitImporter.php';
 		// @todo Rename this to GitImporterTestHarness
 		require_once $root . '/test/unit/classes/GitImporterHarness.php';
 	}

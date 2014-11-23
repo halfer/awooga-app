@@ -78,4 +78,6 @@ CREATE TABLE repository_log (
 CREATE TABLE run (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL,
 	created_at DATETIME NOT NULL
+
+	/* @todo Create a constraint here */
 );
