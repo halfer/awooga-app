@@ -462,25 +462,24 @@ class GitImporter
 	/**
 	 * Bomb out if there's been too many errors recently
 	 * 
-	 * @todo Rather than the 4 hour window, use a run table for this
-	 * 
 	 * @param integer $repoId
 	 */
 	protected function doesErrorCountRequireHalting($repoId)
 	{
-		// If there are too many errors recently, throw Exceptions\SeriousException
+		// If there are too many errors in this run, throw Exceptions\SeriousException
 		$sql = "
 			SELECT COUNT(*) count
 			FROM repository_log
 			WHERE
 				repository_id = :repo_id
+				AND run_id = :run_id
 				AND log_level = :level_trivial
-				AND created_at > (DATE_SUB(CURDATE(), INTERVAL 4 HOUR))
 		";
 		$statement = $this->getDriver()->prepare($sql);
 		$ok = $statement->execute(
 			array(
 				':repo_id' => $repoId,
+				':run_id' => $this->runId,
 				':level_trivial' => self::LOG_LEVEL_ERROR_TRIVIAL,
 			)
 		);
