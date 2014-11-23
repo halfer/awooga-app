@@ -69,13 +69,14 @@ class UpdateAllTest extends TestCase
 			}
 		}
 
-		// Create an importer
-		$importer = $this->getImporterInstanceWithRun($pdo, 1);
+		// Create updater and importer classes, create a run
+		$updater = new UpdateAllTestHarness();
+		$updater->setDriver($pdo);
+		$importer = $this->getImporterInstanceWithRun($pdo, $updater->createRun());
+		$updater->setImporter($importer);
 
 		// Request some repos and make sure we get the right number
-		$updater = new UpdateAllTestHarness($importer);
 		$processSize = 7;
-		$updater->setDriver($pdo);
 		$repos = $updater->getNextRepos($processSize);
 		$this->assertEquals(
 			$processSize,

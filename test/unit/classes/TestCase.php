@@ -131,10 +131,15 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	 * 
 	 * @param \PDO $pdo
 	 * @param integer $runId
+	 * @param string $repoRoot
+	 * @return \Awooga\Testing\GitImporterHarness
 	 */
-	protected function getImporterInstanceWithRun(\PDO $pdo, $runId)
+	protected function getImporterInstanceWithRun(\PDO $pdo, $runId, $repoRoot = null)
 	{
-		$importer = new GitImporterHarness($runId, $this->getTestRepoRoot());
+		$importer = new GitImporterHarness(
+			$runId,
+			is_null($repoRoot) ? $this->getTestRepoRoot() : $repoRoot
+		);
 		$importer->setDriver($pdo);
 
 		return $importer;

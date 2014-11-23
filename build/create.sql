@@ -60,6 +60,11 @@ INSERT INTO issue (code) VALUES
 	('uncategorised')
 ;
 
+CREATE TABLE run (
+	id INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	created_at DATETIME NOT NULL
+);
+
 /* The retry count is the last X rows for a repo that are unsuccessful */
 CREATE TABLE repository_log (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL,
@@ -72,12 +77,6 @@ CREATE TABLE repository_log (
 	created_at DATETIME NOT NULL,
 	log_level ENUM ('success', 'trivial', 'serious') NOT NULL,
 
-	CONSTRAINT repository_log_repo FOREIGN KEY (repository_id) REFERENCES repository (id)
-);
-
-CREATE TABLE run (
-	id INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL,
-	created_at DATETIME NOT NULL
-
-	/* @todo Create a constraint here */
+	CONSTRAINT repository_log_repo FOREIGN KEY (repository_id) REFERENCES repository (id),
+	CONSTRAINT repository_log_run FOREIGN KEY (run_id) REFERENCES run (id)
 );

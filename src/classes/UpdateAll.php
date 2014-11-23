@@ -4,6 +4,7 @@ namespace Awooga;
 
 class UpdateAll
 {
+	protected $importer;
 	protected $repoRoot;
 
 	use Database;
@@ -13,6 +14,7 @@ class UpdateAll
 	 */
 	public function __construct(GitImporter $importer = null, $repoRoot = null)
 	{
+		$this->importer = $importer;
 		$this->repoRoot = $repoRoot;
 	}
 
@@ -129,7 +131,7 @@ class UpdateAll
 		if (!$ok)
 		{
 			throw new \Exception(
-				
+				"Run could not be created"
 			);
 		}
 

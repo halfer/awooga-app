@@ -14,4 +14,9 @@ class UpdateAllTestHarness extends \Awooga\UpdateAll
 	{
 		return parent::createRun();
 	}
+
+	public function setImporter(\Awooga\GitImporter $importer)
+	{
+		$this->importer = $importer;
+	}
 }

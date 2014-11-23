@@ -19,6 +19,8 @@ class GitImporterTest extends TestCase
 		require_once $root . '/src/classes/GitImporter.php';
 		// @todo Rename this to GitImporterTestHarness
 		require_once $root . '/test/unit/classes/GitImporterHarness.php';
+		require_once $root . '/src/classes/UpdateAll.php';
+		require_once $root . '/test/unit/classes/UpdateAllTestHarness.php';
 	}
 
 	/**
@@ -157,7 +159,7 @@ class GitImporterTest extends TestCase
 		$repoId = $this->buildDatabase($this->getDriver(false));
 
 		// Scan everything in this repo
-		$importer = $this->getImporterInstance($this->getDriver());
+		$importer = $this->getImporterInstanceWithRun($this->getDriver(), $this->createRun());
 		$importer->scanRepoWithLogging($repoId, $newRelativePath = 'success');
 
 		// Check the numbers of scanned vs successful
@@ -177,7 +179,7 @@ class GitImporterTest extends TestCase
 		$this->checkLogsGenerated(0, 0, 0);
 
 		// Scan everything in this repo
-		$importer = $this->getImporterInstance($this->getDriver());
+		$importer = $this->getImporterInstanceWithRun($this->getDriver(), $this->createRun());
 		$importer->scanRepo($repoId, $newRelativePath = 'fail');
 
 		// Check the numbers of scanned vs successful
@@ -199,7 +201,7 @@ class GitImporterTest extends TestCase
 		// Set up a pretend repo
 		$tempRoot = $this->getTempFolder();
 		$pdo = $this->getDriver();
-		$importer = $this->getImporterInstance($pdo, $tempRoot);
+		$importer = $this->getImporterInstanceWithRun($pdo, $this->createRun(), $tempRoot);
 
 		// Create a repo and a few bad reports
 		list($absolutePath, $relativePath) = $this->createTempRepoFolder();
@@ -254,7 +256,7 @@ class GitImporterTest extends TestCase
 
 		// Set up a pretend repo
 		$tempRoot = $this->getTempFolder();
-		$importer = $this->getImporterInstance($this->getDriver(), $tempRoot);
+		$importer = $this->getImporterInstanceWithRun($this->getDriver(), $this->createRun(), $tempRoot);
 
 		// Create a repo and one huge report that should fail
 		list($absolutePath, $relativePath) = $this->createTempRepoFolder();
@@ -338,7 +340,7 @@ class GitImporterTest extends TestCase
 		// Check we have no logs to start with
 		$this->checkLogsGenerated(0, 0, 0);
 
-		$importer = $this->getImporterInstance($this->getDriver());
+		$importer = $this->getImporterInstanceWithRun($this->getDriver(), $this->createRun());
 
 		// These are the log levels we will test
 		$logLevels = array(
@@ -379,7 +381,7 @@ class GitImporterTest extends TestCase
 		// Set up repository and importer
 		$repoId = $this->buildDatabase($this->getDriver(false));
 		$pdo = $this->getDriver();
-		$importer = $this->getImporterInstance($pdo);
+		$importer = $this->getImporterInstanceWithRun($pdo, $this->createRun());
 
 		// This (plus the harness) means we don't actually do a file move (hmm, should we?)
 		$importer->setCheckoutPath($relativePath = 'success');
@@ -420,7 +422,6 @@ class GitImporterTest extends TestCase
 		// Check increasing the fail count increases the retry time
 		$oldMinutes = $this->runRepeatedFails(
 			$repoId,
-			1,
 			10,
 			function($test, $minutes, $oldMinutes) {
 				$test->assertTrue(
@@ -431,14 +432,13 @@ class GitImporterTest extends TestCase
 		);
 
 		// Do a successful call
-		$importer = $this->getImporterInstanceWithRun($pdo, 11);
+		$importer = $this->getImporterInstanceWithRun($pdo, $this->createRun());
 		$importer->setCheckoutPath($relativePath = 'success');
 		$importer->processRepo($repoId, 'http://example.com', '/dummy/old/path');
 
 		// Now do another failed call, check the retry has been reset
 		$this->runRepeatedFails(
 			$repoId,
-			12,
 			1,
 			function($test, $minutes, $oldMinutes) {
 				$test->assertTrue(
@@ -450,7 +450,7 @@ class GitImporterTest extends TestCase
 		);
 	}
 
-	protected function runRepeatedFails($repoId, $startRunId, $count, callable $test, $oldMinutes = null)
+	protected function runRepeatedFails($repoId, $count, callable $test, $oldMinutes = null)
 	{
 		$pdo = $this->getDriver();
 
@@ -463,17 +463,17 @@ class GitImporterTest extends TestCase
 			)
 		);
 
-		// Do this across a number of faked runs (the run rows don't actually exist)
-		for($runId = $startRunId; $runId < $startRunId + $count; $runId++)
+		// Do this across a number of runs
+		for($run = 0; $run < $count; $run++)
 		{
 			// Set up a repo for a serious failure
-			$importer = $this->getImporterInstanceWithRun($pdo, $runId);
+			$importer = $this->getImporterInstanceWithRun($pdo, $this->createRun());
 			$importer->setCheckoutPath($relativePath = 'success');
 			$importer->makeGitFail();
 			$importer->processRepo($repoId, 'http://example.com', '/dummy/old/path');
 
 			// Check we have the right number of contiguous errors
-			$this->assertEquals(1 + $runId - $startRunId, $importer->countRecentFails($repoId));
+			$this->assertEquals($run + 1, $importer->countRecentFails($repoId));
 
 			// Check that the rescheduling increases with each failure
 			$dueDate = $this->fetchColumn(
@@ -506,6 +506,19 @@ class GitImporterTest extends TestCase
 		}
 
 		return $oldMinutes;
+	}
+
+	/**
+	 * Creates a run for us, the log table depends on it
+	 * 
+	 * @return integer Run ID
+	 */
+	protected function createRun()
+	{
+		$updater = new UpdateAllTestHarness();
+		$updater->setDriver($this->getDriver());
+
+		return $updater->createRun();
 	}
 
 	protected function createTempRepoFolder()
