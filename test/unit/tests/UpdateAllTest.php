@@ -15,7 +15,7 @@ class UpdateAllTest extends TestCase
 		require_once $root . '/src/classes/UpdateAll.php';
 		require_once $root . '/test/unit/classes/UpdateAllTestHarness.php';
 		require_once $root . '/src/classes/GitImporter.php';
-		require_once $root . '/test/unit/classes/GitImporterHarness.php';
+		require_once $root . '/test/unit/classes/GitImporterTestHarness.php';
 	}
 
 	/**

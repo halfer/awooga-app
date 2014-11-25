@@ -134,11 +134,11 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	 * 
 	 * @param \PDO $pdo Database connection
 	 * @param string $repoRoot Fully-qualified path to repository (optional)
-	 * @return \Awooga\Testing\GitImporterHarness
+	 * @return \Awooga\Testing\GitImporterTestHarness
 	 */
 	protected function getImporterInstance(\PDO $pdo = null, $repoRoot = null)
 	{
-		$importer = new GitImporterHarness(
+		$importer = new GitImporterTestHarness(
 			1,
 			is_null($repoRoot) ? $this->getTestRepoRoot() : $repoRoot
 		);
@@ -160,7 +160,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	 */
 	protected function getImporterInstanceWithRun(\PDO $pdo, $runId, $repoRoot = null)
 	{
-		$importer = new GitImporterHarness(
+		$importer = new GitImporterTestHarness(
 			$runId,
 			is_null($repoRoot) ? $this->getTestRepoRoot() : $repoRoot
 		);

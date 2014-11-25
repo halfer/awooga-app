@@ -5,7 +5,7 @@ namespace Awooga\Testing;
 /**
  * This class inherits from the real GitImporter, making it more amenable to testing
  */
-class GitImporterHarness extends \Awooga\GitImporter
+class GitImporterTestHarness extends \Awooga\GitImporter
 {
 	const SCAN_MODE_NORMAL = 1;
 	const SCAN_MODE_COUNT = 2;
