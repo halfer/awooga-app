@@ -202,6 +202,11 @@ class GitImporter
 		return true;
 	}
 
+	public function setRunId($runId)
+	{
+		$this->runId = $runId;
+	}
+
 	/**
 	 * Clones the repo
 	 * 

@@ -42,7 +42,7 @@ class UpdateAllTest extends TestCase
 	public function testNextRepos()
 	{
 		// Build the database, creates one default repo
-		$this->buildDatabase($this->getDriver(false));
+		$this->buildDatabase($this->getDriver(false), false);
 		$pdo = $this->getDriver();
 
 		// Create 10 repos in the database
@@ -53,8 +53,8 @@ class UpdateAllTest extends TestCase
 		";
 		$statement = $pdo->prepare($sql);
 
-		// ID 1 is taken, and this table isn't autocomplete for the time being
-		for($i = 2; $i <= 11; $i++)
+		// Remember this table isn't auto-increment for the time being
+		for($i = 1; $i <= 10; $i++)
 		{
 			$ok = $statement->execute(
 				array(
@@ -95,10 +95,10 @@ class UpdateAllTest extends TestCase
 			$importer->repoLog($repo['id'], \Awooga\GitImporter::LOG_TYPE_FETCH);
 		}
 
-		// Request another 7, should get 4 more
+		// Request another 7, should get 3 more
 		list($nextRunId, $reposNext) = $updater->getNextRepos($processSize);
 		$this->assertEquals(
-			4,
+			3,
 			count($reposNext),
 			"Ensure the next set of repos is the right size"
 		);
@@ -124,13 +124,39 @@ class UpdateAllTest extends TestCase
 		$this->assertNull($lastRunId, "Checking new set of repos has no run ID");
 	}
 
+	/**
+	 * Does a simple end-to-end for a set of repositories
+	 * 
+	 * @todo Not yet finished
+	 */
 	public function testUpdateSimple()
 	{
-		
+		// Build the database, creates one default repo
+		$this->buildDatabase($this->getDriver(false), false);
+		$pdo = $this->getDriver();
+
+		$updater = new UpdateAllTestHarness();
+		$updater->setDriver($pdo);
+		$runId = $updater->createRun();
+		$importer = $this->getImporterInstanceWithRun($pdo, $runId, $this->getTempFolder());
+		$updater->setImporter($importer);
+
+		// Create some repos
+		for($repoId = 1; $repoId < 10; $repoId++)
+		{
+			// Write a new repo row
+			$this->buildRepo($pdo, $repoId);
+		}
+
+		// Run a scan
+		$updater->run(20, false);
 	}
 
-	public function testGetNext()
+	protected function setMountPath($repoId, $mountPath)
 	{
-		
+		$sql = "
+			UPDATE
+				repository
+		";
 	}
 }

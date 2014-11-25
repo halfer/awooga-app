@@ -11,6 +11,8 @@ class UpdateAll
 
 	/**
 	 * Constructor for this class
+	 * 
+	 * @todo The repoRoot is a feature of the importer, so we can remove it from here
 	 */
 	public function __construct(GitImporter $importer = null, $repoRoot = null)
 	{
@@ -18,20 +20,30 @@ class UpdateAll
 		$this->repoRoot = $repoRoot;
 	}
 
-	public function run()
+	public function run($limit = 20, $sleep = true)
 	{
-		// @todo We don't want to create a run if there is still something left of the old run
-		$repoRows = $this->getNextRepos(20);
-		$runId = $this->createRun();
+		// Only create a run if one is required
+		list($runId, $repoRows) = $this->getNextRepos($limit);
+		if (!$runId)
+		{
+			$runId = $this->createRun();
+		}
 
-		$importer = new GitImporter($runId, $this->repoRoot);
+		$importer = $this->getImporter();
+		$importer->setRunId($runId);
 
 		// Import each repository
 		foreach ($repoRows as $repoRow)
 		{
-			print_r($repoRow);
-			//$importer->processRepo($repoId, $url, $oldPath);
-			sleep(2);
+			$importer->processRepo(
+				$repoRow['id'],
+				$repoRow['url'],
+				$repoRow['mount_path']
+			);
+			if ($sleep)
+			{
+				sleep(2);
+			}
 		}
 	}
 
@@ -104,7 +116,7 @@ class UpdateAll
 			print_r($statement->errorInfo(), true);
 		}
 
-		return $statement->fetchAll();
+		return $statement->fetchAll(\PDO::FETCH_ASSOC);
 	}
 
 	protected function getFirstRepos($limit)
@@ -119,9 +131,8 @@ class UpdateAll
 		";
 		$statement = $this->getDriver()->prepare($sql);
 		$ok = $statement->execute();
-		$repoRows = $statement->fetchAll();
 
-		return $repoRows;
+		return $statement->fetchAll(\PDO::FETCH_ASSOC);
 	}
 
 	/**
@@ -150,5 +161,15 @@ class UpdateAll
 		}
 
 		return $pdo->lastInsertId();
+	}
+
+	protected function getImporter()
+	{
+		if (!$this->importer)
+		{
+			throw new \Exception("No importer set");
+		}
+
+		return $this->importer;
 	}
 }

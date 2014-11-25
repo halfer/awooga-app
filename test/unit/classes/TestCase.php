@@ -39,32 +39,56 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	 * @param \PDO $pdo
 	 * @return integer Repository ID
 	 */
-	protected function buildDatabase(\PDO $pdo)
+	protected function buildDatabase(\PDO $pdo, $createRepo = true)
 	{
 		$this->runSqlFile($pdo, $this->getProjectRoot() . '/test/build/init.sql');
 		$this->runSqlFile($pdo, $this->getProjectRoot() . '/build/create.sql');
-		$repoId = $this->buildRepo($pdo, 1);
+		$repoId = $createRepo ? $this->buildRepo($pdo, 1) : null;
 
 		return $repoId;
 	}
 
 	/**
-	 * Creates a dummy repo account (hardwired ID for now)
+	 * Creates a dummy repo account
 	 * 
 	 * @param \PDO $pdo
 	 */
-	protected function buildRepo(\PDO $pdo)
+	protected function buildRepo(\PDO $pdo, $repoId = 1)
 	{
-		$repoId = 1;
 		$sql = "
 			INSERT INTO
 				repository
 			(id, url, created_at)
-			VALUES ($repoId, 'http://example.com/repo.git', '2014-11-18')
+			VALUES (:repo_id, 'http://example.com/repo.git', '2014-11-18')
 		";
-		$pdo->exec($sql);
+		$statement = $pdo->prepare($sql);
+		$ok = $statement->execute(
+			array(':repo_id' => $repoId, )
+		);
+
+		// Bork if the query fails (e.g. PK clash)
+		if (!$ok)
+		{
+			throw new \Exception(
+				"Creating a repository row failed:" . print_r($statement->errorInfo(), true)
+			);
+		}
 
 		return $repoId;
+	}
+
+	protected function createTempRepoFolder()
+	{
+		$relativePath = $this->randomLeafname();
+		$absolutePath = $this->getTempFolder() . '/' . $relativePath;
+		mkdir($absolutePath);
+
+		return array($absolutePath, $relativePath);
+	}
+
+	protected function randomLeafname()
+	{
+		return 'path' . rand(1, 9999999) . time();
 	}
 
 	protected function runSqlFile(\PDO $pdo, $sqlPath)

@@ -521,20 +521,6 @@ class GitImporterTest extends TestCase
 		return $updater->createRun();
 	}
 
-	protected function createTempRepoFolder()
-	{
-		$relativePath = $this->randomLeafname();
-		$absolutePath = $this->getTempFolder() . '/' . $relativePath;
-		mkdir($absolutePath);
-
-		return array($absolutePath, $relativePath);
-	}
-
-	protected function randomLeafname()
-	{
-		return 'path' . rand(1, 9999999) . time();
-	}
-
 	protected function checkFilesSeen(\Awooga\GitImporter $importer, $expectedCount)
 	{
 		// Check we've scanned the right number of reports
