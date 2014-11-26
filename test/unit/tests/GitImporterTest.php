@@ -90,7 +90,7 @@ class GitImporterTest extends TestCase
 
 		// Let's update the location
 		$expectedPath = 'new-path';
-		$importer->moveRepo($repoId, $oldPath = null, $expectedPath);
+		$importer->moveRepo($repoId, $expectedPath);
 		$newMountPath = $this->fetchColumn($pdo, $sql, array(':repo_id' => $repoId, ));
 		$this->assertEquals($expectedPath, $newMountPath, "Check repo path is reset");
 	}
@@ -111,15 +111,18 @@ class GitImporterTest extends TestCase
 		$importer = $this->getImporterInstance($this->getDriver(), $tempRoot);
 
 		// Let's create a folder we can delete
-		$oldRelativePath = 'path' . rand(1, 9999999) . time();
+		$oldRelativePath = $this->randomLeafname();
 		$oldPath = $tempRoot . '/' . $oldRelativePath;
 		mkdir($oldPath);
 
 		// Check that the folder exists here, to avoid permissions issues making it pass
 		$this->assertTrue(file_exists($oldPath), "Check new folder actually exists");
 
+		// Normally this is done for us, but we need to emulate at this low level
+		$importer->updateMountPath($repoId, $oldRelativePath);
+
 		// Now let's do a "move", so that this folder is deleted
-		$importer->moveRepo($repoId, $oldRelativePath, $newRelativePath);
+		$importer->moveRepo($repoId, $newRelativePath);
 
 		// Check that the folder is now gone
 		$this->assertFalse(file_exists($oldPath), "Check the folder has now been zapped");		
@@ -134,12 +137,14 @@ class GitImporterTest extends TestCase
 	{
 		$repoId = $this->buildDatabase($this->getDriver(false));
 
-		// Temporary path to delete (it won't actually happen, so it does not need to exist)
-		$oldPath = 'dummy1';
-		$newPath = 'dummy2';
-
+		// This contains an empty repo root, which is invalid
 		$importer = $this->getImporterInstance($this->getDriver(), $repoRoot = '');
-		$importer->moveRepo($repoId, $oldPath, $newPath);
+
+		// Let's add a (fake) dummy mount point in the database
+		$importer->updateMountPath($repoId, 'old-location');
+
+		// I use a dummy path to delete (it won't actually happen, so it does not need to exist)
+		$importer->moveRepo($repoId, 'new-location');
 	}
 
 	/**
@@ -155,12 +160,12 @@ class GitImporterTest extends TestCase
 		$tempRoot = $this->getTempFolder();
 		$importer = $this->getImporterInstance($this->getDriver(), $tempRoot);
 
-		// Let's NOT create a folder, so a file system error is caused
-		$oldRelativePath = $this->randomLeafname();
+		// Let's add a (fake) dummy mount point in the database
+		$importer->updateMountPath($repoId, 'dummy-location');
 
 		// Now let's do a "move" set up to fail
 		$importer->makeMoveFail();
-		$importer->moveRepo($repoId, $oldRelativePath, $newRelativePath);		
+		$importer->moveRepo($repoId, $newRelativePath);		
 	}
 
 	/**
@@ -411,7 +416,7 @@ class GitImporterTest extends TestCase
 
 		// We use a test hardness feature to do a fake checkout (really just a file copy)
 		$importer->setCheckoutPath($relativePath = 'success');
-		$importer->processRepo($repoId, $this->getTestRepoRoot() . '/' . $relativePath, null);
+		$importer->processRepo($repoId, $this->getTestRepoRoot() . '/' . $relativePath);
 		$importer->deleteOldRepo($relativePath);
 		
 		$this->assertEquals(
@@ -460,7 +465,7 @@ class GitImporterTest extends TestCase
 		// Do a successful call
 		$importer = $this->getImporterInstanceWithRun($pdo, $this->createRun(), $this->getTempFolder());
 		$importer->setCheckoutPath($relativePath = 'success');
-		$importer->processRepo($repoId, $this->getTestRepoRoot() . '/' . $relativePath, null);
+		$importer->processRepo($repoId, $this->getTestRepoRoot() . '/' . $relativePath);
 
 		// Make sure it was successful
 		$this->assertEquals(
@@ -509,7 +514,7 @@ class GitImporterTest extends TestCase
 			$importer = $this->getImporterInstanceWithRun($pdo, $this->createRun(), $this->getTempFolder());
 			$importer->setCheckoutPath($relativePath = 'success');
 			$importer->makeGitFail();
-			$importer->processRepo($repoId, 'http://example.com', null);
+			$importer->processRepo($repoId, 'http://example.com');
 
 			// Check we have the right number of contiguous errors
 			$this->assertEquals($run + 1, $importer->countRecentFails($repoId));

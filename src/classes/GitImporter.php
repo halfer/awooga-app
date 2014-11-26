@@ -27,6 +27,7 @@ class GitImporter
 	 * Constructs an importer object
 	 * 
 	 * @todo Repo ID should be a class-wide property
+	 * @todo Should we throw exception if repoRoot is null/empty?
 	 * 
 	 * @param integer $runId
 	 * @param string $repoRoot
@@ -47,15 +48,14 @@ class GitImporter
 	 * 
 	 * @param integer $repoId
 	 * @param string $url
-	 * @param string $oldPath
 	 * @return boolean
 	 */
-	public function processRepo($repoId, $url, $oldPath)
+	public function processRepo($repoId, $url)
 	{
 		// If any part fails, the following will (deliberately) not be called
 		$ok =
 			($newPath = $this->cloneRepoWithLogging($repoId, $url)) &&
-			$this->moveRepoWithLogging($repoId, $oldPath, $newPath) &&
+			$this->moveRepoWithLogging($repoId, $newPath) &&
 			$this->scanRepoWithLogging($repoId, $newPath);
 
 		// We always reschedule
@@ -97,15 +97,14 @@ class GitImporter
 	 * Tries to move a repository, and logs the success/failure
 	 * 
 	 * @param integer $repoId
-	 * @param string $oldPath
 	 * @param string $newPath
 	 * @return boolean
 	 */
-	public function moveRepoWithLogging($repoId, $oldPath, $newPath)
+	public function moveRepoWithLogging($repoId, $newPath)
 	{
 		try
 		{
-			$this->moveRepo($repoId, $oldPath, $newPath);
+			$this->moveRepo($repoId, $newPath);
 			$this->repoLog($repoId, self::LOG_TYPE_MOVE);
 		}
 		catch (\Exception $e)
@@ -113,7 +112,7 @@ class GitImporter
 			$this->repoLog(
 				$repoId,
 				self::LOG_TYPE_MOVE,
-				"Move from $oldPath to $newPath failed",
+				"Move repo to {$newPath} failed",
 				self::LOG_LEVEL_ERROR_SERIOUS
 			);
 
@@ -268,25 +267,24 @@ class GitImporter
 	/**
 	 * Updates the location and deletes the old one if necessary
 	 *
-	 * @todo This would be better if it deleted the repo referenced in the database.
-	 * We'd then not need the $oldPath parameter at all - that's read from the db anyway!
-	 *  
 	 * @param integer $repoId
-	 * @param string $oldPath
 	 * @param string $newPath
 	 * @throws Exceptions\SeriousException
 	 */
-	protected function moveRepo($repoId, $oldPath, $newPath)
+	protected function moveRepo($repoId, $newPath)
 	{
-		// Update the row with the new location
-		$sql = "
-			UPDATE repository SET mount_path = :path WHERE id = :id
-		";
-		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute(array(':path' => $newPath, ':id' => $repoId, ));
+		// Get the old path
+		$statementRead = $this->getDriver()->prepare(
+			$sql = "SELECT mount_path FROM repository WHERE id = :repo_id"
+		);
+		$okRead = $statementRead->execute(array(':repo_id' => $repoId, ));
+		$oldPath = $statementRead->fetchColumn();
 
-		// Let's bork if the query failed
-		if (!$ok)
+		// Update the row with the new location
+		$okWrite = $this->updateMountPath($repoId, $newPath);
+
+		// Let's bork if either of the queries failed
+		if (!$okRead || !$okWrite)
 		{
 			throw new Exceptions\SeriousException("Updating the repo path failed");
 		}
@@ -296,14 +294,31 @@ class GitImporter
 		// Delete the old location if there is one
 		if ($oldPath)
 		{
-			$ok = $this->deleteOldRepo($oldPath);
-			if (!$ok)
+			if (!$this->deleteOldRepo($oldPath))
 			{
 				throw new Exceptions\SeriousException("Problem when deleting the old repo");
 			}
 
 			$this->writeDebug("Remove old location '{$oldPath}' for repo #{$repoId}");
 		}
+	}
+
+	/**
+	 * Updates the relative mount point in the database
+	 * 
+	 * @todo Can this be made protected, and add a public accesor in the test harness?
+	 * 
+	 * @param integer $repoId
+	 * @param string $newPath
+	 * @return boolean
+	 */
+	public function updateMountPath($repoId, $newPath)
+	{
+		$statement = $this->getDriver()->prepare(
+			"UPDATE repository SET mount_path = :path WHERE id = :repo_id"
+		);
+
+		return $statement->execute(array(':path' => $newPath, ':repo_id' => $repoId, ));		
 	}
 
 	/**

@@ -98,12 +98,11 @@ class GitImporterTestHarness extends \Awooga\GitImporter
 	 * A public entry point for the move method
 	 * 
 	 * @param integer $repoId
-	 * @param string $oldPath
 	 * @param string $newPath
 	 */
-	public function moveRepo($repoId, $oldPath, $newPath)
+	public function moveRepo($repoId, $newPath)
 	{
-		return parent::moveRepo($repoId, $oldPath, $newPath);
+		return parent::moveRepo($repoId, $newPath);
 	}
 	/**
 	 * A public entry point for the scan method
