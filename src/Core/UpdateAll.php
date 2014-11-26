@@ -1,6 +1,6 @@
 <?php
 
-namespace Awooga;
+namespace Awooga\Core;
 
 class UpdateAll
 {
@@ -109,6 +109,7 @@ class UpdateAll
 		$ok = $statement->execute(array(':repo_id' => $fromRepoId, ));
 		if (!$ok)
 		{
+			// @todo Throw an exception here please
 			print_r($statement->errorInfo(), true);
 		}
 

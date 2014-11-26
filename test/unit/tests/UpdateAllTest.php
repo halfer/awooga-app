@@ -12,9 +12,7 @@ class UpdateAllTest extends TestCase
 		parent::setUp();
 
 		$root = $this->getProjectRoot();
-		require_once $root . '/src/classes/UpdateAll.php';
 		require_once $root . '/test/unit/classes/UpdateAllTestHarness.php';
-		require_once $root . '/src/classes/GitImporter.php';
 		require_once $root . '/test/unit/classes/GitImporterTestHarness.php';
 	}
 
@@ -92,7 +90,7 @@ class UpdateAllTest extends TestCase
 		// Let's now add success logs against all of them
 		foreach($repos as $repo)
 		{
-			$importer->repoLog($repo['id'], \Awooga\GitImporter::LOG_TYPE_FETCH);
+			$importer->repoLog($repo['id'], \Awooga\Core\GitImporter::LOG_TYPE_FETCH);
 		}
 
 		// Request another 7, should get 3 more
@@ -109,7 +107,7 @@ class UpdateAllTest extends TestCase
 		// Let's now add success logs against all of them
 		foreach($reposNext as $repo)
 		{
-			$importer->repoLog($repo['id'], \Awooga\GitImporter::LOG_TYPE_FETCH);
+			$importer->repoLog($repo['id'], \Awooga\Core\GitImporter::LOG_TYPE_FETCH);
 		}
 
 		// Ensure another request starts again

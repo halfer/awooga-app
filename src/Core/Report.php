@@ -1,6 +1,6 @@
 <?php
 
-namespace Awooga;
+namespace Awooga\Core;
 
 class Report
 {
@@ -40,7 +40,7 @@ class Report
 	 * Sets a URL or an array of URLs
 	 * 
 	 * @param string|array $url
-	 * @throws Exceptions\TrivialException
+	 * @throws \Awooga\Exceptions\TrivialException
 	 */
 	public function setUrl($url)
 	{
@@ -70,7 +70,7 @@ class Report
 
 		if ($formatFail)
 		{
-			throw new Exceptions\TrivialException(
+			throw new \Awooga\Exceptions\TrivialException(
 				"URLs must either be a string or an array of strings"
 			);
 		}
@@ -78,7 +78,7 @@ class Report
 		// Check for duplicates, these are not allowed
 		if (array_unique($url) != $url)
 		{
-			throw new Exceptions\TrivialException(
+			throw new \Awooga\Exceptions\TrivialException(
 				"URL arrays may not contain duplicates"
 			);			
 		}
@@ -120,7 +120,7 @@ class Report
 			// If the issue doesn't have a issue_cat_code, bomb out
 			if (!isset($issue['issue_cat_code']))
 			{
-				throw new Exceptions\TrivialException(
+				throw new \Awooga\Exceptions\TrivialException(
 					"Issues must have an issue_cat_code entry"
 				);
 			}
@@ -129,7 +129,7 @@ class Report
 			$issueCode = $issue['issue_cat_code'];
 			if (!$this->validateIssueCatCode($issueCode))
 			{
-				throw new Exceptions\TrivialException(
+				throw new \Awooga\Exceptions\TrivialException(
 					"Issues must have a valid issue_cat_code"
 				);
 			}
@@ -138,7 +138,7 @@ class Report
 			{
 				if (!is_string($issue['description']))
 				{
-					throw new Exceptions\TrivialException(
+					throw new \Awooga\Exceptions\TrivialException(
 						'Descriptions must be strings'
 					);
 				}
@@ -159,7 +159,7 @@ class Report
 		// Check for duplicates, these are not allowed
 		if (array_unique($issueCodes) != $issueCodes)
 		{
-			throw new Exceptions\TrivialException(
+			throw new \Awooga\Exceptions\TrivialException(
 				"Issue codes may not be duplicated in a report"
 			);			
 		}
@@ -200,7 +200,7 @@ class Report
 		$notifiedDate = \DateTime::createFromFormat('Y-m-d', $notifiedDate);
 		if (!$notifiedDate)
 		{
-			throw new Exceptions\TrivialException("Invalid author notification date passed");
+			throw new \Awooga\Exceptions\TrivialException("Invalid author notification date passed");
 		}
 
 		$this->notifiedDate = $notifiedDate;
@@ -281,7 +281,7 @@ class Report
 		// Bork if there is an issue
 		if ($ok === false)
 		{
-			throw new Exceptions\SeriousException(
+			throw new \Awooga\Exceptions\SeriousException(
 				"Could not delete rows from $tableUntainted"
 			);
 		}
@@ -365,7 +365,7 @@ class Report
 		$ok = $statement->execute($params);
 		if ($ok === false)
 		{
-			throw new Exceptions\TrivialException(
+			throw new \Awooga\Exceptions\TrivialException(
 				'Save operation failed: ' . print_r($statement->errorInfo(), true)
 			);
 		}
@@ -479,7 +479,7 @@ class Report
 				{
 					if ($row['report_id'] != $reportId)
 					{
-						throw new Exceptions\TrivialException(
+						throw new \Awooga\Exceptions\TrivialException(
 							"URLs split over multiple reports cannot be updated by a single report"
 						);
 					}
@@ -495,7 +495,7 @@ class Report
 	{
 		if (!is_string($string))
 		{
-			throw new Exceptions\TrivialException("This field is expected to be a string");			
+			throw new \Awooga\Exceptions\TrivialException("This field is expected to be a string");			
 		}
 	}
 
@@ -503,7 +503,7 @@ class Report
 	{
 		if (!is_array($array))
 		{
-			throw new Exceptions\TrivialException("This field is expected to be an array");			
+			throw new \Awooga\Exceptions\TrivialException("This field is expected to be an array");			
 		}		
 	}
 
@@ -511,7 +511,7 @@ class Report
 	{
 		if (!$data)
 		{
-			throw new Exceptions\TrivialException("This field is required");
+			throw new \Awooga\Exceptions\TrivialException("This field is required");
 		}		
 	}
 }

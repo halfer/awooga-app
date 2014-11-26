@@ -1,6 +1,6 @@
 <?php
 
-namespace Awooga;
+namespace Awooga\Core;
 
 class GitImporter
 {
@@ -141,7 +141,7 @@ class GitImporter
 			$pdo->commit();
 			$this->repoLog($repoId, self::LOG_TYPE_SCAN);
 		}
-		catch (Exceptions\SeriousException $e)
+		catch (\Awooga\Exceptions\SeriousException $e)
 		{
 			// We'll already have logged, so no need to do it again
 			$exitEarly = true;
@@ -217,7 +217,7 @@ class GitImporter
 	 * 
 	 * @param string $url
 	 * @return string
-	 * @throws Exceptions\SeriousException
+	 * @throws \Awooga\Exceptions\SeriousException
 	 */
 	protected function cloneRepo($url)
 	{
@@ -230,7 +230,7 @@ class GitImporter
 
 		if (!$ok)
 		{
-			throw new Exceptions\SeriousException("Problem when cloning");
+			throw new \Awooga\Exceptions\SeriousException("Problem when cloning");
 		}
 
 		return $target;
@@ -275,7 +275,7 @@ class GitImporter
 	 *
 	 * @param integer $repoId
 	 * @param string $newPath
-	 * @throws Exceptions\SeriousException
+	 * @throws \Awooga\Exceptions\SeriousException
 	 */
 	protected function moveRepo($repoId, $newPath)
 	{
@@ -292,7 +292,7 @@ class GitImporter
 		// Let's bork if either of the queries failed
 		if (!$okRead || !$okWrite)
 		{
-			throw new Exceptions\SeriousException("Updating the repo path failed");
+			throw new \Awooga\Exceptions\SeriousException("Updating the repo path failed");
 		}
 
 		$this->writeDebug("Update path '{$newPath}' for repo #{$repoId}");
@@ -302,7 +302,7 @@ class GitImporter
 		{
 			if (!$this->deleteOldRepo($oldPath))
 			{
-				throw new Exceptions\SeriousException("Problem when deleting the old repo");
+				throw new \Awooga\Exceptions\SeriousException("Problem when deleting the old repo");
 			}
 
 			$this->writeDebug("Remove old location '{$oldPath}' for repo #{$repoId}");
@@ -332,14 +332,14 @@ class GitImporter
 	 * 
 	 * @param string $oldPath
 	 * @return boolean True on success
-	 * @throws Exceptions\SeriousException
+	 * @throws \Awooga\Exceptions\SeriousException
 	 */
 	protected function deleteOldRepo($oldPath)
 	{
 		// Halt if there's no root, to avoid a dangerous command :)
 		if (!$this->repoRoot)
 		{
-			throw new Exceptions\SeriousException(
+			throw new \Awooga\Exceptions\SeriousException(
 				"No repository root set, cannot delete old repo"
 			);
 		}
@@ -380,7 +380,7 @@ class GitImporter
 					$reportIds[] = $this->scanReport($repoId, $reportPath);
 					$this->writeDebug("\tFound report ..." . substr($reportPath, -80));
 				}
-				catch (Exceptions\TrivialException $e)
+				catch (\Awooga\Exceptions\TrivialException $e)
 				{
 					// Counting trivial exceptions still contributes to failure/stop limit
 					$this->repoLog($repoId, self::LOG_TYPE_SCAN, $e->getMessage(), self::LOG_LEVEL_ERROR_TRIVIAL);
@@ -393,7 +393,7 @@ class GitImporter
 				}
 			}
 		}
-		catch (Exceptions\SeriousException $e)
+		catch (\Awooga\Exceptions\SeriousException $e)
 		{
 			// These errors are always OK to save directly into the log
 			$this->repoLog($repoId, self::LOG_TYPE_SCAN, $e->getMessage(), self::LOG_LEVEL_ERROR_SERIOUS);
@@ -420,13 +420,13 @@ class GitImporter
 		// Unlikely to happen, we just scanned!
 		if (!file_exists($reportPath))
 		{
-			throw new Exceptions\SeriousException('File cannot be found');
+			throw new \Awooga\Exceptions\SeriousException('File cannot be found');
 		}
 
 		$size = filesize($reportPath);
 		if ($size > self::MAX_REPORT_SIZE)
 		{
-			throw new Exceptions\FileException('Report of ' . $size . ' bytes is too large');
+			throw new \Awooga\Exceptions\FileException('Report of ' . $size . ' bytes is too large');
 		}
 
 		// Let's get this in array form
@@ -435,7 +435,7 @@ class GitImporter
 		// If this is not an array, throw a trivial exception
 		if (!is_array($data))
 		{
-			throw new Exceptions\TrivialException("Could not parse report into an array");
+			throw new \Awooga\Exceptions\TrivialException("Could not parse report into an array");
 		}
 
 		// Parse the data
@@ -460,7 +460,7 @@ class GitImporter
 				$reportId = $report->save();
 				break;
 			default:
-				throw new Exceptions\TrivialException("Unrecognised version number");
+				throw new \Awooga\Exceptions\TrivialException("Unrecognised version number");
 		}
 
 		return $reportId;
@@ -499,7 +499,7 @@ class GitImporter
 
 		if ($statement->fetchColumn() > self::MAX_FAILS_BEFORE_DISABLE)
 		{
-			throw new Exceptions\SeriousException(
+			throw new \Awooga\Exceptions\SeriousException(
 				"Too many failures with this repo recently, please see log"
 			);
 		}

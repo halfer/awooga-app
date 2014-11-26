@@ -2,6 +2,8 @@
 
 namespace Awooga\Testing;
 
+use Awooga\Core\GitImporter;
+
 // Load the parent relative to dir location
 require_once realpath(__DIR__ . '/..') . '/classes/TestCase.php';
 
@@ -15,10 +17,7 @@ class GitImporterTest extends TestCase
 		parent::setUp();
 
 		$root = $this->getProjectRoot();
-		require_once $root . '/src/classes/Exceptions/FileException.php';
-		require_once $root . '/src/classes/GitImporter.php';
 		require_once $root . '/test/unit/classes/GitImporterTestHarness.php';
-		require_once $root . '/src/classes/UpdateAll.php';
 		require_once $root . '/test/unit/classes/UpdateAllTestHarness.php';
 	}
 
@@ -222,7 +221,7 @@ class GitImporterTest extends TestCase
 
 		// Create a repo and a few bad reports
 		list($absolutePath, $relativePath) = $this->createTempRepoFolder();
-		$maxFails = \Awooga\GitImporter::MAX_FAILS_BEFORE_DISABLE;
+		$maxFails = GitImporter::MAX_FAILS_BEFORE_DISABLE;
 		for ($i = 0; $i < $maxFails * 2; $i++)
 		{
 			file_put_contents(
@@ -371,17 +370,17 @@ class GitImporterTest extends TestCase
 
 		// These are the log levels we will test
 		$logLevels = array(
-			\Awooga\GitImporter::LOG_LEVEL_SUCCESS,
-			\Awooga\GitImporter::LOG_LEVEL_ERROR_TRIVIAL,
-			\Awooga\GitImporter::LOG_LEVEL_ERROR_SERIOUS
+			GitImporter::LOG_LEVEL_SUCCESS,
+			GitImporter::LOG_LEVEL_ERROR_TRIVIAL,
+			GitImporter::LOG_LEVEL_ERROR_SERIOUS
 		);
 
 		// Make success/trivial/serious logs of each type
 		$makeLogs = array(
-			\Awooga\GitImporter::LOG_TYPE_FETCH,
-			\Awooga\GitImporter::LOG_TYPE_MOVE,
-			\Awooga\GitImporter::LOG_TYPE_SCAN,
-			\Awooga\GitImporter::LOG_TYPE_RESCHED,
+			GitImporter::LOG_TYPE_FETCH,
+			GitImporter::LOG_TYPE_MOVE,
+			GitImporter::LOG_TYPE_SCAN,
+			GitImporter::LOG_TYPE_RESCHED,
 		);
 		foreach ($makeLogs as $logType)
 		{
@@ -565,7 +564,7 @@ class GitImporterTest extends TestCase
 		return $updater->createRun();
 	}
 
-	protected function checkFilesSeen(\Awooga\GitImporter $importer, $expectedCount)
+	protected function checkFilesSeen(GitImporter $importer, $expectedCount)
 	{
 		// Check we've scanned the right number of reports
 		$this->assertEquals(

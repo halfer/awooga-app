@@ -8,14 +8,7 @@
 
 $root = dirname(__DIR__);
 $repoRoot = $root . '/filesystem/mount';
-
-// Load library files
-require_once $root . '/src/classes/Database.php';
-require_once $root . '/src/classes/GitImporter.php';
-require_once $root . '/src/classes/Report.php';
-require_once $root . '/src/classes/UpdateAll.php';
-require_once $root . '/src/classes/Exceptions/SeriousException.php';
-require_once $root . '/src/classes/Exceptions/TrivialException.php';
+require_once $root . '/src/autoloader.php';
 
 // Connect to the database
 // @todo Pull this from env config
@@ -23,9 +16,9 @@ $dsn = 'mysql:dbname=awooga;host=localhost;username=awooga_user;password=passwor
 $pdo = new PDO($dsn, 'awooga_user', 'password');
 
 // Set up updater
-$importer = new Awooga\GitImporter($repoRoot, true);
+$importer = new \Awooga\Core\GitImporter($repoRoot, true);
 $importer->setDriver($pdo);
-$updater = new Awooga\UpdateAll($importer);
+$updater = new \Awooga\Core\UpdateAll($importer);
 $updater->setDriver($pdo);
 
 // Give it a whirl!
