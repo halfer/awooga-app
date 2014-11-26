@@ -23,7 +23,7 @@ $dsn = 'mysql:dbname=awooga;host=localhost;username=awooga_user;password=passwor
 $pdo = new PDO($dsn, 'awooga_user', 'password');
 
 // Set up updater
-$importer = new Awooga\GitImporter(null, $repoRoot, true);
+$importer = new Awooga\GitImporter($repoRoot, true);
 $importer->setDriver($pdo);
 $updater = new Awooga\UpdateAll($importer);
 $updater->setDriver($pdo);

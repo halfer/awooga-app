@@ -26,18 +26,18 @@ class GitImporter
 	/**
 	 * Constructs an importer object
 	 * 
-	 * @todo I think the runId should just be a setter, not a constructor item
+	 * I removed the run from the constructor, since we usually rely on UpdateAll to set it.
+	 * 
 	 * @todo Repo ID should be a class-wide property
 	 * @todo Should we throw exception if repoRoot is null/empty?
 	 * 
-	 * @param integer $runId
 	 * @param string $repoRoot
+	 * @param integer $runId
 	 * @param \PDO $pdo
 	 * @param boolean $debug
 	 */
-	public function __construct($runId, $repoRoot, $debug = false)
+	public function __construct($repoRoot, $debug = false)
 	{
-		$this->runId = $runId;
 		$this->repoRoot = $repoRoot;
 		$this->debug = $debug;
 	}
@@ -202,6 +202,11 @@ class GitImporter
 		return true;
 	}
 
+	/**
+	 * Sets the current run ID
+	 * 
+	 * @param integer $runId
+	 */
 	public function setRunId($runId)
 	{
 		$this->runId = $runId;

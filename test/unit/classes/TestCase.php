@@ -139,9 +139,9 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	protected function getImporterInstance(\PDO $pdo = null, $repoRoot = null)
 	{
 		$importer = new GitImporterTestHarness(
-			1,
 			is_null($repoRoot) ? $this->getTestRepoRoot() : $repoRoot
 		);
+		$importer->setRunId(1);
 		if ($pdo)
 		{
 			$importer->setDriver($pdo);
@@ -161,10 +161,10 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	protected function getImporterInstanceWithRun(\PDO $pdo, $runId, $repoRoot = null)
 	{
 		$importer = new GitImporterTestHarness(
-			$runId,
 			is_null($repoRoot) ? $this->getTestRepoRoot() : $repoRoot
 		);
 		$importer->setDriver($pdo);
+		$importer->setRunId($runId);
 
 		return $importer;
 	}
