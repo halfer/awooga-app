@@ -10,8 +10,10 @@ $root = dirname(__DIR__);
 $repoRoot = $root . '/filesystem/mount';
 
 // Load library files
+require_once $root . '/src/classes/Database.php';
 require_once $root . '/src/classes/GitImporter.php';
 require_once $root . '/src/classes/Report.php';
+require_once $root . '/src/classes/UpdateAll.php';
 require_once $root . '/src/classes/Exceptions/SeriousException.php';
 require_once $root . '/src/classes/Exceptions/TrivialException.php';
 
@@ -20,22 +22,11 @@ require_once $root . '/src/classes/Exceptions/TrivialException.php';
 $dsn = 'mysql:dbname=awooga;host=localhost;username=awooga_user;password=password';
 $pdo = new PDO($dsn, 'awooga_user', 'password');
 
-// Set up importer system
-$importer = new Awooga\GitImporter($pdo, $repoRoot, true);
+// Set up updater
+$importer = new Awooga\GitImporter(null, $repoRoot, true);
+$importer->setDriver($pdo);
+$updater = new Awooga\UpdateAll($importer);
+$updater->setDriver($pdo);
 
-$sql = '
-	SELECT * FROM repository
-	WHERE
-		is_enabled = true AND
-		(due_at IS NULL OR NOW() > due_at)
-	ORDER BY
-		updated_at
-	LIMIT 10
-';
-$statement = $pdo->prepare($sql);
-$statement->execute();
-
-while ($row = $statement->fetch(PDO::FETCH_ASSOC))
-{
-	$importer->processRepo($row['id'], $row['url'], $row['mount_path']);
-}
+// Give it a whirl!
+$updater->run(20, false);

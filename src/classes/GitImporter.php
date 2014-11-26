@@ -26,6 +26,7 @@ class GitImporter
 	/**
 	 * Constructs an importer object
 	 * 
+	 * @todo I think the runId should just be a setter, not a constructor item
 	 * @todo Repo ID should be a class-wide property
 	 * @todo Should we throw exception if repoRoot is null/empty?
 	 * 
