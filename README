@@ -15,5 +15,4 @@ To delete:
 
 To run an update:
 
-	sudo -u awooga php console/update-repos.php
-
+	sudo console/create-mount-fs.sh && sudo -u awooga php console/update-repos.php
