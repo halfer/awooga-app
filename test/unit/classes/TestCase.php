@@ -132,6 +132,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	/**
 	 * Returns a new importer instance pointing to the current test repo
 	 * 
+	 * @todo After we set the GitImporterTestHarness to copy repos, shall we default this method to the temp folder?
+	 * 
 	 * @param \PDO $pdo Database connection
 	 * @param string $repoRoot Fully-qualified path to repository (optional)
 	 * @return \Awooga\Testing\GitImporterTestHarness

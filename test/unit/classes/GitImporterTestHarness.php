@@ -22,7 +22,7 @@ class GitImporterTestHarness extends \Awooga\GitImporter
 	}
 
 	/**
-	 * We can dummy Git, since we've set the path to a test repo anyway
+	 * In test mode we treat the URL as a file source
 	 * 
 	 * @param string $url
 	 * @param string $path
@@ -35,6 +35,25 @@ class GitImporterTestHarness extends \Awooga\GitImporter
 		{
 			$this->nextGitFails = false;
 			return false;
+		}
+
+		// Check this is a folder and that it exists
+		if (is_dir($url) && $path)
+		{
+			$output = $return = null;
+			exec("cp --recursive {$url} {$path}", $output, $return);
+			// @todo Remove this when latest Git copy changes are done
+			//echo "Copy $url to $path\n";
+			if ($return)
+			{
+				throw new \Exception(
+					"An error occured doing a fake Git checkout"
+				);
+			}
+		}
+		else
+		{
+			throw new \Exception();
 		}
 
 		return true;

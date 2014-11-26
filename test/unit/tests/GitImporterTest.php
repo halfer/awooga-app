@@ -28,12 +28,25 @@ class GitImporterTest extends TestCase
 	public function testCloneSuccess()
 	{
 		$relativePath = 'success';
-		$importer = $this->getImporterInstance();
+		$importer = $this->getImporterInstance(null, $this->getTempFolder());
 		$importer->setCheckoutPath($relativePath);
 
-		// Do a fake clone
-		$actualPath = $importer->cloneRepo($url = 'dummy');
+		// Check that a folder does not exist in the target
+		$tmpRepo = $this->getTempFolder() . '/' . $relativePath;
+		$this->assertFalse(file_exists($tmpRepo), "Ensure repo does not exist");
+
+		// Do a clone
+		$actualPath = $importer->cloneRepo($url = $this->getTestRepoRoot() . '/success');
 		$this->assertEquals($relativePath, $actualPath, "Ensure an ordinary clone is OK");
+
+		// Check that the repo contents have ben created
+		$this->assertTrue(
+			file_exists($tmpRepo . '/simple1.json') && file_exists($tmpRepo . '/simple2.json'),
+			"Ensure repo has been copied correctly"
+		);
+
+		// Delete temporary repo
+		$importer->deleteOldRepo($relativePath);
 	}
 
 	/**
@@ -286,6 +299,16 @@ class GitImporterTest extends TestCase
 	}
 
 	/**
+	 * Ensures that after the first pull, any pull removes the old repo location
+	 * 
+	 * @todo Write this
+	 */
+	public function testDeleteOldLocationOnSubsequentPull()
+	{
+		
+	}
+
+	/**
 	 * Checks that a serious exception rolls back changes in scanRepoWithLogging
 	 * 
 	 * @todo Write this
@@ -380,12 +403,14 @@ class GitImporterTest extends TestCase
 		// Set up repository and importer
 		$repoId = $this->buildDatabase($this->getDriver(false));
 		$pdo = $this->getDriver();
-		$importer = $this->getImporterInstanceWithRun($pdo, $this->createRun());
+		$importer = $this->getImporterInstanceWithRun($pdo, $this->createRun(), $this->getTempFolder());
 
 		// This (plus the harness) means we don't actually do a file move (hmm, should we?)
+		// @todo Yes we should!
 		$importer->setCheckoutPath($relativePath = 'success');
 
-		$importer->processRepo($repoId, 'http://example.com', '/dummy/old/path');
+		$importer->processRepo($repoId, $this->getTestRepoRoot() . '/' . $relativePath, null);
+		$importer->deleteOldRepo($relativePath);
 		
 		$this->assertEquals(
 			2,
@@ -431,9 +456,22 @@ class GitImporterTest extends TestCase
 		);
 
 		// Do a successful call
-		$importer = $this->getImporterInstanceWithRun($pdo, $this->createRun());
+		$importer = $this->getImporterInstanceWithRun($pdo, $this->createRun(), $this->getTempFolder());
 		$importer->setCheckoutPath($relativePath = 'success');
-		$importer->processRepo($repoId, 'http://example.com', '/dummy/old/path');
+		$importer->processRepo($repoId, $this->getTestRepoRoot() . '/' . $relativePath, null);
+
+		// Make sure it was successful
+		$this->assertEquals(
+			1,
+			$this->fetchColumn(
+				$pdo,
+				"SELECT COUNT(*) FROM repository_log WHERE log_type = 'fetch' AND log_level = 'success'"
+			),
+			"Ensure call to reset retry was actually successful"
+		);
+
+		// Tidy up after ourselves
+		$importer->deleteOldRepo($relativePath);
 
 		// Now do another failed call, check the retry has been reset
 		$this->runRepeatedFails(
@@ -466,10 +504,10 @@ class GitImporterTest extends TestCase
 		for($run = 0; $run < $count; $run++)
 		{
 			// Set up a repo for a serious failure
-			$importer = $this->getImporterInstanceWithRun($pdo, $this->createRun());
+			$importer = $this->getImporterInstanceWithRun($pdo, $this->createRun(), $this->getTempFolder());
 			$importer->setCheckoutPath($relativePath = 'success');
 			$importer->makeGitFail();
-			$importer->processRepo($repoId, 'http://example.com', '/dummy/old/path');
+			$importer->processRepo($repoId, 'http://example.com', null);
 
 			// Check we have the right number of contiguous errors
 			$this->assertEquals($run + 1, $importer->countRecentFails($repoId));
