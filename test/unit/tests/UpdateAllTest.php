@@ -126,8 +126,6 @@ class UpdateAllTest extends TestCase
 
 	/**
 	 * Does a simple end-to-end for a set of repositories
-	 * 
-	 * @todo Not yet finished
 	 */
 	public function testUpdateSimple()
 	{
@@ -150,13 +148,7 @@ class UpdateAllTest extends TestCase
 
 		// Run a scan
 		$updater->run(20, false);
-	}
 
-	protected function setMountPath($repoId, $mountPath)
-	{
-		$sql = "
-			UPDATE
-				repository
-		";
+		// @todo Let's examine some logs here to see if it worked
 	}
 }

@@ -523,8 +523,6 @@ class GitImporter
 	 * 
 	 * Maybe this should be configurable?
 	 * 
-	 * @todo For failures, let's count the number of recent failed runs, and increase the sched time
-	 * 
 	 * @param integer $repoId
 	 * @param boolean $wasSuccessful
 	 * @return boolean True if successful

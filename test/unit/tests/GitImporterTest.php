@@ -403,12 +403,14 @@ class GitImporterTest extends TestCase
 		// Set up repository and importer
 		$repoId = $this->buildDatabase($this->getDriver(false));
 		$pdo = $this->getDriver();
-		$importer = $this->getImporterInstanceWithRun($pdo, $this->createRun(), $this->getTempFolder());
+		$importer = $this->getImporterInstanceWithRun(
+			$pdo,
+			$this->createRun(),
+			$this->getTempFolder()
+		);
 
-		// This (plus the harness) means we don't actually do a file move (hmm, should we?)
-		// @todo Yes we should!
+		// We use a test hardness feature to do a fake checkout (really just a file copy)
 		$importer->setCheckoutPath($relativePath = 'success');
-
 		$importer->processRepo($repoId, $this->getTestRepoRoot() . '/' . $relativePath, null);
 		$importer->deleteOldRepo($relativePath);
 		

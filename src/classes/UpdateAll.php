@@ -5,19 +5,15 @@ namespace Awooga;
 class UpdateAll
 {
 	protected $importer;
-	protected $repoRoot;
 
 	use Database;
 
 	/**
 	 * Constructor for this class
-	 * 
-	 * @todo The repoRoot is a feature of the importer, so we can remove it from here
 	 */
-	public function __construct(GitImporter $importer = null, $repoRoot = null)
+	public function __construct(GitImporter $importer = null)
 	{
 		$this->importer = $importer;
-		$this->repoRoot = $repoRoot;
 	}
 
 	public function run($limit = 20, $sleep = true)

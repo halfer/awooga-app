@@ -42,8 +42,6 @@ class GitImporterTestHarness extends \Awooga\GitImporter
 		{
 			$output = $return = null;
 			exec("cp --recursive {$url} {$path}", $output, $return);
-			// @todo Remove this when latest Git copy changes are done
-			//echo "Copy $url to $path\n";
 			if ($return)
 			{
 				throw new \Exception(
