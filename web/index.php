@@ -12,15 +12,15 @@ $engine = new \League\Plates\Engine($root . '/src/templates');
 $app->get('/', function() use ($app, $engine)
 {
 	$controller = new \Awooga\Controllers\Home($app, $engine);
-	$controller->execute();
+	$controller->initAndExecute();
 });
 
 // Set up common front controller for browsing
-$browse =  function($page = 1) use ($app, $engine)
+$browse = function($page = 1) use ($app, $engine)
 {
 	$controller = new \Awooga\Controllers\Browse($app, $engine);
 	$controller->setPage($page);
-	$controller->execute();	
+	$controller->initAndExecute();	
 };
 
 // Browse screen with and without pages
@@ -31,7 +31,7 @@ $app->get('/browse/:page', $browse);
 $app->get('/logs', function() use ($app, $engine)
 {
 	$controller = new \Awooga\Controllers\Logs($app, $engine);
-	$controller->execute();
+	$controller->initAndExecute();
 });
 
 // Thunderbirds are go!

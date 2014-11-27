@@ -1,4 +1,7 @@
-<?php $this->layout('layout', array('selectedMenu' => $selectedMenu, )) ?>
+<?php $this->layout(
+	'layout',
+	array('selectedMenu' => $selectedMenu, 'countData' => $countData, )
+) ?>
 
 <div class="jumbotron">
 	<h1>Awooga</h1>

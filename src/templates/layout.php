@@ -24,6 +24,12 @@
 							<a href="/logs">Logs</a>
 						</li>
 					</ul>
+					<div class="nav navbar-nav navbar-right">
+						<p class="navbar-text">
+							Awooga has <?php echo $countData['issue_count'] ?> issues
+							in <?php echo $countData['report_count'] ?> reports
+						</p>
+					</div>
 				</div>
 			</nav>
 

@@ -1,4 +1,7 @@
-<?php $this->layout('layout', array('selectedMenu' => $selectedMenu, )) ?>
+<?php $this->layout(
+	'layout',
+	array('selectedMenu' => $selectedMenu, 'countData' => $countData, )
+) ?>
 
 <table class="table">
 	<?php foreach ($reports as $report): ?>
