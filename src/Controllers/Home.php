@@ -6,6 +6,6 @@ class Home extends BaseController
 {
 	public function execute()
 	{
-		echo $this->getEngine()->render('home');
+		echo $this->render('home');
 	}
 }

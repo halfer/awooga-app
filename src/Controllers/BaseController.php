@@ -10,6 +10,8 @@ class BaseController
 	protected $slim;
 	protected $engine;
 
+	protected $selectedMenu = 'home';
+
 	public function __construct(Slim $slim, Engine $engine)
 	{
 		$this->slim = $slim;
@@ -24,6 +26,13 @@ class BaseController
 	protected function getEngine()
 	{
 		return $this->engine;
+	}
+
+	protected function render($name, array $values = array())
+	{
+		$values['selectedMenu'] = $this->selectedMenu;
+
+		return $this->getEngine()->render($name, $values);
 	}
 
 	protected function getDriver($selectDatabase = true)

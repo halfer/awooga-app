@@ -4,6 +4,8 @@ namespace Awooga\Controllers;
 
 class Browse extends BaseController
 {
+	protected $selectedMenu = 'browse';
+
 	protected $page;
 
 	public function execute()
@@ -17,7 +19,7 @@ class Browse extends BaseController
 		$statement = $this->getDriver()->prepare($sql);
 		$ok = $statement->execute();
 		$reports = $statement->fetchAll(\PDO::FETCH_ASSOC);
-		echo $this->getEngine()->render('browse', array('reports' => $reports, ));
+		echo $this->render('browse', array('reports' => $reports, ));
 	}
 
 	public function setPage($page)

@@ -4,6 +4,8 @@ namespace Awooga\Controllers;
 
 class Logs extends BaseController
 {
+	protected $selectedMenu = 'logs';
+	
 	public function execute()
 	{
 		$sql = "
@@ -15,6 +17,6 @@ class Logs extends BaseController
 		$ok = $statement->execute();
 		$logs = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
-		echo $this->getEngine()->render('logs', array('logs' => $logs, ));
+		echo $this->render('logs', array('logs' => $logs, ));
 	}
 }

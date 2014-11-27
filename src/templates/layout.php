@@ -14,9 +14,15 @@
 			<nav class="navbar navbar-default" role="navigation">
 				<div id="navbar" class="navbar-collapse collapse">
 					<ul class="nav navbar-nav">
-						<li class="active"><a href="/">Awooga</a></li>
-						<li><a href="/browse">Browse</a></li>
-						<li><a href="/logs">Logs</a></li>
+						<li class="<?php echo $selectedMenu == 'home' ? 'active' : '' ?>">
+							<a href="/">Awooga</a>
+						</li>
+						<li class="<?php echo $selectedMenu == 'browse' ? 'active' : '' ?>">
+							<a href="/browse">Browse</a>
+						</li>
+						<li class="<?php echo $selectedMenu == 'logs' ? 'active' : '' ?>">
+							<a href="/logs">Logs</a>
+						</li>
 					</ul>
 				</div>
 			</nav>
