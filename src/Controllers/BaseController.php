@@ -25,4 +25,14 @@ class BaseController
 	{
 		return $this->engine;
 	}
+
+	protected function getDriver($selectDatabase = true)
+	{
+		// Connect to the database
+		$database = $selectDatabase ? 'dbname=awooga;' : '';
+		$dsn = "mysql:{$database}host=localhost;username=awooga_user;password=password";
+		$pdo = new \PDO($dsn, 'awooga_user', 'password');
+
+		return $pdo;
+	}
 }
