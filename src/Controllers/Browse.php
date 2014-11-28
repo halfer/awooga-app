@@ -23,17 +23,7 @@ class Browse extends BaseController
 			$this->pageRedirectAndExit($pageNumber ? 'browse/' . $pageNumber : 'browse');
 		}
 
-		$limitClause = $this->getLimitClause($pageSize);
-		$sql = "
-			SELECT *
-			FROM report
-			WHERE is_enabled = 1
-			ORDER BY id DESC
-			{$limitClause}
-		";
-		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute();
-		$reports = $statement->fetchAll(\PDO::FETCH_ASSOC);
+		$reports = $this->getReports($pageSize);
 		echo $this->render(
 			'browse',
 			array(
@@ -42,5 +32,54 @@ class Browse extends BaseController
 				'maxPage' => $this->getMaxPage($rowCount, $pageSize),
 			)
 		);
+	}
+
+	protected function getReports($pageSize)
+	{
+		$limitClause = $this->getLimitClause($pageSize);
+		$sqlReports = "
+			SELECT *
+			FROM report
+			WHERE is_enabled = 1
+			ORDER BY id DESC
+			{$limitClause}
+		";
+		$statementReports = $this->getDriver()->prepare($sqlReports);
+		$ok1 = $statementReports->execute();
+		$reports = $statementReports->fetchAll(\PDO::FETCH_ASSOC);
+
+		$reportIds = array();
+		// Convert the reports to an pk-indexed array
+		$reportsById = array();
+		foreach ($reports as $report)
+		{
+			$id = $report['id'];
+			$reportsById[$id] = $report;
+			$reportsById[$id]['urls'] = array();
+
+			// Let's also get a list of report PKs
+			$reportIds[] = $id;
+		}
+
+		// Get the related links
+		$strIds = implode(',', $reportIds);
+		$sqlUrls = "
+			SELECT *
+			FROM resource_url
+			WHERE report_id IN ({$strIds})
+			/* Get them in order of creation, first one is regarded as 'primary' */
+			ORDER BY id
+		";
+		$statementLinks = $this->getDriver()->prepare($sqlUrls);
+		$ok2 = $statementLinks->execute();
+		$urls = $statementLinks->fetchAll(\PDO::FETCH_ASSOC);
+
+		// Add each link to the right report
+		foreach($urls as $url)
+		{
+			$reportsById[$url['report_id']]['urls'][] = $url['url'];
+		}
+
+		return $reportsById;
 	}
 }

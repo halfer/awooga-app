@@ -7,7 +7,17 @@
 	<?php foreach ($reports as $report): ?>
 		<tr>
 			<td>
-				<?php echo htmlentities($report['title'], ENT_HTML5, 'UTF-8') ?>
+				<?php // If there is a 0th URL (there should be) let's use that ?>
+				<?php if (isset($report['urls'][0])): ?>
+					<a
+						href="<?php echo htmlentities($report['urls'][0], ENT_HTML5, 'UTF-8') ?>"
+						alt="Primary link for this resource"
+						nofollow="nofollow"
+						target="_blank"
+					><?php echo htmlentities($report['title'], ENT_HTML5, 'UTF-8') ?></a>
+				<?php else: ?>
+					<?php echo htmlentities($report['title'], ENT_HTML5, 'UTF-8') ?>
+				<?php endif ?>
 			</td>
 			<td>
 				<?php echo htmlentities($report['description'], ENT_HTML5, 'UTF-8') ?>
