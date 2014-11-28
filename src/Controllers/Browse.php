@@ -16,13 +16,14 @@ class Browse extends BaseController
 	public function execute()
 	{
 		// Redirects if the page number is invalid
-		$pageNumber = $this->verifyPageNumber($this->getReportCount(), 20);
+		$rowCount = $this->getReportCount();
+		$pageNumber = $this->verifyPageNumber($rowCount, $pageSize = 20);
 		if ($pageNumber !== true)
 		{
 			$this->pageRedirectAndExit($pageNumber ? 'browse/' . $pageNumber : 'browse');
 		}
 
-		$limitClause = $this->getLimitClause(20);
+		$limitClause = $this->getLimitClause($pageSize);
 		$sql = "
 			SELECT *
 			FROM report
@@ -33,6 +34,13 @@ class Browse extends BaseController
 		$statement = $this->getDriver()->prepare($sql);
 		$ok = $statement->execute();
 		$reports = $statement->fetchAll(\PDO::FETCH_ASSOC);
-		echo $this->render('browse', array('reports' => $reports, ));
+		echo $this->render(
+			'browse',
+			array(
+				'reports' => $reports,
+				'currentPage' => $this->getPage(),
+				'maxPage' => $this->getMaxPage($rowCount, $pageSize),
+			)
+		);
 	}
 }

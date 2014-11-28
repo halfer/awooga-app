@@ -11,6 +11,11 @@ trait Pagination
 		$this->page = $page;
 	}
 
+	public function getPage($untaint = true)
+	{
+		return $untaint ? (int) $this->page : $this->page;
+	}
+
 	/**
 	 * Gets a limit statement for a paginated screen
 	 * 
@@ -19,10 +24,15 @@ trait Pagination
 	 */
 	protected function getLimitClause($limit)
 	{
-		$start = (int) ($this->page - 1) * $limit;
+		$start = ($this->getPage() - 1) * $limit;
 		$limitSafe = (int) $limit;
 
 		return "LIMIT {$start}, {$limitSafe}";
+	}
+
+	protected function getMaxPage($rowCount, $pageSize)
+	{
+		return ceil($rowCount / $pageSize);
 	}
 
 	/**
@@ -45,7 +55,7 @@ trait Pagination
 			}
 
 			// Redirect if page is too big
-			$maxPage = ceil($rowCount / $pageSize);
+			$maxPage = $this->getMaxPage($rowCount, $pageSize);
 			if ($realPage > $maxPage)
 			{
 				return $maxPage;
