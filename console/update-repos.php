@@ -8,7 +8,7 @@
 
 $root = dirname(__DIR__);
 $repoRoot = $root . '/filesystem/mount';
-require_once $root . '/src/autoloader.php';
+require_once $root . '/src/autoload.php';
 
 // Connect to the database
 // @todo Pull this from env config
