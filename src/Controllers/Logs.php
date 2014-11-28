@@ -11,16 +11,15 @@ class Logs extends BaseController
 	 */
 	public function execute()
 	{
-		// Redirects if the page number is invalid
-		$rowCount = $this->checkPageOrRedirect($pageSize = 30);
-		$logs = $this->getPaginatedRows($pageSize);
+		// Redirects if the page number is invalid, fetches rows
+		$logs = $this->validatePageAndGetRows($pageSize = 30);
 
 		echo $this->render(
 			'logs',
 			array(
 				'logs' => $logs,
 				'currentPage' => $this->getPage(),
-				'maxPage' => $this->getMaxPage($rowCount, $pageSize),
+				'maxPage' => $this->getMaxPage($this->getRowCount(), $pageSize),
 			)
 		);
 	}
@@ -40,7 +39,7 @@ class Logs extends BaseController
 		return $statement->fetchAll(\PDO::FETCH_ASSOC);		
 	}
 
-	protected function getRowCount()
+	protected function setRowCount()
 	{
 		$sql = "
 			SELECT *
@@ -49,7 +48,7 @@ class Logs extends BaseController
 		$statement = $this->getDriver()->prepare($sql);
 		$ok = $statement->execute();
 
-		return $statement->fetchColumn();
+		$this->rowCount = $statement->fetchColumn();
 	}
 
 	protected function getMenuSlug()

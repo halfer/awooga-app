@@ -11,9 +11,8 @@ class Browse extends BaseController
 	 */
 	public function execute()
 	{
-		// Redirects if the page number is invalid
-		$rowCount =  $this->checkPageOrRedirect($pageSize = 20);
-		$reports = $this->getPaginatedRows($pageSize);
+		// Redirects if the page number is invalid, fetches rows
+		$reports = $this->validatePageAndGetRows($pageSize = 20);
 
 		// Render the reports
 		echo $this->render(
@@ -21,14 +20,14 @@ class Browse extends BaseController
 			array(
 				'reports' => $reports,
 				'currentPage' => $this->getPage(),
-				'maxPage' => $this->getMaxPage($rowCount, $pageSize),
+				'maxPage' => $this->getMaxPage($this->getRowCount(), $pageSize),
 			)
 		);
 	}
 
-	protected function getRowCount()
+	protected function setRowCount()
 	{
-		return $this->getReportCount();
+		$this->rowCount = $this->getReportCount();
 	}
 
 	protected function getMenuSlug()

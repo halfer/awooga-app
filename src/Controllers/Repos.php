@@ -11,8 +11,8 @@ class Repos extends BaseController
 	 */
 	public function execute()
 	{
-		// Redirects if the page number is invalid
-		$rowCount =  $this->checkPageOrRedirect($pageSize = 20);
+		// Redirects if the page number is invalid, fetches rows
+		$repos =  $this->validatePageAndGetRows($pageSize = 20);
 
 		echo $this->render('repos');
 	}
@@ -22,9 +22,9 @@ class Repos extends BaseController
 		return array();
 	}
 
-	protected function getRowCount()
+	protected function setRowCount()
 	{
-		return 1;
+		$this->rowCount = 1;
 	}
 
 	protected function getMenuSlug()

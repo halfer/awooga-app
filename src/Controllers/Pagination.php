@@ -5,6 +5,7 @@ namespace Awooga\Controllers;
 trait Pagination
 {
 	protected $page;
+	protected $rowCount;
 
 	public function setPage($page)
 	{
@@ -19,33 +20,38 @@ trait Pagination
 	/**
 	 * Redirects if the page number is invalid
 	 */
-	public function checkPageOrRedirect($pageSize)
+	public function validatePageAndGetRows($pageSize)
 	{
-		$rowCount = $this->getRowCount();
-		$pageNumber = $this->verifyPageNumber($rowCount, $pageSize);
+		$this->setRowCount();
+		$pageNumber = $this->verifyPageNumber($this->getRowCount(), $pageSize);
 		if ($pageNumber !== true)
 		{
 			$slug = $this->getMenuSlug();
 			$this->pageRedirectAndExit($pageNumber ? $slug . '/' . $pageNumber : $slug);
 		}
 
-		return $rowCount;
+		return $this->getPaginatedRows($pageSize);
 	}
 
 	/**
-	 * Required for checkPageOrRedirect
+	 * Required for validatePageAndGetRows
 	 */
 	abstract protected function getPaginatedRows($pageSize);
 
 	/**
-	 * Required for checkPageOrRedirect
+	 * Required for validatePageAndGetRows
 	 */
-	abstract protected function getRowCount();
+	abstract protected function setRowCount();
 
 	/**
-	 * Required for checkPageOrRedirect
+	 * Required for validatePageAndGetRows
 	 */
 	abstract protected function getMenuSlug();
+
+	protected function getRowCount()
+	{
+		return $this->rowCount;
+	}
 
 	/**
 	 * Gets a limit statement for a paginated screen
