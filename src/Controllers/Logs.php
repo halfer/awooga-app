@@ -12,7 +12,7 @@ class Logs extends BaseController
 	public function execute()
 	{
 		// Redirects if the page number is invalid, fetches rows
-		$logs = $this->validatePageAndGetRows($pageSize = 30);
+		$logs = $this->validatePageAndGetRows($pageSize = 20);
 
 		echo $this->render(
 			'logs',
@@ -42,7 +42,7 @@ class Logs extends BaseController
 	protected function setRowCount()
 	{
 		$sql = "
-			SELECT *
+			SELECT COUNT(*)
 			FROM repository_log
 		";
 		$statement = $this->getDriver()->prepare($sql);

@@ -2,32 +2,27 @@
 
 namespace Awooga\Controllers;
 
-class Repos extends BaseController
+class Issues extends BaseController
 {
 	use Pagination;
 
 	/**
-	 * Controller for repos screen
+	 * Controller for report browsing
 	 */
 	public function execute()
 	{
 		// Redirects if the page number is invalid, fetches rows
-		$repos =  $this->validatePageAndGetRows($pageSize = 20);
+		$reports = $this->validatePageAndGetRows($pageSize = 20);
 
 		// Render the reports
 		echo $this->render(
-			'repos',
+			'issues',
 			array(
-				'repos' => $repos,
+				'reports' => $reports,
 				'currentPage' => $this->getPage(),
 				'maxPage' => $this->getMaxPage($this->getRowCount(), $pageSize),
 			)
 		);
-	}
-
-	protected function getPaginatedRows($pageSize)
-	{
-		return array();
 	}
 
 	protected function setRowCount()
@@ -37,6 +32,11 @@ class Repos extends BaseController
 
 	protected function getMenuSlug()
 	{
-		return 'repos';
+		return 'issues';
+	}
+
+	protected function getPaginatedRows($pageSize)
+	{
+		return array();
 	}
 }

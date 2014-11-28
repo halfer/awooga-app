@@ -28,6 +28,16 @@ $app->get('/browse', $browse);
 $app->get('/browse/:page', $browse);
 
 // Set up a repos screen
+$issues = function($page = 1) use ($app, $engine)
+{
+	$controller = new \Awooga\Controllers\Issues($app, $engine);
+	$controller->setPage($page);
+	$controller->initAndExecute();
+};
+$app->get('/issues', $issues);
+$app->get('/issues/:page', $issues);
+
+// Set up a repos screen
 $repos = function($page = 1) use ($app, $engine)
 {
 	$controller = new \Awooga\Controllers\Repos($app, $engine);

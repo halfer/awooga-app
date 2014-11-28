@@ -21,7 +21,10 @@
 						<li class="<?php echo $selectedMenu == 'browse' ? 'active' : '' ?>">
 							<a href="/browse">Browse</a>
 						</li>
-						<li class="<?php echo $selectedMenu == 'repositories' ? 'active' : '' ?>">
+						<li class="<?php echo $selectedMenu == 'issues' ? 'active' : '' ?>">
+							<a href="/issues">Issues</a>
+						</li>
+						<li class="<?php echo $selectedMenu == 'repos' ? 'active' : '' ?>">
 							<a href="/repos">Repositories</a>
 						</li>
 						<li class="<?php echo $selectedMenu == 'logs' ? 'active' : '' ?>">
