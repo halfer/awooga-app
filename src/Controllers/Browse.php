@@ -4,8 +4,6 @@ namespace Awooga\Controllers;
 
 class Browse extends BaseController
 {
-	protected $selectedMenu = 'browse';
-
 	use Pagination;
 
 	/**
@@ -14,14 +12,10 @@ class Browse extends BaseController
 	public function execute()
 	{
 		// Redirects if the page number is invalid
-		$rowCount = $this->getReportCount();
-		$pageNumber = $this->verifyPageNumber($rowCount, $pageSize = 20);
-		if ($pageNumber !== true)
-		{
-			$this->pageRedirectAndExit($pageNumber ? 'browse/' . $pageNumber : 'browse');
-		}
+		$rowCount =  $this->checkPageOrRedirect($pageSize = 20);
+		$reports = $this->getPaginatedRows($pageSize);
 
-		$reports = $this->getReportsWithRelatedTables($pageSize);
+		// Render the reports
 		echo $this->render(
 			'browse',
 			array(
@@ -32,7 +26,17 @@ class Browse extends BaseController
 		);
 	}
 
-	protected function getReportsWithRelatedTables($pageSize)
+	protected function getRowCount()
+	{
+		return $this->getReportCount();
+	}
+
+	protected function getMenuSlug()
+	{
+		return 'browse';
+	}
+
+	protected function getPaginatedRows($pageSize)
 	{
 		$reports = $this->getReports($pageSize);
 

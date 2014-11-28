@@ -11,8 +11,6 @@ abstract class BaseController
 	protected $engine;
 	protected $pdo;
 
-	protected $selectedMenu = 'home';
-
 	use \Awooga\Core\Database;
 
 	public function __construct(Slim $slim, Engine $engine)
@@ -66,11 +64,13 @@ abstract class BaseController
 
 	protected function render($name, array $values = array())
 	{
-		$values['selectedMenu'] = $this->selectedMenu;
+		$values['selectedMenu'] = $this->getMenuSlug();
 		$values['countData'] = $this->getCounts();
 
 		return $this->getEngine()->render($name, $values);
 	}
+
+	abstract protected function getMenuSlug();
 
 	final public function initAndExecute()
 	{

@@ -8,4 +8,9 @@ class Home extends BaseController
 	{
 		echo $this->render('home');
 	}
+
+	protected function getMenuSlug()
+	{
+		return 'home';
+	}
 }

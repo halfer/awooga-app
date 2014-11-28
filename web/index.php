@@ -27,6 +27,16 @@ $browse = function($page = 1) use ($app, $engine)
 $app->get('/browse', $browse);
 $app->get('/browse/:page', $browse);
 
+// Set up a repos screen
+$repos = function($page = 1) use ($app, $engine)
+{
+	$controller = new \Awooga\Controllers\Repos($app, $engine);
+	$controller->setPage($page);
+	$controller->initAndExecute();
+};
+$app->get('/repos', $repos);
+$app->get('/repos/:page', $repos);
+
 // Set up log screen
 $log = function($page = 1) use ($app, $engine)
 {

@@ -17,6 +17,37 @@ trait Pagination
 	}
 
 	/**
+	 * Redirects if the page number is invalid
+	 */
+	public function checkPageOrRedirect($pageSize)
+	{
+		$rowCount = $this->getRowCount();
+		$pageNumber = $this->verifyPageNumber($rowCount, $pageSize);
+		if ($pageNumber !== true)
+		{
+			$slug = $this->getMenuSlug();
+			$this->pageRedirectAndExit($pageNumber ? $slug . '/' . $pageNumber : $slug);
+		}
+
+		return $rowCount;
+	}
+
+	/**
+	 * Required for checkPageOrRedirect
+	 */
+	abstract protected function getPaginatedRows($pageSize);
+
+	/**
+	 * Required for checkPageOrRedirect
+	 */
+	abstract protected function getRowCount();
+
+	/**
+	 * Required for checkPageOrRedirect
+	 */
+	abstract protected function getMenuSlug();
+
+	/**
 	 * Gets a limit statement for a paginated screen
 	 * 
 	 * @param integer $limit

@@ -21,6 +21,9 @@
 						<li class="<?php echo $selectedMenu == 'browse' ? 'active' : '' ?>">
 							<a href="/browse">Browse</a>
 						</li>
+						<li class="<?php echo $selectedMenu == 'repositories' ? 'active' : '' ?>">
+							<a href="/repos">Repositories</a>
+						</li>
 						<li class="<?php echo $selectedMenu == 'logs' ? 'active' : '' ?>">
 							<a href="/logs">Logs</a>
 						</li>

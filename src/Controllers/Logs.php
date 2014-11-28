@@ -4,8 +4,6 @@ namespace Awooga\Controllers;
 
 class Logs extends BaseController
 {
-	protected $selectedMenu = 'logs';
-
 	use Pagination;
 
 	/**
@@ -14,23 +12,8 @@ class Logs extends BaseController
 	public function execute()
 	{
 		// Redirects if the page number is invalid
-		$rowCount = $this->getRowCount();
-		$pageNumber = $this->verifyPageNumber($rowCount, $pageSize = 30);
-		if ($pageNumber !== true)
-		{
-			$this->pageRedirectAndExit($pageNumber ? 'logs/' . $pageNumber : 'logs');
-		}
-
-		$limitClause = $this->getLimitClause($pageSize);
-		$sql = "
-			SELECT *
-			FROM repository_log
-			ORDER BY id DESC
-			{$limitClause}
-		";
-		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute();
-		$logs = $statement->fetchAll(\PDO::FETCH_ASSOC);
+		$rowCount = $this->checkPageOrRedirect($pageSize = 30);
+		$logs = $this->getPaginatedRows($pageSize);
 
 		echo $this->render(
 			'logs',
@@ -40,6 +23,21 @@ class Logs extends BaseController
 				'maxPage' => $this->getMaxPage($rowCount, $pageSize),
 			)
 		);
+	}
+
+	protected function getPaginatedRows($pageSize)
+	{
+		$limitClause = $this->getLimitClause($pageSize);
+		$sql = "
+			SELECT *
+			FROM repository_log
+			ORDER BY id DESC
+			{$limitClause}
+		";
+		$statement = $this->getDriver()->prepare($sql);
+		$ok = $statement->execute();
+
+		return $statement->fetchAll(\PDO::FETCH_ASSOC);		
 	}
 
 	protected function getRowCount()
@@ -52,5 +50,10 @@ class Logs extends BaseController
 		$ok = $statement->execute();
 
 		return $statement->fetchColumn();
+	}
+
+	protected function getMenuSlug()
+	{
+		return 'logs';
 	}
 }
