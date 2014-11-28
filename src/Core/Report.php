@@ -129,8 +129,9 @@ class Report
 			$issueCode = $issue['issue_cat_code'];
 			if (!$this->validateIssueCatCode($issueCode))
 			{
+				$issueCodeShort = substr($issueCode, 0, 50);
 				throw new \Awooga\Exceptions\TrivialException(
-					"Issues must have a valid issue_cat_code"
+					"'{$issueCodeShort}' does not seem to be a valid issue category code"
 				);
 			}
 
@@ -170,6 +171,8 @@ class Report
 	/**
 	 * Determines if the passed issue code is valid
 	 * 
+	 * @todo This needs to be looked up in the database, not a hardwired list
+	 * 
 	 * @param string $catCode
 	 * @return boolean
 	 */
@@ -181,6 +184,7 @@ class Report
 			'password-inadequate-hashing',
 			'deprecated-library',
 			'sql-needs-parameterisation',
+			'variable-injection',
 			'uncategorised',
 		);
 

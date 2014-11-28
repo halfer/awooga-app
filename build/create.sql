@@ -57,6 +57,7 @@ INSERT INTO issue (code) VALUES
 	('password-inadequate-hashing'),
 	('deprecated-library'),
 	('sql-needs-parameterisation'),
+	('variable-injection'),
 	('uncategorised')
 ;
 
