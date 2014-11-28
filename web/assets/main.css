@@ -1,3 +1,8 @@
 #paginator {
 	text-align: center;
 }
+
+/* Space out the issues labels, so they wrap in a table cell */
+table#reports td.issues span.label {
+	display: inline-block;
+}

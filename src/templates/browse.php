@@ -3,7 +3,7 @@
 	array('selectedMenu' => $selectedMenu, 'countData' => $countData, )
 ) ?>
 
-<table class="table">
+<table class="table" id="reports">
 	<thead>
 		<tr>
 			<th>Links</th>
@@ -41,9 +41,12 @@
 						<?php echo htmlentities($report['title'], ENT_HTML5, 'UTF-8') ?>
 					<?php endif ?>
 				</td>
-				<td>
-					<?php foreach ($report['issues'] as $issues): ?>
-						<?php echo $issues ?>
+				<?php // Here are the issues lozenges ?>
+				<td class="issues">
+					<?php foreach ($report['issues'] as $issue): ?>
+						<span class="label label-danger">
+							<?php echo $issue ?>
+						</span>
 					<?php endforeach ?>
 				</td>
 				<td>
