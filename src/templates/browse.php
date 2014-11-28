@@ -3,12 +3,15 @@
 	array('selectedMenu' => $selectedMenu, 'countData' => $countData, )
 ) ?>
 
+<p>This is a list of reports currently notified to Awooga.</p>
+
 <table class="table" id="reports">
 	<thead>
 		<tr>
 			<th>Links</th>
 			<th>Issues</th>
 			<th>Description</th>
+			<th>Repository</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -51,6 +54,9 @@
 				</td>
 				<td>
 					<?php echo htmlentities($report['description'], ENT_HTML5, 'UTF-8') ?>
+				</td>
+				<td>
+					#<?php echo $report['repository_id'] ?>
 				</td>
 			</tr>
 		<?php endforeach ?>

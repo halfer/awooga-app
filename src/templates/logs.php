@@ -3,20 +3,33 @@
 	array('selectedMenu' => $selectedMenu, 'countData' => $countData, )
 ) ?>
 
+<p>
+	This is a peek into the workings of Awooga, for the curious.
+</p>
+
 <table class="table">
-	<?php foreach ($logs as $log): ?>
+	<thead>
 		<tr>
-			<td>
-				<?php echo $log['log_type'] ?>
-			</td>
-			<td>
-				<?php echo $log['log_level'] ?>
-			</td>
-			<td>
-				<?php echo $log['created_at'] ?>
-			</td>
+			<th>Type</th>
+			<th>Level</th>
+			<th>Date/time</th>
 		</tr>
-	<?php endforeach ?>
+	</thead>
+	<tbody>
+		<?php foreach ($logs as $log): ?>
+			<tr>
+				<td>
+					<?php echo $log['log_type'] ?>
+				</td>
+				<td>
+					<?php echo $log['log_level'] ?>
+				</td>
+				<td>
+					<?php echo $log['created_at'] ?>
+				</td>
+			</tr>
+		<?php endforeach ?>
+	</tbody>
 </table>
 
 <?php // @todo Make this a partial, so it can be shared with browse.php ?>
