@@ -28,11 +28,14 @@ $app->get('/browse', $browse);
 $app->get('/browse/:page', $browse);
 
 // Set up log screen
-$app->get('/logs', function() use ($app, $engine)
+$log = function($page = 1) use ($app, $engine)
 {
 	$controller = new \Awooga\Controllers\Logs($app, $engine);
+	$controller->setPage($page);
 	$controller->initAndExecute();
-});
+};
+$app->get('/logs', $log);
+$app->get('/logs/:page', $log);
 
 // Thunderbirds are go!
 $app->run();
