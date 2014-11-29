@@ -12,7 +12,7 @@ class Repos extends BaseController
 	public function execute()
 	{
 		// Redirects if the page number is invalid, fetches rows
-		$repos =  $this->validatePageAndGetRows($pageSize = 20);
+		$repos = $this->validatePageAndGetRows($pageSize = 10);
 
 		// Render the reports
 		echo $this->render(
@@ -27,12 +27,29 @@ class Repos extends BaseController
 
 	protected function getPaginatedRows($pageSize)
 	{
-		return array();
+		$limitClause = $this->getLimitClause($pageSize);
+		$sql = "
+			SELECT *
+			FROM repository
+			ORDER BY id
+			{$limitClause}
+		";
+		$statement = $this->getDriver()->prepare($sql);
+		$ok = $statement->execute();
+
+		return $statement->fetchAll(\PDO::FETCH_ASSOC);
 	}
 
 	protected function setRowCount()
 	{
-		$this->rowCount = 1;
+		$sql = "
+			SELECT COUNT(*)
+			FROM repository
+		";
+		$statement = $this->getDriver()->prepare($sql);
+		$ok = $statement->execute();
+
+		$this->rowCount = $statement->fetchColumn();
 	}
 
 	protected function getMenuSlug()
