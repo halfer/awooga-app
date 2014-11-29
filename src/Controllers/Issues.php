@@ -12,13 +12,13 @@ class Issues extends BaseController
 	public function execute()
 	{
 		// Redirects if the page number is invalid, fetches rows
-		$reports = $this->validatePageAndGetRows($pageSize = 20);
+		$issues = $this->validatePageAndGetRows($pageSize = 20);
 
 		// Render the reports
 		echo $this->render(
 			'issues',
 			array(
-				'reports' => $reports,
+				'issues' => $issues,
 				'currentPage' => $this->getPage(),
 				'maxPage' => $this->getMaxPage($this->getRowCount(), $pageSize),
 			)
@@ -27,7 +27,14 @@ class Issues extends BaseController
 
 	protected function setRowCount()
 	{
-		$this->rowCount = 1;
+		$sql = "
+			SELECT COUNT(*)
+			FROM issue
+		";
+		$statement = $this->getDriver()->prepare($sql);
+		$ok = $statement->execute();
+
+		$this->rowCount = $statement->fetchColumn();
 	}
 
 	protected function getMenuSlug()
@@ -37,6 +44,16 @@ class Issues extends BaseController
 
 	protected function getPaginatedRows($pageSize)
 	{
-		return array();
+		$limitClause = $this->getLimitClause($pageSize);
+		$sql = "
+			SELECT *
+			FROM issue
+			ORDER BY id
+			{$limitClause}
+		";
+		$statement = $this->getDriver()->prepare($sql);
+		$ok = $statement->execute();
+
+		return $statement->fetchAll(\PDO::FETCH_ASSOC);
 	}
 }
