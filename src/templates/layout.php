@@ -42,5 +42,12 @@
 
 			<?= $this->section('content') ?>
 		</div>
+		<footer class="footer">
+		  <div class="container">
+			<p class="text-muted">
+				<a href="https://twitter.com/ilovephp">Twitter</a>
+			</p>
+		  </div>
+		</footer>
 	</body>
 </html>
