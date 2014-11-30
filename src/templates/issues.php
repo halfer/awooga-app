@@ -16,6 +16,9 @@
 			<th>
 				Description
 			</th>
+			<th>
+				Count
+			</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -26,6 +29,9 @@
 				</td>
 				<td>
 					<?php echo htmlentities($issue['description'], ENT_HTML5, 'UTF-8') ?>
+				</td>
+				<td>
+					<?php echo $issue['report_count'] ?>
 				</td>
 			</tr>
 		<?php endforeach ?>

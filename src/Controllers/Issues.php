@@ -46,9 +46,14 @@ class Issues extends BaseController
 	{
 		$limitClause = $this->getLimitClause($pageSize);
 		$sql = "
-			SELECT *
+			SELECT
+				*,
+				(SELECT COUNT(*)
+				FROM report r
+				INNER JOIN report_issue ir ON (r.id = ir.report_id)
+				WHERE ir.issue_id = issue.id) report_count
 			FROM issue
-			ORDER BY id
+			ORDER BY report_count DESC
 			{$limitClause}
 		";
 		$statement = $this->getDriver()->prepare($sql);

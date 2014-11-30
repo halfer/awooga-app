@@ -28,8 +28,8 @@
 				<td>
 					<?php echo htmlentities($repo['url'], ENT_HTML5, 'UTF-8') ?>
 				</td>
-				<td>?</td>
-				<td>?</td>
+				<td><?php echo $repo['report_count'] ?></td>
+				<td><?php echo $repo['created_at'] ?></td>
 			</tr>
 		<?php endforeach ?>
 	</tbody>

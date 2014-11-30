@@ -29,7 +29,11 @@ class Repos extends BaseController
 	{
 		$limitClause = $this->getLimitClause($pageSize);
 		$sql = "
-			SELECT *
+			SELECT
+				*,
+				(SELECT COUNT(*)
+				FROM report r
+				WHERE r.repository_id = repository.id) report_count
 			FROM repository
 			ORDER BY id
 			{$limitClause}
