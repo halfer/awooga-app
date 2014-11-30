@@ -107,3 +107,25 @@
 		</p>
 	</div>
 </div>
+<div class="row">
+	<div class="col-md-4">
+		<h3>
+			What's the current focus?
+		</h3>
+		<p>
+			Presently it's PHP tutorials, because that's what I know, and because there is a lot
+			of material out there that needs improvement. But if we can get some solid subject
+			experts for other languages, that would be great too.
+		</p>
+	</div>
+	<div class="col-md-4">
+		<h3>
+			Can I reuse Awooga data?
+		</h3>
+		<p>
+			All data in Awooga is owned by the community, and should be regarded as copyleft. I'll
+			look into choosing a license for it, possibly Creative Commons. If you want to re-use
+			the data in your own project, great. Get in touch, and I'll see if I can help.
+		</p>
+	</div>
+</div>
