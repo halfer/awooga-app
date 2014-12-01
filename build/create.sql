@@ -24,7 +24,9 @@ CREATE TABLE report (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL,
 	repository_id INTEGER NOT NULL,
 	title VARCHAR(256) NOT NULL,
+	/* Description is in markdown */
 	description VARCHAR(1024),
+	description_html VARCHAR(1024),
 	/* Only day and not time is important here */
 	author_notified_at DATE,
 	is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
@@ -43,7 +45,9 @@ CREATE TABLE resource_url (
 CREATE TABLE report_issue (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL,
 	report_id INTEGER NOT NULL,
+	/* Description is in markdown */
 	description VARCHAR(1024),
+	description_html VARCHAR(1024),
 	issue_id INTEGER NOT NULL,
 
 	FOREIGN KEY (report_id) REFERENCES report (id),

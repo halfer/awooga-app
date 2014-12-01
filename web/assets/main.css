@@ -8,6 +8,11 @@ table#report td.issues span.label {
 	display: inline-block;
 }
 
+/* Fix any markdown paras so they don't push down cell bottom margins */
+table td p:last-child {
+	margin-bottom: 0;
+}
+
 /* Sticky footer styles, from getbootstrap.com/examples/sticky-footer/ */
 html {
 	position: relative;

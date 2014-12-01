@@ -315,6 +315,7 @@ class Report
 				repository_id = :repo_id,
 				title = :title,
 				description = :description,
+				description_html = :description_html,
 				author_notified_at = :notified_at
 			WHERE
 				id = :report_id
@@ -332,8 +333,8 @@ class Report
 	{
 		$sql = "
 			INSERT INTO report
-			(repository_id, title, description, author_notified_at)
-			VALUES (:repo_id, :title, :description, :notified_at)
+			(repository_id, title, description, description_html, author_notified_at)
+			VALUES (:repo_id, :title, :description, :description_html, :notified_at)
 		";
 
 		$this->runSaveCommand($sql);
@@ -355,6 +356,7 @@ class Report
 			':repo_id' => $this->repoId,
 			':title' => $this->title,
 			':description' => $this->description,
+			':description_html' => $this->convertFromMarkdown($this->description),
 			':notified_at' => $this->getAuthorNotifiedDateAsString(),
 		);
 
@@ -394,8 +396,8 @@ class Report
 	{
 		$sql = "
 			INSERT INTO report_issue
-			(report_id, description, issue_id)
-			VALUES (:report_id, :description, :issue_id)
+			(report_id, description, description_html, issue_id)
+			VALUES (:report_id, :description, :description_html, :issue_id)
 		";
 		foreach ($this->issues as $issue)
 		{
@@ -406,6 +408,7 @@ class Report
 				':report_id' => $reportId,
 				':issue_id' => $this->getIssueIdForCode($issue['issue_cat_code']),
 				':description' => $description,
+				':description_html' => $this->convertFromMarkdown($description),
 			);
 			$statement = $this->getDriver()->prepare($sql);
 			$statement->execute($params);
@@ -493,6 +496,11 @@ class Report
 		}
 
 		return $reportId;
+	}
+
+	protected function convertFromMarkdown($markdown)
+	{
+		return $markdown ? \Michelf\Markdown::defaultTransform($markdown) : null;
 	}
 
 	protected function isString($string)

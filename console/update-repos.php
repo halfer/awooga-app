@@ -8,6 +8,7 @@
 
 $root = dirname(__DIR__);
 $repoRoot = $root . '/filesystem/mount';
+require_once $root . '/vendor/autoload.php';
 require_once $root . '/src/autoload.php';
 
 // Connect to the database

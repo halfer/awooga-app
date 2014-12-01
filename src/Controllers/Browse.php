@@ -71,6 +71,14 @@ class Browse extends BaseController
 		return $reportsById;
 	}
 
+	/**
+	 * Gets a block of reports
+	 * 
+	 * @todo Need to swap '*' for a specific field list
+	 * 
+	 * @param integer $pageSize
+	 * @return array|false
+	 */
 	protected function getReports($pageSize)
 	{
 		$limitClause = $this->getLimitClause($pageSize);

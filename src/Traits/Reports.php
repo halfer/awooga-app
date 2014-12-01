@@ -27,7 +27,7 @@ trait Reports
 			SELECT
 				r.report_id,
 				i.code issue_code,
-				r.description
+				r.description_html
 			FROM report_issue r
 			INNER JOIN issue i ON (i.id = r.issue_id)
 			WHERE r.report_id IN ({$strIds})

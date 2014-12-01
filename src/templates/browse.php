@@ -60,7 +60,8 @@
 					<?php endforeach ?>
 				</td>
 				<td>
-					<?php echo htmlentities($report['description'], ENT_HTML5, 'UTF-8') ?>
+					<?php // Converted from markdown, so should be safe ?>
+					<?php echo $report['description_html'] ?>
 				</td>
 				<td>
 					#<?php echo $report['repository_id'] ?>

@@ -40,8 +40,9 @@
 						><?php echo htmlentities($issue['issue_code'], ENT_HTML5, 'UTF-8') ?></span>
 				</td>
 				<td>
-					<?php if ($issue['description']): ?>
-						<?php echo htmlentities($issue['description'], ENT_HTML5, 'UTF-8') ?>
+					<?php if ($issue['description_html']): ?>
+						<?php // Converted from markdown, so should be safe ?>
+						<?php echo $issue['description_html'] ?>
 					<?php else: ?>
 						(No comments added)
 					<?php endif ?>
@@ -51,7 +52,8 @@
 		<tr>
 			<th>Description</th>
 			<td colspan="2">
-				<?php echo htmlentities($report['description'], ENT_HTML5, 'UTF-8') ?>
+				<?php // Converted from markdown, so should be safe ?>
+				<?php echo $report['description_html'] ?>
 			</td>
 		</tr>
 	</tbody>
