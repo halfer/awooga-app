@@ -161,7 +161,9 @@ class ReportTest extends TestCase
 
 	public function testSetGoodIssues()
 	{
-		$report = $this->getDummyReport();
+		// We need the database to access the issue codes
+		$report = $this->buildDatabaseAndGetReport();
+
 		$issues = array(
 			array(
 				'issue_cat_code' => 'xss'
@@ -204,7 +206,9 @@ class ReportTest extends TestCase
 	 */
 	public function testSetArrayContainingDuplicateIssues()
 	{
-		$report = $this->getDummyReport();
+		// We need the database to access the issue codes
+		$report = $this->buildDatabaseAndGetReport();
+
 		$report->setIssues(
 			array(
 				array('issue_cat_code' => 'xss', 'description' => 'Description goes here', ),
@@ -218,7 +222,9 @@ class ReportTest extends TestCase
 	 */
 	public function testValidIssueCatCodes()
 	{
-		$report = $this->getDummyReport();
+		// We need the database to access the issue codes
+		$report = $this->buildDatabaseAndGetReport();
+
 		$issues = array(
 			array('issue_cat_code' => 'xss', ),
 			array('issue_cat_code' => 'sql-injection', ),
@@ -239,7 +245,9 @@ class ReportTest extends TestCase
 	 */
 	public function testInvalidIssueCatCode()
 	{
-		$report = $this->getDummyReport();
+		// We need the database to access the issue codes
+		$report = $this->buildDatabaseAndGetReport();
+
 		$issues = array(
 			array('issue_cat_code' => 'this-does-not-exist', ),
 		);
@@ -286,10 +294,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSaveNewReport()
 	{
-		$pdo = $this->getDriver();
-		$repoId = $this->buildDatabase($pdo);
-		$report = new ReportTestHarness($repoId);
-		$report->setDriver($pdo);
+		$report = $this->buildDatabaseAndGetReport();
 
 		$report->setTitle($title = 'Example title');
 		$report->setDescription($description = 'Example description');
@@ -305,6 +310,7 @@ class ReportTest extends TestCase
 		$reportId = $report->save();
 		
 		// Check report ID
+		$pdo = $this->getDriver();
 		$this->assertEquals(
 			1,
 			$this->fetchColumn(
@@ -317,7 +323,7 @@ class ReportTest extends TestCase
 
 		// Check issues
 		$statement = $pdo->prepare($this->getRetrieveIssuesSql());
-		$ok = $statement->execute(array(':repo_id' => $repoId, ));
+		$ok = $statement->execute(array(':repo_id' => $report->getId(), ));
 		if ($ok === false)
 		{
 			throw new \Exception(
@@ -337,7 +343,7 @@ class ReportTest extends TestCase
 
 		// Check urls
 		$statement2 = $pdo->prepare($this->getRetrieveUrlsSql());
-		$ok2 = $statement2->execute(array(':repo_id' => $repoId, ));
+		$ok2 = $statement2->execute(array(':repo_id' => $report->getId(), ));
 		if ($ok2 === false)
 		{
 			throw new \Exception(
@@ -391,10 +397,7 @@ class ReportTest extends TestCase
 
 	public function testSaveWithNullAuthorNotificationDate()
 	{
-		$pdo = $this->getDriver();
-		$repoId = $this->buildDatabase($pdo);
-		$report = new ReportTestHarness($repoId);
-		$report->setDriver($pdo);
+		$report = $this->buildDatabaseAndGetReport();
 
 		// Set some fields
 		$report->setTitle('Example title');
@@ -417,8 +420,8 @@ class ReportTest extends TestCase
 				repository_id = :repo_id
 				AND author_notified_at IS NULL
 		";
-		$statement = $pdo->prepare($sql);
-		$statement->execute(array('repo_id' => $repoId, ));
+		$statement = $this->getDriver()->prepare($sql);
+		$statement->execute(array('repo_id' => $report->getId(), ));
 		$this->assertEquals(1, $statement->rowCount());
 	}
 
@@ -464,10 +467,7 @@ class ReportTest extends TestCase
 
 	protected function trySavingNewReportWithMissingField($field)
 	{
-		$pdo = $this->getDriver();
-		$repoId = $this->buildDatabase($pdo);
-		$report = new ReportTestHarness($repoId);
-		$report->setDriver($pdo);
+		$report = $this->buildDatabaseAndGetReport();
 
 		// Skip one of the fields here
 		if ($field != 'title')
@@ -598,5 +598,15 @@ class ReportTest extends TestCase
 	protected function getDummyReport()
 	{
 		return new ReportTestHarness(1);
+	}
+
+	protected function buildDatabaseAndGetReport()
+	{
+		$pdo = $this->getDriver();
+		$repoId = $this->buildDatabase($pdo);
+		$report = new ReportTestHarness($repoId);
+		$report->setDriver($pdo);
+
+		return $report;
 	}
 }

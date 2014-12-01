@@ -171,24 +171,24 @@ class Report
 	/**
 	 * Determines if the passed issue code is valid
 	 * 
-	 * @todo This needs to be looked up in the database, not a hardwired list
-	 * 
 	 * @param string $catCode
 	 * @return boolean
 	 */
 	protected function validateIssueCatCode($catCode)
 	{
-		$issueCodes = array(
-			'xss', 'sql-injection',
-			'password-clear',
-			'password-inadequate-hashing',
-			'deprecated-library',
-			'sql-needs-parameterisation',
-			'variable-injection',
-			'uncategorised',
-		);
+		$sql = "
+			SELECT 1 FROM
+			issue
+			WHERE code = :issue_code
+		";
+		$statement = $this->getDriver()->prepare($sql);
+		$ok = $statement->execute(array(':issue_code' => $catCode, ));
+		if (!$ok)
+		{
+			throw new \Exception();
+		}
 
-		return in_array($catCode, $issueCodes, true);
+		return is_array($statement->fetch());
 	}
 
 	/**
@@ -242,6 +242,11 @@ class Report
 		$this->insertUrls($reportId);
 
 		return $reportId;
+	}
+
+	public function getId()
+	{
+		return $this->repoId;
 	}
 
 	/**
