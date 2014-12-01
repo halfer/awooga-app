@@ -8,6 +8,7 @@
 <table class="table" id="reports">
 	<thead>
 		<tr>
+			<th>Title</th>
 			<th>Links</th>
 			<th>Issues</th>
 			<th>Description</th>
@@ -18,14 +19,20 @@
 		<?php foreach ($reports as $report): ?>
 			<tr>
 				<td>
+					<a
+						href="/report/<?php echo $report['id'] ?>"
+						alt="More info"
+					><?php echo htmlentities($report['title'], ENT_HTML5, 'UTF-8') ?></a>
+				</td>
+				<td>
 					<?php // If there is a 0th URL (there should be) let's use that ?>
 					<?php if (isset($report['urls'][0])): ?>
 						<a
 							href="<?php echo htmlentities($report['urls'][0], ENT_HTML5, 'UTF-8') ?>"
 							alt="Primary link for this resource"
-							nofollow="nofollow"
+							rel="nofollow"
 							target="_blank"
-						><?php echo htmlentities($report['title'], ENT_HTML5, 'UTF-8') ?></a>
+						>Primary link</a>
 
 						<?php // If there are more URLs, list them here ?>
 						<?php if (count($report['urls']) > 1): ?>

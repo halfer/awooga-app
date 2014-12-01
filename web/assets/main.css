@@ -3,7 +3,8 @@
 }
 
 /* Space out the issues labels, so they wrap in a table cell */
-table#reports td.issues span.label {
+table#reports td.issues span.label,
+table#report td.issues span.label {
 	display: inline-block;
 }
 

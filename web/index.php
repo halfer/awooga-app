@@ -27,6 +27,14 @@ $browse = function($page = 1) use ($app, $engine)
 $app->get('/browse', $browse);
 $app->get('/browse/:page', $browse);
 
+// A controller for a single report
+$app->get('/report/:report', function($reportId) use ($app, $engine)
+{
+	$controller = new \Awooga\Controllers\Report($app, $engine);
+	$controller->setReportId($reportId);
+	$controller->initAndExecute();
+});
+
 // Set up a repos screen
 $issues = function($page = 1) use ($app, $engine)
 {
