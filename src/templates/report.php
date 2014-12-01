@@ -17,7 +17,7 @@
 				<?php if ($ord): ?>
 					</tr><tr>
 				<?php endif ?>
-				<td>
+				<td colspan="2">
 					<a
 						href="<?php echo htmlentities($url['url'], ENT_HTML5, 'UTF-8') ?>"
 						alt="Link to learning resource"
@@ -27,18 +27,32 @@
 			<?php endforeach ?>
 		</tr>
 		<tr>
-			<th>Issues</th>
-			<td class="issues">
-				<?php foreach ($report['issues'] as $issue): ?>
+			<th
+				rowspan="<?php echo count($report['issues']) ?>"
+				>Issues</th>
+			<?php foreach ($report['issues'] as $ord => $issue): ?>
+				<?php if ($ord): ?>
+					</tr><tr>
+				<?php endif ?>
+				<td class="issues">
 					<?php // Doesn't need escaping,  but let's do it anyway ?>
 					<span class="label label-danger"
 						><?php echo htmlentities($issue['issue_code'], ENT_HTML5, 'UTF-8') ?></span>
-				<?php endforeach ?>
-			</td>
+				</td>
+				<td>
+					<?php if ($issue['description']): ?>
+						<?php echo htmlentities($issue['description'], ENT_HTML5, 'UTF-8') ?>
+					<?php else: ?>
+						(No comments added)
+					<?php endif ?>
+				</td>
+			<?php endforeach ?>
 		</tr>
 		<tr>
 			<th>Description</th>
-			<td><?php echo htmlentities($report['description'], ENT_HTML5, 'UTF-8') ?></td>
+			<td colspan="2">
+				<?php echo htmlentities($report['description'], ENT_HTML5, 'UTF-8') ?>
+			</td>
 		</tr>
 	</tbody>
 </table>

@@ -24,7 +24,10 @@ trait Reports
 	{
 		$strIds = implode(',', $reportIds);
 		$sql = "
-			SELECT r.report_id, i.code issue_code
+			SELECT
+				r.report_id,
+				i.code issue_code,
+				r.description
 			FROM report_issue r
 			INNER JOIN issue i ON (i.id = r.issue_id)
 			WHERE r.report_id IN ({$strIds})
