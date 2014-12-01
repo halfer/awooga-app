@@ -145,6 +145,17 @@ class Report
 				}
 			}
 
+			if (isset($issue['resolved_at']))
+			{
+				$date = \DateTime::createFromFormat('Y-m-d H:i:s', $issue['resolved_at']);
+				if ($date === false || $this->getLastDateParseFailCount())
+				{
+					throw new \Awooga\Exceptions\TrivialException(
+						'A resolution datetime must be in the form yyyy-mm-dd [h:m:s]'
+					);					
+				}
+			}
+
 			// Add the issue code to the list
 			$issueCodes[] = $issueCode;
 
@@ -153,6 +164,10 @@ class Report
 			if (isset($issue['description']) && $issue['description'])
 			{
 				$issueOut['description'] = $issue['description'];
+			}
+			if (isset($issue['resolved_at']))
+			{
+				$issueOut['resolved_at'] = $issue['resolved_at'];
 			}
 			$issuesOut[] = $issueOut;
 		}
@@ -166,6 +181,15 @@ class Report
 		}
 
 		$this->issues = $issuesOut;
+	}
+
+	protected function getLastDateParseFailCount()
+	{
+		$fails = \DateTime::getLastErrors();
+		$warnings = isset($fails['warning_count']) ? $fails['warning_count'] : 0;
+		$errors = isset($fails['error_count']) ? $fails['error_count'] : 0;
+
+		return $warnings + $errors;
 	}
 
 	/**
@@ -193,6 +217,8 @@ class Report
 
 	/**
 	 * Sets an optional author notified date
+	 * 
+	 * @todo This probably needs \DateTime::getLastErrors() to check for swapped date/month?
 	 * 
 	 * @param string $notifiedDate
 	 */
@@ -244,6 +270,13 @@ class Report
 		return $reportId;
 	}
 
+	/**
+	 * Returns the primary key for this record
+	 * 
+	 * @todo Can this move to ReportTestHarness?
+	 * 
+	 * @return type
+	 */
 	public function getId()
 	{
 		return $this->repoId;

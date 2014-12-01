@@ -38,4 +38,9 @@ class ReportTestHarness extends \Awooga\Core\Report
 	{
 		return parent::getAuthorNotifiedDateAsString();
 	}
+
+	public function getIssues()
+	{
+		return $this->issues;
+	}
 }

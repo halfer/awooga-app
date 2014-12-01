@@ -254,6 +254,53 @@ class ReportTest extends TestCase
 		$report->setIssues($issues);
 	}
 
+	public function testIssueValidResolvedDate()
+	{
+		$report = $this->checkIssueDateResolvedValidity('2014-12-21 18:00:00');
+		$this->assertTrue(
+			isset($report->getIssues()[0]['resolved_at']),
+			"Ensure the issue has a resolution date"
+		);
+	}
+
+	/**
+	 * Check that an invalid resolution date throws an exception
+	 * 
+	 * @expectedException \Awooga\Exceptions\TrivialException
+	 */
+	public function testIssueSlightlyInvalidResolvedDate()
+	{
+		// Here the day and month are transposed
+		$report = $this->checkIssueDateResolvedValidity('2014-21-12 18:00:00');
+	}
+
+	/**
+	 * Check that a very invalid resolution date throws an exception
+	 * 
+	 * @expectedException \Awooga\Exceptions\TrivialException
+	 */
+	public function testIssueReallyInvalidResolvedDate()
+	{
+		$this->checkIssueDateResolvedValidity('nonsense');
+	}
+
+	protected function checkIssueDateResolvedValidity($strDate)
+	{
+		// We need the database to access the issue codes
+		$report = $this->buildDatabaseAndGetReport();
+
+		$issues = array(
+			array(
+				'issue_cat_code' => 'xss',
+				'description' => 'The author has switched from the deprecated mysql library to PDO, and all queries now use parameterisation!',
+				'resolved_at' => $strDate,
+			)
+		);
+		$report->setIssues($issues);
+
+		return $report;
+	}
+
 	/**
 	 * Sets a notified date that should be accepted and recorded
 	 */
@@ -340,6 +387,8 @@ class ReportTest extends TestCase
 			$this->assertEquals($issue['issue_cat_code'], $issueData['issue_code']);
 			next($issues);
 		}
+
+		// @todo Need to check setting an issue resolved date works OK
 
 		// Check urls
 		$statement2 = $pdo->prepare($this->getRetrieveUrlsSql());

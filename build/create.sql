@@ -49,6 +49,8 @@ CREATE TABLE report_issue (
 	description VARCHAR(1024),
 	description_html VARCHAR(1024),
 	issue_id INTEGER NOT NULL,
+	/* Optional fixed date/time to indicate something has been improved or removed */
+	resolved_at DATETIME,
 
 	FOREIGN KEY (report_id) REFERENCES report (id),
 	FOREIGN KEY (issue_id) REFERENCES issue (id)
