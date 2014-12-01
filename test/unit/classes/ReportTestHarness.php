@@ -39,6 +39,16 @@ class ReportTestHarness extends \Awooga\Core\Report
 		return parent::getAuthorNotifiedDateAsString();
 	}
 
+	/**
+	 * Returns the primary key for this record
+	 * 
+	 * @return integer
+	 */
+	public function getId()
+	{
+		return $this->repoId;
+	}
+
 	public function getIssues()
 	{
 		return $this->issues;

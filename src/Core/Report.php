@@ -271,18 +271,6 @@ class Report
 	}
 
 	/**
-	 * Returns the primary key for this record
-	 * 
-	 * @todo Can this move to ReportTestHarness?
-	 * 
-	 * @return type
-	 */
-	public function getId()
-	{
-		return $this->repoId;
-	}
-
-	/**
 	 * Removes issues against a report
 	 *
 	 * @param integer $reportId
