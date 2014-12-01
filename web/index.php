@@ -23,7 +23,7 @@ $app->get('/about', function() use ($app, $engine)
 });
 
 // Set up common front controller for browsing
-$browse = function($page = 1) use ($app, $engine)
+$browse = function($page = null) use ($app, $engine)
 {
 	$controller = new \Awooga\Controllers\Browse($app, $engine);
 	$controller->setPage($page);
@@ -43,7 +43,7 @@ $app->get('/report/:report', function($reportId) use ($app, $engine)
 });
 
 // Set up a repos screen
-$issues = function($page = 1) use ($app, $engine)
+$issues = function($page = null) use ($app, $engine)
 {
 	$controller = new \Awooga\Controllers\Issues($app, $engine);
 	$controller->setPage($page);
@@ -53,7 +53,7 @@ $app->get('/issues', $issues);
 $app->get('/issues/:page', $issues);
 
 // Set up a repos screen
-$repos = function($page = 1) use ($app, $engine)
+$repos = function($page = null) use ($app, $engine)
 {
 	$controller = new \Awooga\Controllers\Repos($app, $engine);
 	$controller->setPage($page);
@@ -63,7 +63,7 @@ $app->get('/repos', $repos);
 $app->get('/repos/:page', $repos);
 
 // Set up log screen
-$log = function($page = 1) use ($app, $engine)
+$log = function($page = null) use ($app, $engine)
 {
 	$controller = new \Awooga\Controllers\Logs($app, $engine);
 	$controller->setPage($page);

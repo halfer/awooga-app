@@ -11,7 +11,10 @@
 		address and see if it's in the database.
 	</p>
 
-	<form>
+	<form
+		method="get"
+		action="/browse"
+	>
 		<div class="input-group">
 			<input
 				type="text"

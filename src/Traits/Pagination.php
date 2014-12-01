@@ -12,9 +12,16 @@ trait Pagination
 		$this->page = $page;
 	}
 
-	public function getPage($untaint = true)
+	/**
+	 * Gets page number
+	 * 
+	 * We check for less than 1, since null (no page number) is valid
+	 * 
+	 * @return integer
+	 */
+	public function getPage()
 	{
-		return $untaint ? (int) $this->page : $this->page;
+		return (int) $this->page < 1 ? 1 : $this->page;
 	}
 
 	/**
