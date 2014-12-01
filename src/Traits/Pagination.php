@@ -1,6 +1,6 @@
 <?php
 
-namespace Awooga\Controllers;
+namespace Awooga\Traits;
 
 trait Pagination
 {

@@ -4,7 +4,7 @@ namespace Awooga\Controllers;
 
 class Repos extends BaseController
 {
-	use Pagination;
+	use \Awooga\Traits\Pagination;
 
 	/**
 	 * Controller for repos screen

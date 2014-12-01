@@ -4,7 +4,7 @@ namespace Awooga\Controllers;
 
 class Issues extends BaseController
 {
-	use Pagination;
+	use \Awooga\Traits\Pagination;
 
 	/**
 	 * Controller for report browsing

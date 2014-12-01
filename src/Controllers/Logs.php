@@ -4,7 +4,7 @@ namespace Awooga\Controllers;
 
 class Logs extends BaseController
 {
-	use Pagination;
+	use \Awooga\Traits\Pagination;
 
 	/**
 	 * Controller for logs screen
