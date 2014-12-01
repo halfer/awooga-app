@@ -319,19 +319,27 @@ class ReportTest extends TestCase
 	 */
 	public function testSetAuthorNotifiedDateWrongType()
 	{
-		$report = $this->getDummyReport();
-		$report->setAuthorNotifiedDate(new \stdClass());
+		$this->getDummyReport()->setAuthorNotifiedDate(new \stdClass());
 	}
 
 	/**
-	 * Sets a notified date, of the wrong string format, that should be thrown out
+	 * Sets a notified date, of the wrong string format, which should be thrown out
 	 * 
 	 * @expectedException \Awooga\Exceptions\TrivialException
 	 */
 	public function testSetAuthorNotifiedDateWrongFormat()
 	{
-		$report = $this->getDummyReport();
-		$report->setAuthorNotifiedDate('18/11/2014');
+		$this->getDummyReport()->setAuthorNotifiedDate('18-11-2014');
+	}
+
+	/**
+	 * Sets a notified date, with date and month transposed, which should be thrown out
+	 * 
+	 * @expectedException \Awooga\Exceptions\TrivialException
+	 */
+	public function testSetAuthorNotifiedSlightlyWrongFormat()
+	{
+		$this->getDummyReport()->setAuthorNotifiedDate('2014-18-11');		
 	}
 
 	/**

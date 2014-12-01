@@ -228,7 +228,7 @@ class Report
 		$this->isString($notifiedDate);
 
 		$notifiedDate = \DateTime::createFromFormat('Y-m-d', $notifiedDate);
-		if (!$notifiedDate)
+		if (!$notifiedDate || $this->getLastDateParseFailCount())
 		{
 			throw new \Awooga\Exceptions\TrivialException("Invalid author notification date passed");
 		}
