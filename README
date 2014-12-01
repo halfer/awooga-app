@@ -3,11 +3,11 @@ Awooga primer
 
 To build for the first time:
 
-	cat build/init.sql build/create.sql | mysql -u root -p
+	cat build/init.sql build/create.sql build/update-issues.sql | mysql -u root -p
 
 Also run this to populate with test data:
 
-	cat build/repositories_local.sql | mysql -u root -p
+	cat build/local/repositories_local.sql | mysql -u root -p
 
 To delete:
 
