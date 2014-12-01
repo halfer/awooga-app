@@ -350,8 +350,8 @@ class ReportTest extends TestCase
 		);
 		$report->setIssues(
 			$issues = array(
-				array('issue_cat_code' => 'sql-injection', ),
-				array('issue_cat_code' => 'xss', ),
+				array('issue_cat_code' => 'sql-injection', 'resolved_at' => null, ),
+				array('issue_cat_code' => 'xss', 'resolved_at' => '2014-10-20', ),
 			)
 		);
 		$reportId = $report->save();
@@ -383,12 +383,12 @@ class ReportTest extends TestCase
 		{
 			$this->assertEquals($issueData['title'], $title);
 			$this->assertEquals($issueData['description'], $description);
+			// Check issues are recorded OK
 			$issue = current($issues);
 			$this->assertEquals($issue['issue_cat_code'], $issueData['issue_code']);
+			$this->assertEquals($issue['resolved_at'], $issueData['issue_resolved_at']);
 			next($issues);
 		}
-
-		// @todo Need to check setting an issue resolved date works OK
 
 		// Check urls
 		$statement2 = $pdo->prepare($this->getRetrieveUrlsSql());
@@ -416,6 +416,7 @@ class ReportTest extends TestCase
 			SELECT
 				r.*,
 				ri.description issue_description,
+				ri.resolved_at issue_resolved_at,
 				i.code issue_code
 			FROM
 				report r
