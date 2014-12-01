@@ -15,6 +15,13 @@ $app->get('/', function() use ($app, $engine)
 	$controller->initAndExecute();
 });
 
+// Here is an about screen
+$app->get('/about', function() use ($app, $engine)
+{
+	$controller = new \Awooga\Controllers\About($app, $engine);
+	$controller->initAndExecute();
+});
+
 // Set up common front controller for browsing
 $browse = function($page = 1) use ($app, $engine)
 {

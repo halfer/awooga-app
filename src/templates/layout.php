@@ -30,6 +30,9 @@
 						<li class="<?php echo $selectedMenu == 'logs' ? 'active' : '' ?>">
 							<a href="/logs">Logs</a>
 						</li>
+						<li class="<?php echo $selectedMenu == 'about' ? 'active' : '' ?>">
+							<a href="/about">About</a>
+						</li>
 					</ul>
 					<div class="nav navbar-nav navbar-right">
 						<p class="navbar-text">
