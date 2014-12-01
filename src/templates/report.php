@@ -17,7 +17,7 @@
 				<?php if ($ord): ?>
 					</tr><tr>
 				<?php endif ?>
-				<td colspan="2">
+				<td colspan="3">
 					<a
 						href="<?php echo htmlentities($url['url'], ENT_HTML5, 'UTF-8') ?>"
 						alt="Link to learning resource"
@@ -35,10 +35,24 @@
 					</tr><tr>
 				<?php endif ?>
 				<td class="issues">
-					<?php // Doesn't need escaping,  but let's do it anyway ?>
-					<span class="label label-danger"
-						><?php echo htmlentities($issue['issue_code'], ENT_HTML5, 'UTF-8') ?></span>
+					<?php if ($issue['resolved_at']): ?>
+						<?php // Doesn't need escaping,  but let's do it anyway ?>
+						<span class="label label-success"
+							><?php echo htmlentities($issue['code'], ENT_HTML5, 'UTF-8') ?></span>
+					<?php else: ?>
+						<span class="label label-danger"
+							><?php echo htmlentities($issue['code'], ENT_HTML5, 'UTF-8') ?></span>
+					<?php endif ?>
 				</td>
+				<?php // This is the date resolved column ?>
+				<td>
+					<?php if ($issue['resolved_at']): ?>
+						<?php echo $issue['resolved_at'] ?>
+					<?php else: ?>
+						Unresolved
+					<?php endif ?>
+				</td>
+				<?php // This is an optional description field, from the reporter ?>
 				<td>
 					<?php if ($issue['description_html']): ?>
 						<?php // Converted from markdown, so should be safe ?>
@@ -51,7 +65,7 @@
 		</tr>
 		<tr>
 			<th>Description</th>
-			<td colspan="2">
+			<td colspan="3">
 				<?php // Converted from markdown, so should be safe ?>
 				<?php echo $report['description_html'] ?>
 			</td>

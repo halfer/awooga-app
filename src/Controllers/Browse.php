@@ -65,7 +65,7 @@ class Browse extends BaseController
 		// Add each issue to the right report
 		foreach($this->getRelatedIssues($reportIds) as $issue)
 		{
-			$reportsById[$issue['report_id']]['issues'][] = $issue['issue_code'];
+			$reportsById[$issue['report_id']]['issues'][] = $issue;
 		}
 
 		return $reportsById;

@@ -54,9 +54,15 @@
 				<?php // Here are the issues lozenges ?>
 				<td class="issues">
 					<?php foreach ($report['issues'] as $issue): ?>
-						<span class="label label-danger">
-							<?php echo $issue ?>
-						</span>
+						<?php if ($issue['resolved_at']): ?>
+							<span class="label label-success">
+								<?php echo $issue['code'] ?> (fixed)
+							</span>
+						<?php else: ?>
+							<span class="label label-danger">
+								<?php echo $issue['code'] ?>
+							</span>
+						<?php endif ?>
 					<?php endforeach ?>
 				</td>
 				<td>

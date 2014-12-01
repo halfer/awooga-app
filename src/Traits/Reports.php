@@ -26,8 +26,9 @@ trait Reports
 		$sql = "
 			SELECT
 				r.report_id,
-				i.code issue_code,
-				r.description_html
+				i.code,
+				r.description_html,
+				r.resolved_at
 			FROM report_issue r
 			INNER JOIN issue i ON (i.id = r.issue_id)
 			WHERE r.report_id IN ({$strIds})
