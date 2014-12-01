@@ -147,11 +147,11 @@ class Report
 
 			if (isset($issue['resolved_at']))
 			{
-				$date = \DateTime::createFromFormat('Y-m-d H:i:s', $issue['resolved_at']);
+				$date = \DateTime::createFromFormat('Y-m-d', $issue['resolved_at']);
 				if ($date === false || $this->getLastDateParseFailCount())
 				{
 					throw new \Awooga\Exceptions\TrivialException(
-						'A resolution datetime must be in the form yyyy-mm-dd [h:m:s]'
+						'A resolution date must be in the form yyyy-mm-dd'
 					);					
 				}
 			}
@@ -434,19 +434,23 @@ class Report
 	{
 		$sql = "
 			INSERT INTO report_issue
-			(report_id, description, description_html, issue_id)
-			VALUES (:report_id, :description, :description_html, :issue_id)
+			(report_id, description, description_html, issue_id, resolved_at)
+			VALUES (:report_id, :description, :description_html, :issue_id, :resolved_at)
 		";
 		foreach ($this->issues as $issue)
 		{
 			$description = isset($issue['description']) && $issue['description'] ?
 				$issue['description'] :
 				null;
+			$resolvedAt = isset($issue['resolved_at']) && $issue['resolved_at'] ?
+				$issue['resolved_at'] :
+				null;
 			$params = array(
 				':report_id' => $reportId,
 				':issue_id' => $this->getIssueIdForCode($issue['issue_cat_code']),
 				':description' => $description,
 				':description_html' => $this->convertFromMarkdown($description),
+				':resolved_at' => $resolvedAt,
 			);
 			$statement = $this->getDriver()->prepare($sql);
 			$statement->execute($params);

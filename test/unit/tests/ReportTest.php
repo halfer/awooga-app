@@ -256,7 +256,7 @@ class ReportTest extends TestCase
 
 	public function testIssueValidResolvedDate()
 	{
-		$report = $this->checkIssueDateResolvedValidity('2014-12-21 18:00:00');
+		$report = $this->checkIssueDateResolvedValidity('2014-12-21');
 		$this->assertTrue(
 			isset($report->getIssues()[0]['resolved_at']),
 			"Ensure the issue has a resolution date"
@@ -271,7 +271,7 @@ class ReportTest extends TestCase
 	public function testIssueSlightlyInvalidResolvedDate()
 	{
 		// Here the day and month are transposed
-		$report = $this->checkIssueDateResolvedValidity('2014-21-12 18:00:00');
+		$this->checkIssueDateResolvedValidity('2014-21-12');
 	}
 
 	/**
@@ -457,7 +457,10 @@ class ReportTest extends TestCase
 		$report->setIssues(
 			array(
 				array('issue_cat_code' => 'sql-injection', ),
-				array('issue_cat_code' => 'xss', ),
+				array(
+					'issue_cat_code' => 'xss',
+					'resolved_at' => '2014-11-18'
+				),
 			)
 		);
 		$report->save();
