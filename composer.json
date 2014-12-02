@@ -3,6 +3,7 @@
         "phpunit/phpunit": "4.3.*",
         "slim/slim": "2.4.*",
         "league/plates": "3.1.*",
-        "michelf/php-markdown": "1.4.*"
+        "michelf/php-markdown": "1.4.*",
+        "zendframework/zendsearch": "dev-master"
     }
 }
