@@ -5,9 +5,6 @@ namespace Awooga\Core;
 class Searcher
 {
 	protected $index;
-	protected $report;
-	protected $urls;
-	protected $issues;
 	protected $logger;
 
 	use \Awooga\Core\Database;
@@ -17,11 +14,11 @@ class Searcher
 		// Create index
 		if (file_exists($indexPath))
 		{
-			$this->index = ZendSearch\Lucene\Lucene::open($indexPath);
+			$this->index = \ZendSearch\Lucene\Lucene::open($indexPath);
 		}
 		else
 		{
-			$this->index = ZendSearch\Lucene\Lucene::create($indexPath);
+			$this->index = \ZendSearch\Lucene\Lucene::create($indexPath);
 		}
 	}
 
@@ -41,40 +38,18 @@ class Searcher
 		return $this->index;
 	}
 
-	public function setReport(array $report)
-	{
-		$this->report = $report;
-	}
-
-	/**
-	 * Sets the URL(s)
-	 * 
-	 * We can't typehint on array as it can be a string
-	 * 
-	 * @param type $urls
-	 */
-	public function setUrls($urls)
-	{
-		$this->urls = $urls;
-	}
-
-	public function setIssues(array $issues)
-	{
-		$this->issues = $issues;
-	}
-
-	public function index()
+	public function index(array $report, $urls, array $issues)
 	{
 		// Compile the issues HTML
 		$issuesHtml = '';
-		foreach ($this->issues as $issue)
+		foreach ($issues as $issue)
 		{
 			$issuesHtml .= $issue['description_html'];
 		}
-		$html = $this->report['description_html'] . $issuesHtml;
+		$html = $report['description_html'] . $issuesHtml;
 
 		// Let's delete this item first (and any dups, which should not exist)
-		$foundDocs = $this->index->find('pk:' . $this->report['id']);
+		$foundDocs = $this->index->find('pk:' . $report['id']);
 		if (count($foundDocs) > 1)
 		{
 			// @todo Reset log level
@@ -86,24 +61,24 @@ class Searcher
 		}
 
 		// Add in HTML
-		$doc = ZendSearch\Lucene\Document\HTML::loadHtml($html);
+		$doc = \ZendSearch\Lucene\Document\HTML::loadHtml($html);
 
 		// Add useful fields
-		$doc->addField(\ZendSearch\Lucene\Document\Field::keyword('pk', $this->report['id']));
-		$doc->addField(\ZendSearch\Lucene\Document\Field::text('title', $this->report['title']));
+		$doc->addField(\ZendSearch\Lucene\Document\Field::keyword('pk', $report['id']));
+		$doc->addField(\ZendSearch\Lucene\Document\Field::text('title', $report['title']));
 
 		// Add URLs
-		foreach ($this->urls as $ord => $url)
+		foreach ($urls as $ord => $url)
 		{
 			$keyName = 'url' . $ord;
-			$doc->addField(\ZendSearch\Lucene\Document\Field::keyword($keyName, $url['url']));
+			$doc->addField(\ZendSearch\Lucene\Document\Field::keyword($keyName, $url));
 		}
 
 		// Add issue keywords
-		foreach ($this->issues as $ord => $issue)
+		foreach ($issues as $ord => $issue)
 		{
 			$keyName = 'issue' . $ord;
-			$doc->addField(\ZendSearch\Lucene\Document\Field::keyword($keyName, $issue['code']));
+			$doc->addField(\ZendSearch\Lucene\Document\Field::keyword($keyName, $issue['issue_cat_code']));
 		}
 
 		$this->getIndex()->addDocument($doc);
@@ -142,6 +117,6 @@ class Searcher
 	 */
 	protected function log($message, $level)
 	{
-		echo $message . "\n";
+		//echo $message . "\n";
 	}
 }

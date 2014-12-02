@@ -443,6 +443,7 @@ class GitImporter
 		$version = $this->grabElement($data, 'version');
 		$url = $this->grabElement($data, 'url');
 		$issues = $this->grabElement($data, 'issues');
+		// @todo Move these back to var names, or better still move them to setters directly
 		$reportData = array(
 			'title' => $this->grabElement($data, 'title'),
 			'description' => $this->grabElement($data, 'description'),
@@ -463,8 +464,7 @@ class GitImporter
 				$reportId = $report->save();
 				
 				// This will only be called if the above does not throw an exception
-				// @todo Would it be better to pass a $report to this instead?
-				$this->tryReindexing($reportData, $url, $issues);
+				$this->tryReindexing($report);
 				break;
 			default:
 				throw new \Awooga\Exceptions\TrivialException("Unrecognised version number");
@@ -645,15 +645,12 @@ class GitImporter
 		return $failCount;
 	}
 
-	protected function tryReindexing(array $report, $urls, array $issues)
+	protected function tryReindexing(Report $report)
 	{
-		$searcher = $this->getSearcher();
-		if ($searcher)
+		if ($searcher = $this->getSearcher())
 		{
-			$searcher->setReport($report);
-			$searcher->setUrls($urls);
-			$searcher->setIssues($issues);
-			$searcher->index();
+			$report->index($searcher);
+//			$searcher->index($report);
 		}
 	}
 

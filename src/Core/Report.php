@@ -5,9 +5,11 @@ namespace Awooga\Core;
 class Report
 {
 	protected $repoId;
+	protected $id;
 	protected $title;
 	protected $urls;
 	protected $description;
+	protected $descriptionHtml;
 	protected $issues;
 	protected $notifiedDate;
 
@@ -35,6 +37,11 @@ class Report
 
 		$this->title = $title;
 	}
+//
+//	public function getTitle()
+//	{
+//		return $this->title;
+//	}
 
 	/**
 	 * Sets a URL or an array of URLs
@@ -86,6 +93,12 @@ class Report
 		$this->urls = $url;
 	}
 
+//	// @todo Replicated in ReportTestHarness, fix this
+//	public function getUrl()
+//	{
+//		return $this->urls;
+//	}
+
 	/**
 	 * Sets a string description
 	 * 
@@ -98,6 +111,11 @@ class Report
 
 		$this->description = $description;
 	}
+
+//	public function getDescriptionHtml()
+//	{
+//		return $this->descriptionHtml;
+//	}
 
 	/**
 	 * Setter to accept the issue array
@@ -182,6 +200,12 @@ class Report
 
 		$this->issues = $issuesOut;
 	}
+//
+//	// @todo Replicated in ReportTestHarness, fix this
+//	public function getIssues()
+//	{
+//		return $this->issues;
+//	}
 
 	protected function getLastDateParseFailCount()
 	{
@@ -267,7 +291,22 @@ class Report
 		$this->insertIssues($reportId);
 		$this->insertUrls($reportId);
 
+		$this->id = $reportId;
+
 		return $reportId;
+	}
+
+	public function index(Searcher $searcher)
+	{
+		$searcher->index(
+			array(
+				'id' => $this->id,
+				'title' => $this->title,
+				'description_html' => $this->descriptionHtml
+			),
+			$this->urls,
+			$this->issues
+		);
 	}
 
 	/**
@@ -381,11 +420,12 @@ class Report
 	protected function runSaveCommand($sql, $reportId = null)
 	{
 		// Set up the parameters (the report is for the update only)
+		$this->descriptionHtml = $this->convertFromMarkdown($this->description);
 		$params = array(
 			':repo_id' => $this->repoId,
 			':title' => $this->title,
 			':description' => $this->description,
-			':description_html' => $this->convertFromMarkdown($this->description),
+			':description_html' => $this->descriptionHtml,
 			':notified_at' => $this->getAuthorNotifiedDateAsString(),
 		);
 
@@ -429,7 +469,7 @@ class Report
 			(report_id, description, description_html, issue_id, resolved_at)
 			VALUES (:report_id, :description, :description_html, :issue_id, :resolved_at)
 		";
-		foreach ($this->issues as $issue)
+		foreach ($this->issues as &$issue)
 		{
 			$description = isset($issue['description']) && $issue['description'] ?
 				$issue['description'] :
@@ -437,11 +477,12 @@ class Report
 			$resolvedAt = isset($issue['resolved_at']) && $issue['resolved_at'] ?
 				$issue['resolved_at'] :
 				null;
+			$issue['description_html'] = $this->convertFromMarkdown($description);
 			$params = array(
 				':report_id' => $reportId,
 				':issue_id' => $this->getIssueIdForCode($issue['issue_cat_code']),
 				':description' => $description,
-				':description_html' => $this->convertFromMarkdown($description),
+				':description_html' => $issue['description_html'],
 				':resolved_at' => $resolvedAt,
 			);
 			$statement = $this->getDriver()->prepare($sql);
