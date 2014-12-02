@@ -7,11 +7,27 @@ class Browse extends BaseController
 	use \Awooga\Traits\Pagination;
 	use \Awooga\Traits\Reports;
 
+	protected $searchKeys;
+
 	/**
 	 * Controller for report browsing
 	 */
 	public function execute()
 	{
+		// See if we are in search mode
+		if ($this->isSearchMode())
+		{
+			// @todo Tidy this up, needs to be configurable
+			$root = realpath(__DIR__ . '/../..') . '/filesystem/mount/search-index';
+			$searcher = new \Awooga\Core\Searcher($root);
+			$results = $searcher->search($_GET['search']);
+			$this->searchKeys = array();
+			foreach ($results as $row)
+			{
+				$this->searchKeys[] = $row->pk;
+			}
+		}
+
 		// Redirects if the page number is invalid, fetches rows
 		$reports = $this->validatePageAndGetRows($pageSize = 20);
 
@@ -26,9 +42,16 @@ class Browse extends BaseController
 		);
 	}
 
+	protected function isSearchMode()
+	{
+		return isset($_GET['search']);
+	}
+
 	protected function setRowCount()
 	{
-		$this->rowCount = $this->getReportCount();
+		$this->rowCount = $this->isSearchMode() ?
+			count($this->searchKeys) :
+			$this->getReportCount();
 	}
 
 	protected function getMenuSlug()
@@ -81,14 +104,29 @@ class Browse extends BaseController
 	 */
 	protected function getReports($pageSize)
 	{
-		$limitClause = $this->getLimitClause($pageSize);
-		$sql = "
-			SELECT *
-			FROM report
-			WHERE is_enabled = 1
-			ORDER BY id DESC
-			{$limitClause}
-		";
+		if ($this->isSearchMode())
+		{
+			// @todo Need to take the right page slice out of here
+			$where = implode(',', $this->searchKeys);
+			$sql = "
+				SELECT *
+				FROM report
+				WHERE is_enabled = 1
+				AND id IN ($where)
+				ORDER BY id DESC
+			";			
+		}
+		else
+		{
+			$limitClause = $this->getLimitClause($pageSize);
+			$sql = "
+				SELECT *
+				FROM report
+				WHERE is_enabled = 1
+				ORDER BY id DESC
+				{$limitClause}
+			";
+		}
 		$statement = $this->getDriver()->prepare($sql);
 		$ok = $statement->execute();
 

@@ -17,16 +17,18 @@
 	>
 		<div class="input-group">
 			<input
+				name="search"
 				type="text"
 				class="form-control"
 				id="addressSearch"
 				placeholder="Enter tutorial address"
 			/>
 			<span class="input-group-btn">
-				<button
-					type="button"
+				<input
+					type="submit"
 					class="btn btn-default pull-right"
-				>Search</button>
+					value="Search"
+				/>
 			</span>
 		</div>
 		<div class="checkbox">
