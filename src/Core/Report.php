@@ -333,6 +333,7 @@ class Report
 	 *
 	 * @param integer $reportId
 	 * @return boolean
+	 * @throws \Awooga\Exceptions\TrivialException
 	 */
 	protected function update($reportId)
 	{
@@ -354,6 +355,7 @@ class Report
 	 * Internal save command to do an insert
 	 *
 	 * @return boolean
+	 * @throws \Awooga\Exceptions\TrivialException
 	 */
 	protected function insert()
 	{
@@ -374,6 +376,7 @@ class Report
 	 * @param string $sql
 	 * @param integer $reportId
 	 * @return boolean
+	 * @throws \Awooga\Exceptions\TrivialException
 	 */
 	protected function runSaveCommand($sql, $reportId = null)
 	{
@@ -397,6 +400,7 @@ class Report
 		$ok = $statement->execute($params);
 		if ($ok === false)
 		{
+			// @todo It's not safe to add error information to a TrivialException, remove this
 			throw new \Awooga\Exceptions\TrivialException(
 				'Save operation failed: ' . print_r($statement->errorInfo(), true)
 			);

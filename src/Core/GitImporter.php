@@ -19,6 +19,7 @@ class GitImporter
 
 	protected $runId;
 	protected $repoRoot;
+	protected $searcher;
 	protected $debug;
 
 	use Database;
@@ -440,11 +441,13 @@ class GitImporter
 
 		// Parse the data
 		$version = $this->grabElement($data, 'version');
-		$title = $this->grabElement($data, 'title');
 		$url = $this->grabElement($data, 'url');
-		$description = $this->grabElement($data, 'description');
 		$issues = $this->grabElement($data, 'issues');
-		$notifiedDate = $this->grabElement($data, 'author_notified_date');
+		$reportData = array(
+			'title' => $this->grabElement($data, 'title'),
+			'description' => $this->grabElement($data, 'description'),
+			'notified_date' => $this->grabElement($data, 'author_notified_date'),
+		);
 
 		// Handle depending on version
 		switch ($version)
@@ -452,12 +455,16 @@ class GitImporter
 			case 1:
 				$report = new Report($repoId);
 				$report->setDriver($this->pdo);
-				$report->setTitle($title);
+				$report->setTitle($reportData['title']);
 				$report->setUrl($url);
-				$report->setDescription($description);
+				$report->setDescription($reportData['description']);
 				$report->setIssues($issues);
-				$report->setAuthorNotifiedDate($notifiedDate);
+				$report->setAuthorNotifiedDate($reportData['notified_date']);
 				$reportId = $report->save();
+				
+				// This will only be called if the above does not throw an exception
+				// @todo Would it be better to pass a $report to this instead?
+				$this->tryReindexing($reportData, $url, $issues);
 				break;
 			default:
 				throw new \Awooga\Exceptions\TrivialException("Unrecognised version number");
@@ -636,6 +643,35 @@ class GitImporter
 		}
 
 		return $failCount;
+	}
+
+	protected function tryReindexing(array $report, $urls, array $issues)
+	{
+		$searcher = $this->getSearcher();
+		if ($searcher)
+		{
+			$searcher->setReport($report);
+			$searcher->setUrls($urls);
+			$searcher->setIssues($issues);
+			$searcher->index();
+		}
+	}
+
+	/**
+	 * Gets the currently set searcher
+	 * 
+	 * Fails silently if no searcher has been set
+	 * 
+	 * @return Searcher
+	 */
+	public function getSearcher()
+	{
+		return $this->searcher;
+	}
+
+	public function setSearcher(Searcher $searcher)
+	{
+		$this->searcher = $searcher;
 	}
 
 	/**
