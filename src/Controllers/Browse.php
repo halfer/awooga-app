@@ -32,12 +32,15 @@ class Browse extends BaseController
 		$reports = $this->validatePageAndGetRows($pageSize = 20);
 
 		// Render the reports
+		$rowCount = $this->getRowCount();
 		echo $this->render(
 			'browse',
 			array(
 				'reports' => $reports,
+				'rowCount' => $rowCount,
+				'isSearch' => $this->isSearchMode(),
 				'currentPage' => $this->getPage(),
-				'maxPage' => $this->getMaxPage($this->getRowCount(), $pageSize),
+				'maxPage' => $this->getMaxPage($rowCount, $pageSize),
 			)
 		);
 	}

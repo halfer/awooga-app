@@ -15,22 +15,7 @@
 		method="get"
 		action="/browse"
 	>
-		<div class="input-group">
-			<input
-				name="search"
-				type="text"
-				class="form-control"
-				id="addressSearch"
-				placeholder="Enter tutorial address"
-			/>
-			<span class="input-group-btn">
-				<input
-					type="submit"
-					class="btn btn-default pull-right"
-					value="Search"
-				/>
-			</span>
-		</div>
+		<?php $this->insert('partials/search', ['searchString' => '', ]) ?>
 		<div class="checkbox">
 			<label>
 				<input
