@@ -37,11 +37,6 @@ class Report
 
 		$this->title = $title;
 	}
-//
-//	public function getTitle()
-//	{
-//		return $this->title;
-//	}
 
 	/**
 	 * Sets a URL or an array of URLs
@@ -93,12 +88,6 @@ class Report
 		$this->urls = $url;
 	}
 
-//	// @todo Replicated in ReportTestHarness, fix this
-//	public function getUrl()
-//	{
-//		return $this->urls;
-//	}
-
 	/**
 	 * Sets a string description
 	 * 
@@ -111,11 +100,6 @@ class Report
 
 		$this->description = $description;
 	}
-
-//	public function getDescriptionHtml()
-//	{
-//		return $this->descriptionHtml;
-//	}
 
 	/**
 	 * Setter to accept the issue array
@@ -200,12 +184,6 @@ class Report
 
 		$this->issues = $issuesOut;
 	}
-//
-//	// @todo Replicated in ReportTestHarness, fix this
-//	public function getIssues()
-//	{
-//		return $this->issues;
-//	}
 
 	protected function getLastDateParseFailCount()
 	{

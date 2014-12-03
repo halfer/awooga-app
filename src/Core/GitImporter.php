@@ -650,7 +650,6 @@ class GitImporter
 		if ($searcher = $this->getSearcher())
 		{
 			$report->index($searcher);
-//			$searcher->index($report);
 		}
 	}
 
