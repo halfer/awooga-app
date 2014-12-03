@@ -343,6 +343,19 @@ class ReportTest extends TestCase
 	}
 
 	/**
+	 * Ensure null is a valid value for author-notified-date
+	 */
+	public function testSetNullAuthorNotifiedDate()
+	{
+		$report = $this->getDummyReport();
+		$report->setAuthorNotifiedDate(null);
+		$this->assertNull(
+			$report->getAuthorNotifiedDateAsString(),
+			"Check author notified date can be set to null"
+		);
+	}
+
+	/**
 	 * Saves a report
 	 * 
 	 * @throws \Exception

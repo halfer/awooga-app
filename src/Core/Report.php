@@ -220,22 +220,22 @@ class Report
 	/**
 	 * Sets an optional author notified date
 	 * 
-	 * @todo This probably needs \DateTime::getLastErrors() to check for swapped date/month?
-	 * 
 	 * @param string $notifiedDate
 	 */
 	public function setAuthorNotifiedDate($notifiedDate)
 	{
-		$this->isRequired($notifiedDate, 'author notified date');
-		$this->isString($notifiedDate);
-
-		$notifiedDate = \DateTime::createFromFormat('Y-m-d', $notifiedDate);
-		if (!$notifiedDate || $this->getLastDateParseFailCount())
+		if ($notifiedDate)
 		{
-			throw new \Awooga\Exceptions\TrivialException("Invalid author notification date passed");
+			$this->isString($notifiedDate);
+
+			$notifiedDate = \DateTime::createFromFormat('Y-m-d', $notifiedDate);
+			if (!$notifiedDate || $this->getLastDateParseFailCount())
+			{
+				throw new \Awooga\Exceptions\TrivialException("Invalid author notification date passed");
+			}
 		}
 
-		$this->notifiedDate = $notifiedDate;
+		$this->notifiedDate = $notifiedDate ? $notifiedDate : null;
 	}
 
 	/**
