@@ -11,6 +11,7 @@
 # Set up some constants
 IMAGE=filesystem/image.img
 MOUNT_POINT=filesystem/mount
+SEARCH_INDEX=$MOUNT_POINT/search-index
 SIZE=20
 USER=awooga
 
@@ -55,6 +56,15 @@ fi
 
 # Set appropriate user perms on mounted filing system
 chown $USER $MOUNT_POINT
+
+# The following is for the search index. I wonder if this would be better with its own
+# private filing system?
+
+# Set up search index folder
+mkdir --parents $SEARCH_INDEX
+chown $USER $SEARCH_INDEX
+chgrp www-data $SEARCH_INDEX
+chmod g+w $SEARCH_INDEX
 
 # Go back to original dir
 cd $STARTDIR 

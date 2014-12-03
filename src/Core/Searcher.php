@@ -11,8 +11,17 @@ class Searcher
 
 	public function __construct($indexPath)
 	{
-		// Create index
+		// The mount script creates the index folder for us, so we need to check to see if
+		// there is anything in it to be sure it is created.
+		$exists = false;
 		if (file_exists($indexPath))
+		{
+			$files = glob($indexPath . '/*');
+			$exists = count($files) > 0;
+		}
+
+		// Create index
+		if ($exists)
 		{
 			$this->index = \ZendSearch\Lucene\Lucene::open($indexPath);
 		}
