@@ -32,7 +32,7 @@ class Report
 	 */
 	public function setTitle($title)
 	{
-		$this->isRequired($title);
+		$this->isRequired($title, 'title');
 		$this->isString($title);
 
 		$this->title = $title;
@@ -58,7 +58,7 @@ class Report
 		{
 			foreach ($url as $urlItem)
 			{
-				$this->isRequired($urlItem);
+				$this->isRequired($urlItem, 'url');
 				if (!is_string($urlItem))
 				{
 					$formatFail = true;
@@ -95,7 +95,7 @@ class Report
 	 */
 	public function setDescription($description)
 	{
-		$this->isRequired($description);
+		$this->isRequired($description, 'description');
 		$this->isString($description);
 
 		$this->description = $description;
@@ -108,7 +108,7 @@ class Report
 	 */
 	public function setIssues($issues)
 	{
-		$this->isRequired($issues);
+		$this->isRequired($issues, 'issues array');
 		$this->isArray($issues);
 
 		// Valid entries are copied to an output array
@@ -226,7 +226,7 @@ class Report
 	 */
 	public function setAuthorNotifiedDate($notifiedDate)
 	{
-		$this->isRequired($notifiedDate);
+		$this->isRequired($notifiedDate, 'author notified date');
 		$this->isString($notifiedDate);
 
 		$notifiedDate = \DateTime::createFromFormat('Y-m-d', $notifiedDate);
@@ -572,11 +572,11 @@ class Report
 		}		
 	}
 
-	protected function isRequired($data)
+	protected function isRequired($data, $name)
 	{
 		if (!$data)
 		{
-			throw new \Awooga\Exceptions\TrivialException("This field is required");
+			throw new \Awooga\Exceptions\TrivialException("The '{$name}' field is required");
 		}		
 	}
 }
