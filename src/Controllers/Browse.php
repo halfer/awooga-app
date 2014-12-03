@@ -19,7 +19,8 @@ class Browse extends BaseController
 		{
 			// @todo Tidy this up, needs to be configurable
 			$root = realpath(__DIR__ . '/../..') . '/filesystem/mount/search-index';
-			$searcher = new \Awooga\Core\Searcher($root);
+			$searcher = new \Awooga\Core\Searcher();
+			$searcher->connect($root);
 			$results = $searcher->search($_GET['search']);
 			$this->searchKeys = array();
 			foreach ($results as $row)

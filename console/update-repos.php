@@ -25,7 +25,9 @@ $pdo = new PDO($dsn, 'awooga_user', 'password');
 // Set up importer, search indexer, updater
 $importer = new GitImporter($repoRoot, true);
 $importer->setDriver($pdo);
-$importer->setSearcher(new Searcher($searchIndex));
+$searcher = new Searcher();
+$searcher->connect($searchIndex);
+$importer->setSearcher($searcher);
 $updater = new UpdateAll($importer);
 $updater->setDriver($pdo);
 
