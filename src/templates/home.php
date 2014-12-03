@@ -16,6 +16,9 @@
 		action="/browse"
 	>
 		<?php $this->insert('partials/search', ['searchString' => '', ]) ?>
+		
+		<?php
+		/* @todo Implement this another time
 		<div class="checkbox">
 			<label>
 				<input
@@ -26,6 +29,8 @@
 				Add this address to our internal list, so we can take a peek at it
 			</label>
 		</div>
+		*/
+		?>
 	</form>
 </div>
 
