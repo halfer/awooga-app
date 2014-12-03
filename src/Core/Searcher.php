@@ -112,6 +112,9 @@ class Searcher
 	/**
 	 * Quotes any unquoted URLs within a string
 	 * 
+	 * Potentially we could identify a URL as anything with dots and slashes in it, but this
+	 * mix will do for now - either starts with a protocol or "www.".
+	 * 
 	 * @param string $string
 	 * @return string
 	 */
@@ -119,10 +122,10 @@ class Searcher
 	{
 		$words = $this->quotedExplode($string);
 
-		// If a word starts with a protocol, and is not quoted, quote it
+		// If a word starts with a protocol or www, and is not quoted, quote it
 		foreach ($words as $ord => $word)
 		{
-			$isUrl = (bool) preg_match('#^[a-z]{1,10}://#', $word);
+			$isUrl = (bool) preg_match('#^([a-z]{1,10}://|www\.)#', $word);
 			if ($isUrl)
 			{
 				$words[$ord] = '"' . $word . '"';
