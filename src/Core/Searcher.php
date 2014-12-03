@@ -78,10 +78,15 @@ class Searcher
 		$doc->addField(\ZendSearch\Lucene\Document\Field::text('title', $report['title']));
 
 		// Add URLs
-		foreach ($urls as $ord => $url)
+		$urlId = 0;
+		foreach ($urls as $baseUrl)
 		{
-			$keyName = 'url' . $ord;
-			$doc->addField(\ZendSearch\Lucene\Document\Field::keyword($keyName, $url));
+			// For each URL, add the domain and the non-www forms etc.
+			foreach ($this->getUrlsToIndex($baseUrl) as $url)
+			{
+				$keyName = 'url' . $urlId++;
+				$doc->addField(\ZendSearch\Lucene\Document\Field::keyword($keyName, $url));
+			}
 		}
 
 		// Add issue keywords
@@ -107,6 +112,60 @@ class Searcher
 	public function search($query)
 	{
 		return $this->searchWithZend($this->quoteUrls($query));
+	}
+
+	/**
+	 * For a given URL, returns an array of things to index
+	 * 
+	 * @param string $url
+	 */
+	protected function getUrlsToIndex($url)
+	{
+		$parts = parse_url($url);
+		$scheme = isset($parts['scheme']) ? $parts['scheme'] : null;
+		$host = isset($parts['host']) ? $parts['host'] : null;
+		$path = isset($parts['path']) ? $parts['path'] : null;
+
+		// We'll always index the URL itself
+		$urls = array($url, );
+
+		// Add these if the elements exist
+		if ($host)
+		{
+			// Add the host on its own
+			$urls[] = $host;
+
+			if ($path)
+			{
+				$urls[] = $host . $path;
+			}
+
+			// Is there a www part?
+			$count = 0;
+			$noWwwHost = preg_replace('/^www\./', '', $host, 1, $count);
+			if ($count)
+			{
+				// Add the non-www host on its own
+				$urls[] = $noWwwHost;
+
+				if ($scheme)
+				{
+					$urls[] = $scheme . '://' . $noWwwHost;
+
+					if ($path)
+					{
+						$urls[] = $scheme . '://' . $noWwwHost . $path;
+					}
+				}
+
+				if ($path)
+				{
+					$urls[] = $noWwwHost . $path;
+				}
+			}
+		}
+
+		return $urls;
 	}
 
 	/**

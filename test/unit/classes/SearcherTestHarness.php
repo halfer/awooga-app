@@ -23,4 +23,9 @@ class SearcherTestHarness extends \Awooga\Core\Searcher
 	{
 		return parent::quoteUrls($string);
 	}
+
+	public function getUrlsToIndex($url)
+	{
+		return parent::getUrlsToIndex($url);
+	}
 }

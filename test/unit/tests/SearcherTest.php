@@ -99,4 +99,30 @@ class SearcherTest extends TestCase
 			$searcher->quoteUrls('one "http://example.com" two')
 		);
 	}
+
+	public function testUrlIndexing()
+	{
+		$searcher = new SearcherTestHarness();
+
+		// Checks that indexing a site will index the domain and other things too
+		$this->assertEquals(
+			array(
+				'example.com',
+				'example.com/thing',
+				'http://example.com',
+				'http://example.com/thing',
+				'http://www.example.com/thing',
+				'www.example.com',
+				'www.example.com/thing',
+			),
+			$this->sortArray($searcher->getUrlsToIndex('http://www.example.com/thing'))
+		);
+	}
+
+	protected function sortArray(array $array)
+	{
+		sort($array);
+
+		return $array;
+	}
 }
