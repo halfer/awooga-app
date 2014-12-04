@@ -13,7 +13,7 @@ UPDATE issue
 	WHERE code = 'password-clear';
 
 UPDATE issue
-	SET description = "Passwords are being stored using an inappropriate hashing algorithm."
+	SET description = "Passwords are being stored using an inappropriate hashing algorithm, such as MD5 or SHA1."
 	WHERE code = 'password-inadequate-hashing';
 
 UPDATE issue
@@ -27,6 +27,14 @@ UPDATE issue
 UPDATE issue
 	SET description = "It is possible to present user input to a code example that would modify program variables in a way the author did not intend."
 	WHERE code = 'variable-injection';
+
+UPDATE issue
+	SET description = "Copying values straight from user input to email headers can result in miscreants sending strings containing newlines together with their own headers, such as a To or Bcc field. This allows a remote attacker to turn a web server into a spam relay."
+	WHERE code = 'email-header-injection';
+
+UPDATE issue
+	SET description = "If an upload feature permits a PHP script to be uploaded to a world-accessable address on a web server, it is likely to allow arbitrary (malicious) code to be run on the server."
+ 	WHERE code = 'upload-arbitrary-file';
 
 UPDATE issue
 	SET description = "An issue that doesn't have a specific category."

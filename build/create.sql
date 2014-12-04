@@ -64,6 +64,8 @@ INSERT INTO issue (code) VALUES
 	('deprecated-library'),
 	('sql-needs-parameterisation'),
 	('variable-injection'),
+	('email-header-injection'),
+	('upload-arbitrary-file'),
 	('uncategorised')
 ;
 
