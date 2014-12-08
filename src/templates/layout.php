@@ -48,6 +48,8 @@
 		<footer class="footer">
 		  <div class="container">
 			<p class="text-muted">
+				<a href="https://github.com/halfer/awooga-app">GitHub</a>
+				|
 				<a href="https://twitter.com/ilovephp">Twitter</a>
 			</p>
 		  </div>
