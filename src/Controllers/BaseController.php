@@ -2,7 +2,6 @@
 
 namespace Awooga\Controllers;
 
-use \Awooga\Core\DebugPDO;
 use \League\Plates\Engine;
 use \Slim\Slim;
 
@@ -94,8 +93,9 @@ abstract class BaseController
 		// Connect to the database
 		$database = $selectDatabase ? 'dbname=awooga;' : '';
 		$dsn = "mysql:{$database}host=localhost;username=awooga_user;password=password";
-		$pdo = new DebugPDO($dsn, 'awooga_user', 'password');
-		$pdo->setDebugBar($this->slim->debugbar);
+		$pdo = new \PDO($dsn, 'awooga_user', 'password');
+		$traceablePDO = new \DebugBar\DataCollector\PDO\TraceablePDO($pdo);
+		$this->slim->debugbar->addCollector(new \DebugBar\DataCollector\PDO\PDOCollector($traceablePDO));
 
 		return $pdo;
 	}
