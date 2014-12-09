@@ -4,6 +4,7 @@
         "slim/slim": "2.4.*",
         "league/plates": "3.1.*",
         "michelf/php-markdown": "1.4.*",
-        "zendframework/zendsearch": "dev-master"
+        "zendframework/zendsearch": "dev-master",
+        "maximebf/debugbar": "1.*"
     }
 }

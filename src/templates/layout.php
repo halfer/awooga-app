@@ -8,6 +8,7 @@
 		<link rel="stylesheet" href="/assets/main.css">
 		<link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
 		<script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+		<?php echo $debugbarRenderer->renderHead() ?>
 	</head>
 
 	<body>
@@ -54,5 +55,6 @@
 			</p>
 		  </div>
 		</footer>
+		<?php echo $debugbarRenderer->render() ?>
 	</body>
 </html>
