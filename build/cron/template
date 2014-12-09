@@ -1,0 +1,8 @@
+# Awooga cron tasks
+
+# Mount the file system on reboot
+@reboot root __ROOT__/console/create-mount-fs.sh
+
+# Run the import script every hour, to see if anything is due. Note the second script
+# only needs limited permissions to run, so for paranoia it's wrapped in sudo with a custom user.
+37 * * * * root __ROOT__/console/create-mount-fs.sh && sudo -u awooga php __ROOT__/console/update-repos.php

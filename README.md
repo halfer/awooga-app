@@ -16,3 +16,7 @@ To delete:
 To run an update:
 
     sudo console/create-mount-fs.sh && sudo -u awooga php console/update-repos.php
+
+To install cron/reboot tasks:
+
+	sudo ./build/cron/install.sh
