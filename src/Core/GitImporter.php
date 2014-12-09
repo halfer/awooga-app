@@ -251,7 +251,9 @@ class GitImporter
 	/**
 	 * Clones the repo at the URL into the file system path
 	 * 
-	 * Emptying HOME is to prevent Git trying to fetch config it doesn't have access to
+	 * Emptying HOME is to prevent Git trying to fetch config it doesn't have access to. Also
+	 * the Git clone command is fussy, it tries to access things like /root if the current
+	 * working directory isn't initially set to something that is writeable.
 	 * 
 	 * @param string $url
 	 * @param string $path
@@ -259,9 +261,11 @@ class GitImporter
 	 */
 	protected function runGitCommand($url, $path)
 	{
-		$command = "HOME='' git clone --quiet \\
+		$dir = dirname($path);
+		$command = "cd $dir; \\
+			HOME='' git clone --quiet \\
 			{$url} \\
-			{$path}";
+			{$path} 2>&1";
 		$output = $return = null;
 		exec($command, $output, $return);
 
