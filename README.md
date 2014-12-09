@@ -3,15 +3,15 @@ Installation instructions
 
 To build for the first time:
 
-    cat build/init.sql build/create.sql build/update-issues.sql | mysql -u root -p
+    cat build/database/init.sql build/database/create.sql build/database/update-issues.sql | mysql -u root -p
 
 Also run this to populate with test data:
 
-    cat build/local/repositories_local.sql | mysql -u root -p
+    cat build/database/local/repositories_local.sql | mysql -u root -p
 
 To delete:
 
-    cat build/destroy.sql | mysql -u root -p
+    cat build/database/destroy.sql | mysql -u root -p
 
 To run an update:
 
