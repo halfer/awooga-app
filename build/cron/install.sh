@@ -15,10 +15,18 @@ chown -R awooga /var/log/awooga
 
 # @todo Add some log rotation for the above?
 
+# Add Git location to cron path
+GIT_PATH=`which git`
+GIT_DIR=`dirname $GIT_PATH`
+
 # Install the command as a system cron file
 # Using semicolons here as a regex delimiter, since filenames have forward slashes
 ROOT=`pwd`
-sed -e "s;__ROOT__;${ROOT};g" < $ROOT/build/cron/template > /etc/cron.d/awooga
+sed \
+	-e "s;__ROOT__;${ROOT};g" \
+	-e "s;__GIT_DIR__;${GIT_DIR};g" \
+	< $ROOT/build/cron/template \
+	> /etc/cron.d/awooga
 
 # Go back to original dir
 cd $STARTDIR 

@@ -1,5 +1,7 @@
 # Awooga cron tasks
 
+PATH=__GIT_DIR__
+
 # Mount the file system on reboot
 @reboot root __ROOT__/console/create-mount-fs.sh
 
