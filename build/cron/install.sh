@@ -16,8 +16,11 @@ chown -R awooga /var/log/awooga
 # @todo Add some log rotation for the above?
 
 # Add Git location to cron path
+# @todo May not need this, nor the path in the cron file
 GIT_PATH=`which git`
 GIT_DIR=`dirname $GIT_PATH`
+
+# @todo Does not seem necessary on Ubuntu, but a FQ path for php would be nice
 
 # Install the command as a system cron file
 # Using semicolons here as a regex delimiter, since filenames have forward slashes
