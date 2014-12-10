@@ -39,7 +39,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	protected function buildDatabase(\PDO $pdo, $createRepo = true)
 	{
 		$this->runSqlFile($pdo, $this->getProjectRoot() . '/test/build/init.sql');
-		$this->runSqlFile($pdo, $this->getProjectRoot() . '/build/create.sql');
+		$this->runSqlFile($pdo, $this->getProjectRoot() . '/build/database/create.sql');
 		$repoId = $createRepo ? $this->buildRepo($pdo, 1) : null;
 
 		return $repoId;
