@@ -7,6 +7,8 @@ namespace Awooga\Testing;
  */
 class UpdateAllTestHarness extends \Awooga\Core\UpdateAll
 {
+	protected $dateInterval = null;
+
 	/**
 	 * Public entry point for the run create method
 	 */
@@ -18,5 +20,29 @@ class UpdateAllTestHarness extends \Awooga\Core\UpdateAll
 	public function setImporter(\Awooga\Core\GitImporter $importer)
 	{
 		$this->importer = $importer;
+	}
+
+	/**
+	 * Sets a time offset (as a DateInterval) to test due date/times
+	 * 
+	 * @param \DateInterval $dateInterval
+	 */
+	public function setTimeOffset(\DateInterval $dateInterval)
+	{
+		$this->dateInterval = $dateInterval;
+	}
+
+	/**
+	 * Return the date/time in string format, taking into account the offset
+	 */
+	protected function getCurrentDateTime()
+	{
+		$dt = new \DateTime();
+		if ($this->dateInterval)
+		{
+			$dt->add($this->dateInterval);
+		}
+
+		return $dt->format('Y-m-d H:i:s');
 	}
 }

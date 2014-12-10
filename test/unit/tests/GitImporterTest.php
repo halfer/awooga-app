@@ -350,9 +350,13 @@ class GitImporterTest extends TestCase
 
 		$importer->rescheduleRepo($repoId, true);
 
-		$this->assertNotNull(
-			$this->fetchColumn($pdo, $sql, array(':repo_id' => $repoId, )),
-			"Check the due time is not empty"
+		$strDate = $this->fetchColumn($pdo, $sql, array(':repo_id' => $repoId, ));
+		$dueDate = $this->stringToDate($strDate);
+		$interval = $dueDate->diff(new \DateTime());
+		$this->assertEquals(
+			4,
+			$interval->format('%h'),
+			"Check the next due time is correct"
 		);
 	}
 
@@ -526,7 +530,7 @@ class GitImporterTest extends TestCase
 			);
 
 			// Parse the date and fail if it is not created
-			$date = \DateTime::createFromFormat('Y-m-d H:i:s', $dueDate);
+			$date = $this->stringToDate($dueDate);
 			if (!$date)
 			{
 				throw new \Exception('Could not parse next due date');
@@ -636,5 +640,10 @@ class GitImporterTest extends TestCase
 		$logs = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
 		return $logs;
+	}
+
+	protected function stringToDate($strDate)
+	{
+		return \DateTime::createFromFormat('Y-m-d H:i:s', $strDate);
 	}
 }

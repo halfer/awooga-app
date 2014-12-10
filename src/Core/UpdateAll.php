@@ -147,7 +147,7 @@ class UpdateAll
 		$pdo = $this->getDriver();
 		$statement = $pdo->prepare($sql);
 		$ok = $statement->execute(
-			array(':created_at' => (new \DateTime())->format('Y-m-d H:i:s'), )
+			array(':created_at' => $this->getCurrentDateTime(), )
 		);
 
 		if (!$ok)
@@ -168,5 +168,15 @@ class UpdateAll
 		}
 
 		return $this->importer;
+	}
+
+	/**
+	 * Gets the current date and time, in SQL format
+	 * 
+	 * @return string
+	 */
+	protected function getCurrentDateTime()
+	{
+		return (new \DateTime())->format('Y-m-d H:i:s');
 	}
 }
