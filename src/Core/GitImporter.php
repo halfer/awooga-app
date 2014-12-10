@@ -353,6 +353,9 @@ class GitImporter
 		$command = "rm -rf {$this->repoRoot}/{$oldPath}";
 		exec($command, $output, $return);
 
+		// Write debug to screen if required
+		$this->writeDebug("System command: $command");
+
 		return $return === 0;
 	}
 
