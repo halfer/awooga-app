@@ -22,6 +22,9 @@ class GitImporter
 	protected $searcher;
 	protected $debug;
 
+	// If on, rethrows any exception after logging
+	protected $failureExceptions = false;
+
 	use Database;
 
 	/**
@@ -63,6 +66,7 @@ class GitImporter
 		// We always reschedule
 		$rescheduleOk = $this->rescheduleRepoWithLogging($repoId, $ok);
 
+// @todo Can we make this $newPath on success or false on failure?
 		return $ok;
 	}
 
@@ -88,6 +92,12 @@ class GitImporter
 				'Fetch failed',
 				self::LOG_LEVEL_ERROR_SERIOUS
 			);
+
+			// Rethrow exception on failure, if requested
+			if ($this->failureExceptions)
+			{
+				throw $e;
+			}
 
 			return false;
 		}
@@ -117,6 +127,12 @@ class GitImporter
 				"Move repo to {$newPath} failed",
 				self::LOG_LEVEL_ERROR_SERIOUS
 			);
+
+			// Rethrow exception on failure, if requested
+			if ($this->failureExceptions)
+			{
+				throw $e;
+			}
 
 			return false;
 		}
@@ -164,6 +180,12 @@ class GitImporter
 		if ($exitEarly)
 		{
 			$pdo->rollBack();
+			// Rethrow exception on failure, if requested
+			if ($this->failureExceptions)
+			{
+				throw $e;
+			}
+
 			return false;
 		}
 
@@ -196,6 +218,11 @@ class GitImporter
 				"Failed to reschedule repo",
 				self::LOG_LEVEL_ERROR_SERIOUS
 			);
+			// Rethrow exception on failure, if requested
+			if ($this->failureExceptions)
+			{
+				throw $e;
+			}
 
 			return false;
 		}
@@ -675,6 +702,11 @@ class GitImporter
 	public function setSearcher(Searcher $searcher)
 	{
 		$this->searcher = $searcher;
+	}
+
+	public function setFailureExceptions($failureExceptions)
+	{
+		$this->failureExceptions = $failureExceptions;
 	}
 
 	/**

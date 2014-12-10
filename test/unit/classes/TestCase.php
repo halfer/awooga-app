@@ -11,6 +11,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	{
 		$root = $this->getProjectRoot();
 		require_once $root . '/src/autoload.php';
+		require_once $root . '/test/unit/classes/RepoBuilder.php';
 	}
 
 	/**
@@ -40,35 +41,14 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	{
 		$this->runSqlFile($pdo, $this->getProjectRoot() . '/test/build/init.sql');
 		$this->runSqlFile($pdo, $this->getProjectRoot() . '/build/database/create.sql');
-		$repoId = $createRepo ? $this->buildRepo($pdo, 1) : null;
 
-		return $repoId;
-	}
-
-	/**
-	 * Creates a dummy repo account
-	 * 
-	 * @param \PDO $pdo
-	 */
-	protected function buildRepo(\PDO $pdo, $repoId = 1)
-	{
-		$sql = "
-			INSERT INTO
-				repository
-			(id, url, created_at)
-			VALUES (:repo_id, 'http://example.com/repo.git', '2014-11-18')
-		";
-		$statement = $pdo->prepare($sql);
-		$ok = $statement->execute(
-			array(':repo_id' => $repoId, )
-		);
-
-		// Bork if the query fails (e.g. PK clash)
-		if (!$ok)
+		// Create a repo if required
+		$repoId = null;
+		if ($createRepo)
 		{
-			throw new \Exception(
-				"Creating a repository row failed:" . print_r($statement->errorInfo(), true)
-			);
+			$builder = new RepoBuilder();
+			$builder->setDriver($pdo);
+			$repoId = $builder->create(1);
 		}
 
 		return $repoId;

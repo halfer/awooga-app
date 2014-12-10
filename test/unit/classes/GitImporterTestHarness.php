@@ -37,21 +37,26 @@ class GitImporterTestHarness extends \Awooga\Core\GitImporter
 			return false;
 		}
 
-		// Check this is a folder and that it exists
-		if (is_dir($url) && $path)
+		// The URL needs to be a folder
+		if (!is_dir($url))
 		{
-			$output = $return = null;
-			exec("cp --recursive {$url} {$path}", $output, $return);
-			if ($return)
-			{
-				throw new \Exception(
-					"An error occured doing a fake Git checkout"
-				);
-			}
+			throw new \Exception("For testing, the URL ($url) should be a source directory");
 		}
-		else
+		if (!$path)
 		{
-			throw new \Exception();
+			throw new \Exception("For testing, the path ($path) should be the target directory");
+		}
+
+		$output = $return = null;
+		exec(
+			$command = "cp --recursive {$url} {$path}",
+			$output, $return
+		);
+		if ($return)
+		{
+			throw new \Exception(
+				"An error occured doing a fake Git checkout"
+			);
 		}
 
 		return true;
@@ -170,22 +175,14 @@ class GitImporterTestHarness extends \Awooga\Core\GitImporter
 	}
 
 	/**
-	 * Returns a relative path that points to a test repo
+	 * Returns a relative path that points to a test repo, or passes to parent
 	 * 
 	 * @param string $url
 	 * @return string
 	 */
 	protected function getCheckoutPath($url)
 	{
-		// Only allow this test harness feature if it's been set
-		if (!$this->checkoutPath)
-		{
-			throw new \Exception(
-				"No checkout path set"
-			);
-		}
-
-		return $this->checkoutPath;
+		return $this->checkoutPath ? $this->checkoutPath : parent::getCheckoutPath($url);
 	}
 
 	/**

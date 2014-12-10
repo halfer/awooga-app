@@ -99,14 +99,21 @@ class UpdateAll
 		$intLimit = (int) $limit;
 		$sql = "
 			SELECT *
-			FROM repository
+			FROM
+				repository
 			WHERE
 				is_enabled = 1
 				AND id > :repo_id
+				AND (
+					due_at IS NULL
+					OR due_at < :now
+				)
 			LIMIT $intLimit
 		";
 		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute(array(':repo_id' => $fromRepoId, ));
+		$ok = $statement->execute(
+			array(':repo_id' => $fromRepoId, ':now' => $this->getCurrentDateTime(), )
+		);
 		if (!$ok)
 		{
 			// @todo Throw an exception here please
@@ -118,16 +125,21 @@ class UpdateAll
 
 	protected function getFirstRepos($limit)
 	{
+		// @todo Can this share some SQL with fetchRemainingRows?
 		$intLimit = (int) $limit;
 		$sql = "
 			SELECT *
 			FROM repository
 			WHERE
 				is_enabled = 1			
+				AND (
+					due_at IS NULL
+					OR due_at < :now
+				)
 			LIMIT $intLimit
 		";
 		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute();
+		$ok = $statement->execute(array(':now' => $this->getCurrentDateTime(), ));
 
 		return $statement->fetchAll(\PDO::FETCH_ASSOC);
 	}

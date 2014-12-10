@@ -110,7 +110,7 @@ class UpdateAllTest extends TestCase
 			$importer->repoLog($repo['id'], \Awooga\Core\GitImporter::LOG_TYPE_FETCH);
 		}
 
-		// Ensure another request starts again
+		// Ensure another request starts again, since we've not actually processed them
 		list($lastRunId, $reposLast) = $updater->getNextRepos($processSize);
 		$this->assertEquals(
 			$processSize,
@@ -123,9 +123,72 @@ class UpdateAllTest extends TestCase
 	}
 
 	/**
+	 * Checks that a disabled repo is not processed
+	 */
+	public function testIgnoreDisabledRepo()
+	{
+		
+	}
+
+	/**
+	 * Check that a processed repo becomes due, by faking the time
+	 */
+	public function testDueRepositoriesBecomeDue()
+	{
+		// Need to be able to reset the 'now' time
+	}
+
+	/**
 	 * Does a simple end-to-end for a set of repositories
 	 */
 	public function testUpdateSimple()
+	{
+		// Run a scan
+		$updater = $this->setupReposToProcess();
+		$updater->run(20, false);
+
+		// @todo Let's examine some logs here to see if it worked
+	}
+
+	/**
+	 * Check that a repo is not reprocessed when it isn't due
+	 * 
+	 * @todo Do other tests need setFailureExceptions, or do we need to reset the default in the harness?
+	 * 
+	 * @throws \Exception
+	 */
+	public function testRunUpdateOnlyWhenDue()
+	{
+		// Run a scan
+		$updater = $this->setupReposToProcess();
+		$updater->run(20, false);
+
+		// ... then check that no repos are not due straight away
+		list(, $repoRows1) = $updater->getNextRepos($repoCount = 10);
+		$this->assertEmpty(
+			$repoRows1,
+			"Ensure repos that have just been processed are not due immediately"
+		);
+
+		$updater->setTimeOffset(new \DateInterval('PT5H'));
+
+		// Ensure that a while later, all repos are now due
+		list(, $repoRows2) = $updater->getNextRepos($repoCount);
+		$this->assertEquals(
+			count($repoRows2),
+			$repoCount,
+			"Ensure repos become due later"
+		);
+
+		// @todo Tidy up the temp folder
+	}
+
+	/**
+	 * Sets up a number of copies of the same repo, ready to kick off the updater
+	 * 
+	 * @return \Awooga\Testing\UpdateAllTestHarness
+	 */
+	protected function setupReposToProcess()
 	{
 		// Build the database, creates one default repo
 		$this->buildDatabase($this->getDriver(false), false);
@@ -135,18 +198,18 @@ class UpdateAllTest extends TestCase
 		$updater->setDriver($pdo);
 		$runId = $updater->createRun();
 		$importer = $this->getImporterInstanceWithRun($pdo, $runId, $this->getTempFolder());
+		$importer->setFailureExceptions(true);
 		$updater->setImporter($importer);
 
 		// Create some repos
+		$builder = new RepoBuilder();
+		$builder->setDriver($pdo);
 		for($repoId = 1; $repoId < 10; $repoId++)
 		{
-			// Write a new repo row
-			$this->buildRepo($pdo, $repoId);
+			// Write a new repo row (using URL as checkout source)
+			$builder->create($repoId, $this->getTestRepoRoot() . '/success');
 		}
 
-		// Run a scan
-		$updater->run(20, false);
-
-		// @todo Let's examine some logs here to see if it worked
+		return $updater;
 	}
 }
