@@ -36,6 +36,8 @@ class UpdateAllTest extends TestCase
 
 	/**
 	 * Checks that the next method will grab the next due rows
+	 * 
+	 * @todo Use RepoBuilder to create the repo, or maybe setupReposToProcess?
 	 */
 	public function testNextRepos()
 	{
@@ -123,19 +125,26 @@ class UpdateAllTest extends TestCase
 	}
 
 	/**
-	 * Checks that a disabled repo is not processed
+	 * Checks that disabled repos are not processed
 	 */
 	public function testIgnoreDisabledRepo()
 	{
-		
-	}
+		// Create repos, and then disable half of them
+		$updater = $this->setupReposToProcess();
+		$statement = $this->getDriver()->prepare(
+			"UPDATE repository SET is_enabled = 0 WHERE id <= 5"
+		);
+		$statement->execute();
 
-	/**
-	 * Check that a processed repo becomes due, by faking the time
-	 */
-	public function testDueRepositoriesBecomeDue()
-	{
-		// Need to be able to reset the 'now' time
+		// Ensure only half of the repos are returned as due
+		list(, $repoRows) = $updater->getNextRepos(10);
+		$this->assertEquals(
+			5,
+			count($repoRows),
+			"Ensure disabled repos are not processed"
+		);
+
+		$this->cleanupTemporaryRepos();
 	}
 
 	/**
@@ -147,7 +156,10 @@ class UpdateAllTest extends TestCase
 		$updater = $this->setupReposToProcess();
 		$updater->run(20, false);
 
-		// @todo Let's examine some logs here to see if it worked
+		// Let's examine some logs here to see if it worked
+		$this->checkLogsGenerated(40, 0, 0);
+
+		$this->cleanupTemporaryRepos();
 	}
 
 	/**
@@ -175,12 +187,12 @@ class UpdateAllTest extends TestCase
 		// Ensure that a while later, all repos are now due
 		list(, $repoRows2) = $updater->getNextRepos($repoCount);
 		$this->assertEquals(
-			count($repoRows2),
 			$repoCount,
+			count($repoRows2),
 			"Ensure repos become due later"
 		);
 
-		// @todo Tidy up the temp folder
+		$this->cleanupTemporaryRepos();
 	}
 
 	/**
@@ -204,12 +216,20 @@ class UpdateAllTest extends TestCase
 		// Create some repos
 		$builder = new RepoBuilder();
 		$builder->setDriver($pdo);
-		for($repoId = 1; $repoId < 10; $repoId++)
+		for($repoId = 1; $repoId <= 10; $repoId++)
 		{
 			// Write a new repo row (using URL as checkout source)
 			$builder->create($repoId, $this->getTestRepoRoot() . '/success');
 		}
 
 		return $updater;
+	}
+
+	/**
+	 * Deletes repositories that have just been created
+	 */
+	protected function cleanupTemporaryRepos()
+	{
+		// @todo Needs implementing
 	}
 }

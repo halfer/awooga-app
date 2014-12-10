@@ -590,43 +590,6 @@ class GitImporterTest extends TestCase
 		);
 	}
 
-	/**
-	 * Checks the number of logs at different levels
-	 * 
-	 * @param integer $expectedSuccess
-	 * @param integer $expectedSerious
-	 * @param integer $expectedTrivial
-	 */
-	protected function checkLogsGenerated($expectedSuccess, $expectedSerious, $expectedTrivial)
-	{
-		$sql = "
-			SELECT
-				(SELECT COUNT(*) FROM repository_log WHERE log_level = 'success') success_count,
-				(SELECT COUNT(*) FROM repository_log WHERE log_level = 'serious') serious_count,
-				(SELECT COUNT(*) FROM repository_log WHERE log_level = 'trivial') trivial_count
-			FROM dual
-		";
-		$statement = $this->getDriver()->prepare($sql);
-		$statement->execute();
-		$counts = $statement->fetch(\PDO::FETCH_ASSOC);
-
-		$this->assertEquals(
-			$expectedSuccess,
-			$counts['success_count'],
-			"Check the number of success logs is correct"
-		);
-		$this->assertEquals(
-			$expectedSerious,
-			$counts['serious_count'],
-			"Check the number of fail logs is correct"
-		);
-		$this->assertEquals(
-			$expectedTrivial,
-			$counts['trivial_count'],
-			"Check the number of fail logs is correct"
-		);
-	}
-
 	protected function getLogs($repoId)
 	{
 		$sql = "
