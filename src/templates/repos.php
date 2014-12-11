@@ -18,7 +18,10 @@
 				Reports
 			</th>
 			<th>
-				Creation date
+				Added at
+			</th>
+			<th>
+				Next update at
 			</th>
 		</tr>
 	</thead>
@@ -26,10 +29,13 @@
 		<?php foreach ($repos as $repo): ?>
 			<tr>
 				<td>
-					<?php echo htmlentities($repo['url'], ENT_HTML5, 'UTF-8') ?>
+					<a
+						href="<?php echo $this->escape($repo['url']) ?>"
+					><?php echo $this->escape($repo['url']) ?></a>
 				</td>
 				<td><?php echo $repo['report_count'] ?></td>
 				<td><?php echo $repo['created_at'] ?></td>
+				<td><?php echo $repo['due_at'] ?></td>
 			</tr>
 		<?php endforeach ?>
 	</tbody>
