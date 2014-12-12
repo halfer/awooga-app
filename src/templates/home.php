@@ -62,10 +62,9 @@
 
 		<p>
 			If you are an experienced programmer, I'd love to have your help. Please create a
-			public Git repository <a href="#">using this template</a> and let me take a look. If I
-			agree with your initial commits, I'll add your repo to auto-publish.
-			You'll need to be willing to keep your list maintained - if a tutorial is improved,
-			the database needs to reflect that.
+			public Git repository similar to an
+			<a href="https://github.com/halfer/awooga-reports">existing repository</a> and let me
+			take a look. If I agree with your initial commits, I'll add your repo to auto-publish.
 		</p>
 	</div>
 	<div class="col-md-4">
@@ -88,7 +87,7 @@
 		<p>
 			If you are listed, don't panic! If you agree with the assessment made of your resource,
 			you can either fix the mistakes in it, take it down temporarily whilst you fix it,
-			or remove it entirely. Remember that sometimes taking down really old material is
+			or remove it permanently. Remember that sometimes taking down really old material is
 			sometimes the right thing to do. Feel free to liaise with the editor, too.
 		</p>
 	</div>
@@ -98,7 +97,8 @@
 		</h3>
 		<p>
 			If you've made a change as a result of a report here, thank you! Please ask the editor
-			to review the changes, and to mark the issue(s) as resolved.
+			to review the changes, and to mark the issue(s) as resolved - they should be happy to
+			do so.
 		</p>
 	</div>
 	<div class="col-md-4">
