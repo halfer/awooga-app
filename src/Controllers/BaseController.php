@@ -83,6 +83,11 @@ abstract class BaseController
 
 	abstract public function execute();
 
+	protected function setPageTitle($title)
+	{
+		$this->engine->addData(array('title' => $title, ));
+	}
+
 	/**
 	 * Creates a database connection
 	 * 

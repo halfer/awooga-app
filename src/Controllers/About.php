@@ -6,6 +6,8 @@ class About extends BaseController
 {
 	public function execute()
 	{
+		$this->setPageTitle("About");
+
 		echo $this->render('about');
 	}
 

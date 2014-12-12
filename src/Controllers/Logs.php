@@ -14,6 +14,8 @@ class Logs extends BaseController
 		// Redirects if the page number is invalid, fetches rows
 		$logs = $this->validatePageAndGetRows($pageSize = 20);
 
+		$this->setPageTitle("Import logs");
+
 		echo $this->render(
 			'logs',
 			array(

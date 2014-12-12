@@ -14,6 +14,8 @@ class Repos extends BaseController
 		// Redirects if the page number is invalid, fetches rows
 		$repos = $this->validatePageAndGetRows($pageSize = 10);
 
+		$this->setPageTitle("Source repositories");
+
 		// Render the reports
 		echo $this->render(
 			'repos',

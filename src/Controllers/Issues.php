@@ -14,6 +14,8 @@ class Issues extends BaseController
 		// Redirects if the page number is invalid, fetches rows
 		$issues = $this->validatePageAndGetRows($pageSize = 20);
 
+		$this->setPageTitle("Issue types");
+
 		// Render the reports
 		echo $this->render(
 			'issues',

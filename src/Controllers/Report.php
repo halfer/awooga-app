@@ -28,6 +28,11 @@ class Report extends BaseController
 		$report['urls'] = $this->getRelatedUrls($reportIds);
 		$report['issues'] = $this->getRelatedIssues($reportIds);
 
+		// Assemble title (@todo need to count +unresolved+ issues, not issues in total)
+		$this->setPageTitle(
+			'Report "' . $report['title'] . '" containing ' . count($report['issues']) . ' issues'
+		);
+
 		echo $this->render('report', array('report' => $report, ));
 	}
 

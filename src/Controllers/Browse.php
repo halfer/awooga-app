@@ -32,6 +32,8 @@ class Browse extends BaseController
 		// Redirects if the page number is invalid, fetches rows
 		$reports = $this->validatePageAndGetRows($pageSize = 20);
 
+		$this->setPageTitle("Browse reports");
+
 		// Render the reports
 		$rowCount = $this->getRowCount();
 		echo $this->render(
