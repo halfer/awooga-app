@@ -3,7 +3,14 @@
 	array('selectedMenu' => $selectedMenu, 'countData' => $countData, )
 ) ?>
 
-<p>This is information about a single report in the Awooga system.</p>
+<p>
+	This is information about a single report in the Awooga system.</p>
+
+<div class="alert alert-info">
+	If you are the author of the referenced work, please note that it appears here because it has
+	been judged to contain serious errors, usually of a security nature. Please read the
+	introductory notes on the <a href="/">home page</a>.
+</div>
 
 <h1><?php echo htmlentities($report['title'], ENT_HTML5, 'UTF-8') ?></h1>
 
