@@ -4,6 +4,7 @@ namespace Awooga\Controllers;
 
 use \League\Plates\Engine;
 use \Slim\Slim;
+use \DebugBar\StandardDebugBar;
 
 abstract class BaseController
 {
@@ -74,6 +75,8 @@ abstract class BaseController
 
 	final public function initAndExecute()
 	{
+		$this->configureDebugging();
+		$this->initDebugBar();
 		$this->setDriver($this->initDriver());
 		$this->execute();
 	}
@@ -95,8 +98,52 @@ abstract class BaseController
 		$dsn = "mysql:{$database}host=localhost;username=awooga_user;password=password";
 		$pdo = new \PDO($dsn, 'awooga_user', 'password');
 		$traceablePDO = new \DebugBar\DataCollector\PDO\TraceablePDO($pdo);
-		$this->slim->debugbar->addCollector(new \DebugBar\DataCollector\PDO\PDOCollector($traceablePDO));
+		$this->getDebugBar()->addCollector(
+			new \DebugBar\DataCollector\PDO\PDOCollector($traceablePDO)
+		);
 
 		return $pdo;
+	}
+
+	/**
+	 * Turns off debug mode for production env
+	 */
+	protected function configureDebugging()
+	{
+		$app = $this->slim;
+		$app->configureMode('production', function () use ($app)
+		{
+			$app->config(array('debug' => false, ));
+		});
+	}
+
+	protected function initDebugBar()
+	{
+		// Set up the debug bar, but not in production
+		$jsRenderer = null;
+		if (!$this->isProduction())
+		{
+			$debugbar = new StandardDebugBar();
+			$jsRenderer = $debugbar->getJavascriptRenderer('/assets/debugbar');
+			$this->slim->debugbar = $debugbar;
+		}
+		$this->engine->addData(
+			array('debugbarRenderer' => $jsRenderer, )
+		);
+	}
+
+	protected function getDebugBar()
+	{
+		if (!isset($this->slim->debugbar) || !$this->slim->debugbar)
+		{
+			throw new \Exception('Debug bar not set');
+		}
+
+		return $this->slim->debugbar;
+	}
+
+	protected function isProduction()
+	{
+		return $this->slim->mode == 'production';
 	}
 }

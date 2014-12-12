@@ -4,17 +4,9 @@ $root = dirname(__DIR__);
 require_once $root . '/vendor/autoload.php';
 require_once $root . '/src/autoload.php';
 
-// Set up the debug bar
-$debugbar = new DebugBar\StandardDebugBar();
-$jsRenderer = $debugbar->getJavascriptRenderer('/assets/debugbar');
-
-// Set up the framework and template system
+// Set up the framework and template system (mode comes from SLIM_MODE in vhost)
 $app = new \Slim\Slim();
-$app->debugbar = $debugbar;
 $engine = new \League\Plates\Engine($root . '/src/templates');
-$engine->addData(
-	array('debugbarRenderer' => $jsRenderer, )
-);
 
 // This provides an introduction and a search screen
 $app->get('/', function() use ($app, $engine)
