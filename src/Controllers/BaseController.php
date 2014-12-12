@@ -97,10 +97,15 @@ abstract class BaseController
 		$database = $selectDatabase ? 'dbname=awooga;' : '';
 		$dsn = "mysql:{$database}host=localhost;username=awooga_user;password=password";
 		$pdo = new \PDO($dsn, 'awooga_user', 'password');
-		$traceablePDO = new \DebugBar\DataCollector\PDO\TraceablePDO($pdo);
-		$this->getDebugBar()->addCollector(
-			new \DebugBar\DataCollector\PDO\PDOCollector($traceablePDO)
-		);
+
+		// Add debugging facility if appropriate
+		if (!$this->isProduction())
+		{
+			$traceablePDO = new \DebugBar\DataCollector\PDO\TraceablePDO($pdo);
+			$this->getDebugBar()->addCollector(
+				new \DebugBar\DataCollector\PDO\PDOCollector($traceablePDO)
+			);
+		}
 
 		return $pdo;
 	}
