@@ -4,6 +4,8 @@ namespace Awooga\Testing\Browser;
 
 class HomeTest extends \Openbuildings\PHPUnitSpiderling\Testcase_Spiderling
 {
+	const DOMAIN = 'http://awooga.local';
+
 	/**
 	 * Ensure the menus and footers look OK
 	 * 
@@ -13,7 +15,7 @@ class HomeTest extends \Openbuildings\PHPUnitSpiderling\Testcase_Spiderling
 	{
 		$this->
 			// A help section
-			visit('http://awooga.local/')->
+			visit(self::DOMAIN)->
 			// Check a help section is present
 			assertHasCss("h3:contains('What does a listing mean?')")->
 			// Check our assertions are working by testing something that isn't there
@@ -39,10 +41,23 @@ class HomeTest extends \Openbuildings\PHPUnitSpiderling\Testcase_Spiderling
 
 	/**
 	 * Grab all the example searches and make sure they land on the right page
+	 * 
+	 * @driver phantomjs
 	 */
 	public function testExampleSearches()
 	{
-		
+		$this->visit(self::DOMAIN);
+		$links = $this->find('form small a');
+
+		foreach ($links as $link)
+		{
+			$link->
+				click()->
+				assertEquals('/browse', $this->current_path())
+			;
+			// Go back to home so we can check each link does something
+			$this->visit(self::DOMAIN);
+		}
 	}
 
 	/**
@@ -53,8 +68,7 @@ class HomeTest extends \Openbuildings\PHPUnitSpiderling\Testcase_Spiderling
 	public function testMoreInterestingQuestions()
 	{
 		$this->
-			// A help section
-			visit('http://awooga.local/')->
+			visit(self::DOMAIN)->
 			click_link('more-questions')->
 			// This seems needed to help the browser settle before we get the current path
 			assertHasCss("h3:contains(\"What's the current focus?\")")
