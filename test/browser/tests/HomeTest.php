@@ -30,8 +30,8 @@ class HomeTest extends \Openbuildings\PHPUnitSpiderling\Testcase_Spiderling
 			assertHasCss("nav a:contains('About')")->
 
 			// Report/issues counter (line break means two tests are necessary)
-			assertHasCss("nav p:contains('Awooga has 53 issues')")->
-			assertHasCss("nav p:contains('in 25 reports')")->
+			assertHasCss("nav p:contains('Awooga has 54 issues')")->
+			assertHasCss("nav p:contains('in 26 reports')")->
 
 			// Footer
 			assertHasCss("footer a:contains('GitHub')")->
