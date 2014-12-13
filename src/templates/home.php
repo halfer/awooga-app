@@ -36,6 +36,7 @@
 
 <p class="pull-right">
 	<a
+		id="more-questions"
 		href="/about"
 		class="btn btn-default"
 		alt="More information about this site"
