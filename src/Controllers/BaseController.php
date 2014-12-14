@@ -91,17 +91,18 @@ abstract class BaseController
 	/**
 	 * Creates a database connection
 	 * 
-	 * @todo Fix connection hardwiring
-	 * 
 	 * @param boolean $selectDatabase
 	 * @return \PDO
 	 */
 	protected function initDriver($selectDatabase = true)
 	{
+		// Get database settings
+		$config = $this->getEnvConfig('database');
+
 		// Connect to the database
-		$database = $selectDatabase ? 'dbname=awooga;' : '';
-		$dsn = "mysql:{$database}host=localhost;username=awooga_user;password=password";
-		$pdo = new \PDO($dsn, 'awooga_user', 'password');
+		$database = $selectDatabase ? "dbname={$config['database']};" : '';
+		$dsn = "mysql:{$database}host={$config['host']};username={$config['username']};password={$config['password']}";
+		$pdo = new \PDO($dsn, $config['username'], $config['password']);
 
 		// Add debugging facility if appropriate
 		if (!$this->isProduction())
@@ -155,5 +156,30 @@ abstract class BaseController
 	protected function isProduction()
 	{
 		return $this->slim->mode == 'production';
+	}
+
+	protected function getEnvConfig($key)
+	{
+		$configs = require($this->getProjectRoot() . '/config/env-config.php');
+		$mode = $this->slim->mode;
+
+		// If we don't have an entry for this mode, bork
+		if (!array_key_exists($mode, $configs))
+		{
+			throw new \Exception("Configuration for mode '$mode' not found");
+		}
+
+		// If we don't have an entry for this key, bork
+		if (!array_key_exists($key, $configs[$mode]))
+		{
+			throw new \Exception("Configuration key '$key' for mode '$mode' not found");
+		}
+
+		return $configs[$mode][$key];
+	}
+
+	protected function getProjectRoot()
+	{
+		return realpath(__DIR__ . '/../..');
 	}
 }
