@@ -1,5 +1,6 @@
 <?php
 
+// @todo Move this and others to Awooga\Testing\Unit to match \Browser
 namespace Awooga\Testing;
 
 abstract class TestCase extends \PHPUnit_Framework_TestCase
@@ -19,6 +20,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	 * 
 	 * @todo Pull this from env config
 	 * 
+	 * @param boolean $selectDatabase
 	 * @return \PDO
 	 */
 	protected function getDriver($selectDatabase = true)
@@ -35,6 +37,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	 * Creates the test database
 	 * 
 	 * @param \PDO $pdo
+	 * @param boolean $createRepo
 	 * @return integer Repository ID
 	 */
 	protected function buildDatabase(\PDO $pdo, $createRepo = true)
@@ -81,7 +84,6 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
 		if ($rows === false)
 		{
-			print_r($pdo->errorInfo());
 			throw new \Exception(
 				"Could not initialise the database"
 			);

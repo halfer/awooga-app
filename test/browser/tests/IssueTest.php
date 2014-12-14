@@ -2,7 +2,10 @@
 
 namespace Awooga\Testing\Browser;
 
-class IssueTest extends \Openbuildings\PHPUnitSpiderling\Testcase_Spiderling
+// Load the parent relative to dir location
+require_once realpath(__DIR__ . '/..') . '/classes/TestCase.php';
+
+class IssueTest extends TestCase
 {
 	const DOMAIN = 'http://awooga.local';
 
