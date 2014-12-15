@@ -20,24 +20,6 @@ abstract class TestCase extends \Openbuildings\PHPUnitSpiderling\Testcase_Spider
 	}
 
 	/**
-	 * Gets a PDO driver
-	 * 
-	 * @todo Pull this from env config
-	 * @todo Copied from unit/classes/TestCase
-	 * 
-	 * @return \PDO
-	 */
-	protected function getDriver($selectDatabase = true)
-	{
-		// Connect to the database
-		$database = $selectDatabase ? 'dbname=awooga_test;' : '';
-		$dsn = "mysql:{$database}host=localhost;username=awooga_user_test;password=password";
-		$pdo = new \PDO($dsn, 'awooga_user_test', 'password');
-
-		return $pdo;
-	}
-
-	/**
 	 * Creates the test database
 	 * 
 	 * @param \PDO $pdo
