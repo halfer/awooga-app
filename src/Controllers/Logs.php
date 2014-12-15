@@ -36,7 +36,7 @@ class Logs extends BaseController
 			{$limitClause}
 		";
 		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute();
+		$statement->execute();
 
 		return $statement->fetchAll(\PDO::FETCH_ASSOC);		
 	}
@@ -48,7 +48,7 @@ class Logs extends BaseController
 			FROM repository_log
 		";
 		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute();
+		$statement->execute();
 
 		$this->rowCount = $statement->fetchColumn();
 	}

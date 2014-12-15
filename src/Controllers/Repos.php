@@ -41,7 +41,7 @@ class Repos extends BaseController
 			{$limitClause}
 		";
 		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute();
+		$statement->execute();
 
 		return $statement->fetchAll(\PDO::FETCH_ASSOC);
 	}
@@ -53,7 +53,7 @@ class Repos extends BaseController
 			FROM repository
 		";
 		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute();
+		$statement->execute();
 
 		$this->rowCount = $statement->fetchColumn();
 	}

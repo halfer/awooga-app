@@ -139,7 +139,7 @@ class UpdateAll
 			LIMIT $intLimit
 		";
 		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute(array(':now' => $this->getCurrentDateTime(), ));
+		$statement->execute(array(':now' => $this->getCurrentDateTime(), ));
 
 		return $statement->fetchAll(\PDO::FETCH_ASSOC);
 	}

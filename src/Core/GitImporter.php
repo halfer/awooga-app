@@ -62,7 +62,7 @@ class GitImporter
 			$this->scanRepoWithLogging($repoId, $newPath);
 
 		// We always reschedule
-		$rescheduleOk = $this->rescheduleRepoWithLogging($repoId, $ok);
+		$this->rescheduleRepoWithLogging($repoId, $ok);
 
 		// @todo Can we make this $newPath on success or false on failure?
 		return $ok;

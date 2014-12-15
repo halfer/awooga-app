@@ -34,7 +34,7 @@ class Issues extends BaseController
 			FROM issue
 		";
 		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute();
+		$statement->execute();
 
 		$this->rowCount = $statement->fetchColumn();
 	}
@@ -59,7 +59,7 @@ class Issues extends BaseController
 			{$limitClause}
 		";
 		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute();
+		$statement->execute();
 
 		return $statement->fetchAll(\PDO::FETCH_ASSOC);
 	}

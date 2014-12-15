@@ -50,7 +50,7 @@ class Report extends BaseController
 				AND is_enabled = 1
 		";
 		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute(array(':report_id' => $this->reportId, ));
+		$statement->execute(array(':report_id' => $this->reportId, ));
 
 		return $statement->fetch(\PDO::FETCH_ASSOC);
 	}

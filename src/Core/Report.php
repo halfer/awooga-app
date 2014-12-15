@@ -477,7 +477,7 @@ class Report
 	{
 		$sql = "SELECT id FROM issue WHERE code = :code";
 		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute(array(':code' => $code, ));
+		$statement->execute(array(':code' => $code, ));
 
 		return $statement->fetchColumn();
 	}
@@ -528,7 +528,7 @@ class Report
 		$reportId = null;
 		foreach ($this->urls as $url)
 		{
-			$ok = $statement->execute(
+			$statement->execute(
 				array(':repo_id' => $this->repoId, ':url' => $url, )
 			);
 			// If we have some rows returned from the query

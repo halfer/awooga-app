@@ -44,7 +44,7 @@ abstract class BaseController
 			WHERE is_enabled = 1
 		";
 		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute();
+		$statement->execute();
 
 		return $statement->fetchColumn();
 	}
@@ -57,7 +57,7 @@ abstract class BaseController
 			WHERE r.is_enabled = 1
 		";
 		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute();
+		$statement->execute();
 
 		return $statement->fetchColumn();
 	}

@@ -134,7 +134,7 @@ class Browse extends BaseController
 			";
 		}
 		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute();
+		$statement->execute();
 
 		return $statement->fetchAll(\PDO::FETCH_ASSOC);
 	}
