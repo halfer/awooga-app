@@ -7,6 +7,6 @@ notifications:
   email: false
 before_script:
   - composer self-update
-  - composer install
+  - COMPOSER=composer.travis.json composer install
   - mysql -u root < test/build/create-user.sql
   - export PATH=`pwd`/bin:$PATH
