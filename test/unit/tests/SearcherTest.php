@@ -1,6 +1,6 @@
 <?php
 
-namespace Awooga\Testing;
+namespace Awooga\Testing\Unit;
 
 // Load the parent relative to dir location
 require_once realpath(__DIR__ . '/..') . '/classes/TestCase.php';

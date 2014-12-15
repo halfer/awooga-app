@@ -1,6 +1,6 @@
 <?php
 
-namespace Awooga\Testing;
+namespace Awooga\Testing\Unit;
 
 use Awooga\Core\GitImporter;
 

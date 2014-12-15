@@ -1,6 +1,6 @@
 <?php
 
-namespace Awooga\Testing;
+namespace Awooga\Testing\Unit;
 
 class SearcherTestHarness extends \Awooga\Core\Searcher
 {

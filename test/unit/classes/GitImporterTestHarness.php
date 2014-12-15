@@ -1,6 +1,6 @@
 <?php
 
-namespace Awooga\Testing;
+namespace Awooga\Testing\Unit;
 
 /**
  * This class inherits from the real GitImporter, making it more amenable to testing

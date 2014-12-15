@@ -1,10 +1,14 @@
 <?php
 
-// @todo Move this and others to Awooga\Testing\Unit to match \Browser
-namespace Awooga\Testing;
+namespace Awooga\Testing\Unit;
+
+// Load the parent relative to dir location
+require_once realpath(__DIR__ . '/../..') . '/traits/BaseTestCase.php';
 
 abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
+	use \Awooga\Testing\BaseTestCase;
+
 	/**
 	 * Common library loading for all test classes
 	 */
@@ -69,25 +73,6 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	protected function randomLeafname()
 	{
 		return 'path' . rand(1, 9999999) . time();
-	}
-
-	protected function runSqlFile(\PDO $pdo, $sqlPath)
-	{
-		$sql = file_get_contents($sqlPath);
-
-		return $this->runSql($pdo, $sql);
-	}
-
-	protected function runSql(\PDO $pdo, $sql)
-	{
-		$rows = $pdo->exec($sql);
-
-		if ($rows === false)
-		{
-			throw new \Exception(
-				"Could not initialise the database"
-			);
-		}
 	}
 
 	public function fetchResults(\PDO $pdo, $sql, array $params = array())
@@ -183,11 +168,6 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 			$counts['trivial_count'],
 			"Check the number of fail logs is correct"
 		);
-	}
-
-	protected function getProjectRoot()
-	{
-		return realpath(__DIR__ . '/../../..');
 	}
 
 	protected function getTestRepoRoot()

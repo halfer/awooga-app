@@ -2,8 +2,13 @@
 
 namespace Awooga\Testing\Browser;
 
+// Load the parent relative to dir location
+require_once realpath(__DIR__ . '/../..') . '/traits/BaseTestCase.php';
+
 abstract class TestCase extends \Openbuildings\PHPUnitSpiderling\Testcase_Spiderling
 {
+	use \Awooga\Testing\BaseTestCase;
+
 	const DOMAIN = 'http://localhost:8090';
 
 	/**
@@ -42,32 +47,5 @@ abstract class TestCase extends \Openbuildings\PHPUnitSpiderling\Testcase_Spider
 		$this->runSqlFile($pdo, $this->getProjectRoot() . '/test/build/init.sql');
 		$this->runSqlFile($pdo, $this->getProjectRoot() . '/build/database/create.sql');
 		$this->runSqlFile($pdo, $this->getProjectRoot() . '/test/browser/fixtures/data.sql');
-	}
-
-	// @todo Copied from unit/classes/TestCase
-	protected function runSqlFile(\PDO $pdo, $sqlPath)
-	{
-		$sql = file_get_contents($sqlPath);
-
-		return $this->runSql($pdo, $sql);
-	}
-
-	// @todo Copied from unit/classes/TestCase
-	protected function runSql(\PDO $pdo, $sql)
-	{
-		$rows = $pdo->exec($sql);
-
-		if ($rows === false)
-		{
-			throw new \Exception(
-				"Could not initialise the database"
-			);
-		}
-	}
-
-	// @todo Copied from unit/classes/TestCase
-	protected function getProjectRoot()
-	{
-		return realpath(__DIR__ . '/../../..');
 	}
 }
