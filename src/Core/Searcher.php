@@ -67,8 +67,7 @@ class Searcher
 		$foundDocs = $this->index->find('pk:' . $report['id']);
 		if (count($foundDocs) > 1)
 		{
-			// @todo Reset log level
-			$this->log("Warning, deleting more than one doc", 1);
+			$this->log("Warning, deleting more than one doc");
 		}
 		foreach ($foundDocs as $foundDoc)
 		{
@@ -102,8 +101,7 @@ class Searcher
 		}
 
 		$this->getIndex()->addDocument($doc);
-		// @todo Add logger
-		$this->log("Added report " . $report['id'], 1);
+		$this->log("Added report " . $report['id']);
 	}
 
 	/**
@@ -257,13 +255,10 @@ class Searcher
 	/**
 	 * Logs a message with the specified level
 	 * 
-	 * @todo Needs to be implemented properly
-	 * 
 	 * @param string $message
-	 * @param integer $level
 	 */
-	protected function log($message, $level)
+	protected function log($message)
 	{
-		//echo $message . "\n";
+		echo $message . "\n";
 	}
 }

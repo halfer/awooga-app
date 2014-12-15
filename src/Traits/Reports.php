@@ -15,7 +15,7 @@ trait Reports
 			ORDER BY id
 		";
 		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute();
+		$statement->execute();
 
 		return $statement->fetchAll(\PDO::FETCH_ASSOC);
 	}
@@ -36,7 +36,7 @@ trait Reports
 			ORDER BY r.issue_id
 		";
 		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute();
+		$statement->execute();
 
 		return $statement->fetchAll(\PDO::FETCH_ASSOC);
 	}
