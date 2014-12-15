@@ -36,8 +36,6 @@ class GitImporter
 	 * @todo Should we throw exception if repoRoot is null/empty?
 	 * 
 	 * @param string $repoRoot
-	 * @param integer $runId
-	 * @param \PDO $pdo
 	 * @param boolean $debug
 	 */
 	public function __construct($repoRoot, $debug = false)
@@ -66,7 +64,7 @@ class GitImporter
 		// We always reschedule
 		$rescheduleOk = $this->rescheduleRepoWithLogging($repoId, $ok);
 
-// @todo Can we make this $newPath on success or false on failure?
+		// @todo Can we make this $newPath on success or false on failure?
 		return $ok;
 	}
 
@@ -75,7 +73,7 @@ class GitImporter
 	 * 
 	 * @param integer $repoId
 	 * @param string $url
-	 * @return boolean
+	 * @return false|string
 	 */
 	public function cloneRepoWithLogging($repoId, $url)
 	{

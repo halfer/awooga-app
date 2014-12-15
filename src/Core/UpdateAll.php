@@ -48,7 +48,7 @@ class UpdateAll
 	 * 
 	 * @todo Make this protected again
 	 * 
-	 * @param integer $n
+	 * @param integer $limit
 	 */
 	public function getNextRepos($limit)
 	{
@@ -147,7 +147,7 @@ class UpdateAll
 	/**
 	 * Creates a run entry, returns a run ID
 	 * 
-	 * @return integer Run ID
+	 * @return string Run ID
 	 */
 	protected function createRun()
 	{

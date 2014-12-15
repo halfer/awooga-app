@@ -62,6 +62,11 @@ abstract class BaseController
 		return $statement->fetchColumn();
 	}
 
+	/**
+	 * Shortcut rendering method that sets up a few template values
+	 * 
+	 * @param string $name
+	 */
 	protected function render($name, array $values = array())
 	{
 		$values['selectedMenu'] = $this->getMenuSlug();
@@ -82,6 +87,11 @@ abstract class BaseController
 
 	abstract public function execute();
 
+	/**
+	 * Sets up the page title
+	 * 
+	 * @param string $title
+	 */
 	protected function setPageTitle($title)
 	{
 		$this->engine->addData(array('title' => $title, ));
@@ -157,6 +167,12 @@ abstract class BaseController
 		return $this->slim->mode == 'production';
 	}
 
+	/**
+	 * Retrieves the specified config value from environment-specific settings
+	 * 
+	 * @param string $key
+	 * @return string
+	 */
 	protected function getEnvConfig($key)
 	{
 		$configs = require($this->getProjectRoot() . '/config/env-config.php');
@@ -177,6 +193,11 @@ abstract class BaseController
 		return $configs[$mode][$key];
 	}
 
+	/**
+	 * Returns the root path of the project
+	 * 
+	 * @return string
+	 */
 	protected function getProjectRoot()
 	{
 		return realpath(__DIR__ . '/../..');

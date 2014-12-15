@@ -9,6 +9,11 @@ class Searcher
 
 	use \Awooga\Core\Database;
 
+	/**
+	 * Opens or creates the search index folder
+	 * 
+	 * @param string $indexPath
+	 */
 	public function connect($indexPath)
 	{
 		// The mount script creates the index folder for us, so we need to check to see if
@@ -34,7 +39,7 @@ class Searcher
 	/**
 	 * Gets the current Zend search class
 	 * 
-	 * @return ZendSearch\Lucene\Index
+	 * @return \ZendSearch\Lucene\Index
 	 * @throws \Exception
 	 */
 	protected function getIndex()
@@ -236,6 +241,11 @@ class Searcher
 		return $pieces;
 	}
 
+	/**
+	 * Convenience method to set search limit and run search
+	 * 
+	 * @param string $query
+	 */
 	protected function searchWithZend($query)
 	{
 		// Save memory and make it snappy

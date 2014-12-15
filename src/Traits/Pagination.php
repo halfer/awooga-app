@@ -26,6 +26,7 @@ trait Pagination
 
 	/**
 	 * Redirects if the page number is invalid
+	 * @param integer $pageSize
 	 */
 	public function validatePageAndGetRows($pageSize)
 	{
@@ -74,6 +75,9 @@ trait Pagination
 		return "LIMIT {$start}, {$limitSafe}";
 	}
 
+	/**
+	 * @param integer $pageSize
+	 */
 	protected function getMaxPage($rowCount, $pageSize)
 	{
 		return ceil($rowCount / $pageSize);

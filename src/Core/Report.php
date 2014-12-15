@@ -349,7 +349,7 @@ class Report
 	 * Internal save command to do an update
 	 *
 	 * @param integer $reportId
-	 * @return boolean
+	 * @return boolean|null
 	 * @throws \Awooga\Exceptions\TrivialException
 	 */
 	protected function update($reportId)
@@ -371,7 +371,7 @@ class Report
 	/**
 	 * Internal save command to do an insert
 	 *
-	 * @return boolean
+	 * @return string
 	 * @throws \Awooga\Exceptions\TrivialException
 	 */
 	protected function insert()
@@ -392,7 +392,6 @@ class Report
 	 *
 	 * @param string $sql
 	 * @param integer $reportId
-	 * @return boolean
 	 * @throws \Awooga\Exceptions\TrivialException
 	 */
 	protected function runSaveCommand($sql, $reportId = null)
@@ -472,7 +471,7 @@ class Report
 	 * Converts an issue code into an ID
 	 * 
 	 * @param string $code
-	 * @return integer
+	 * @return string
 	 */
 	protected function getIssueIdForCode($code)
 	{
@@ -510,6 +509,8 @@ class Report
 	 * Search for all the URLs for this repo. If they point to more than one report,
 	 * then let's chuck it out with a trivial exception. Hopefully one of the other
 	 * reports will end up deleted and it will work out on the next pass.
+	 * 
+	 * @return integer
 	 */
 	protected function getCurrentReport()
 	{
@@ -551,11 +552,22 @@ class Report
 		return $reportId;
 	}
 
+	/**
+	 * Converts a Markdown string to HTML
+	 * 
+	 * @param string $markdown
+	 * @return string|null
+	 */
 	protected function convertFromMarkdown($markdown)
 	{
 		return $markdown ? \Michelf\Markdown::defaultTransform($markdown) : null;
 	}
 
+	/**
+	 * Checks to see if the parameter is a string, raises a TrivialException if not
+	 * 
+	 * @param mixed $string
+	 */
 	protected function isString($string)
 	{
 		if (!is_string($string))
@@ -564,6 +576,12 @@ class Report
 		}
 	}
 
+	/**
+	 * Checks to see if the parameter is an array, raises a TrivialException if not
+	 * 
+	 * @param mixed $array
+	 * @throws \Awooga\Exceptions\TrivialException
+	 */
 	protected function isArray($array)
 	{
 		if (!is_array($array))
@@ -572,6 +590,13 @@ class Report
 		}		
 	}
 
+	/**
+	 * Checks to see if a required field is entered, raises a TrivialException if not
+	 * 
+	 * @param mixed $data
+	 * @param string $name
+	 * @throws \Awooga\Exceptions\TrivialException
+	 */
 	protected function isRequired($data, $name)
 	{
 		if (!$data)
