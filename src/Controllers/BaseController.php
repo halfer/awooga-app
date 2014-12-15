@@ -10,7 +10,6 @@ abstract class BaseController
 {
 	protected $slim;
 	protected $engine;
-	protected $pdo;
 
 	use \Awooga\Core\Database;
 
