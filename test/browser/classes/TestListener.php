@@ -62,7 +62,6 @@ class TestListener extends \PHPUnit_Framework_BaseTestListener
 
 		// Check the web server
 		$response = file_get_contents('http://localhost:8090/server-check');
-		echo $response;
 		if ($response != 'OK')
 		{
 			throw new \Exception(
