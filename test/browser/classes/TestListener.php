@@ -24,6 +24,7 @@ class TestListener extends \PHPUnit_Framework_BaseTestListener
 		{
 			$this->startServer();
 			$this->hasInitialised = true;
+			$this->checkServer();
 		}
 	}
 
@@ -51,6 +52,22 @@ class TestListener extends \PHPUnit_Framework_BaseTestListener
 
 			// Exit to prevent PHPUnit thinking it should run again
 			exit();
+		}
+	}
+
+	protected function checkServer()
+	{
+		// Let's wait a litle for it to settle down
+		sleep(1);
+
+		// Check the web server
+		$response = file_get_contents('http://localhost:8090/server-check');
+		echo $response;
+		if ($response != 'OK')
+		{
+			throw new \Exception(
+				"Did not get expected result when checking the web server is up"
+			);
 		}
 	}
 

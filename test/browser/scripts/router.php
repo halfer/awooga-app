@@ -1,4 +1,4 @@
- <?php
+<?php
  
  /*
   * Simple routing file for browser testing. This is started up by the
@@ -17,6 +17,11 @@ if (preg_match('#^/assets/#', $_SERVER["REQUEST_URI"]))
 {
 	// Let static assets fall through to the default server
 	return false;
+}
+elseif ($_SERVER["REQUEST_URI"] == '/server-check')
+{
+	// This is a check to ensure the web server is up
+	echo 'OK';
 }
 else
 {
