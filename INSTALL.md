@@ -20,3 +20,7 @@ To run an update:
 To install cron/reboot tasks:
 
 	sudo ./build/cron/install.sh
+
+To run unit and browser tests:
+
+	PATH=$PATH:`pwd`/bin ./phpunit

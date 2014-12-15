@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit>
+	<testsuites>
+		<testsuite name="unit">
+			<directory>test/unit/tests</directory>
+		</testsuite>
+		<testsuite name="browser">
+			<directory>test/browser/tests</directory>
+		</testsuite>
+	</testsuites>
+	<!--
+		We use this as a makeshift per-suite bootstrap, as there is no specific support for that.
+		This helps up avoid setting up the web server if only the unit tests are being run.
+	-->
+	<listeners>
+		<listener
+			class="\Awooga\Testing\Browser\TestListener"
+			file="test/browser/classes/TestListener.php"
+		/>
+	</listeners>
+</phpunit>
