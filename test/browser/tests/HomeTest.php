@@ -14,6 +14,10 @@ class HomeTest extends TestCase
 	 */
 	public function testBasicPageShape()
 	{
+		// Temporary test to see if web server is started at all
+		echo $this->visit(self::DOMAIN)->content() . "\n";
+		echo $this->current_url . "\n";
+
 		$this->
 			// A help section
 			visit(self::DOMAIN)->
