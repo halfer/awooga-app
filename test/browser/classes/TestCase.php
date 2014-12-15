@@ -4,6 +4,8 @@ namespace Awooga\Testing\Browser;
 
 abstract class TestCase extends \Openbuildings\PHPUnitSpiderling\Testcase_Spiderling
 {
+	const DOMAIN = 'http://localhost:8090';
+
 	/**
 	 * Common library loading for all test classes
 	 */

@@ -7,8 +7,6 @@ require_once realpath(__DIR__ . '/..') . '/classes/TestCase.php';
 
 class HomeTest extends TestCase
 {
-	const DOMAIN = 'http://awooga.local';
-
 	/**
 	 * Ensure the menus and footers look OK
 	 * 

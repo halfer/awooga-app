@@ -7,8 +7,6 @@ require_once realpath(__DIR__ . '/..') . '/classes/TestCase.php';
 
 class BrowseTest extends TestCase
 {
-	const DOMAIN = 'http://awooga.local';
-
 	/**
 	 * General table browsing
 	 * 
