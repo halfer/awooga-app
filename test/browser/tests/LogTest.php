@@ -7,8 +7,13 @@ require_once realpath(__DIR__ . '/..') . '/classes/TestCase.php';
 
 class LogTest extends TestCase
 {
+	/**
+	 * Check logs pagination works
+	 * 
+	 * @driver phantomjs
+	 */
 	public function testLogs()
 	{
-		// Check logs pagination works
+		// @todo Improve fixture data first, too much cruft at the mo
 	}
 }
