@@ -634,7 +634,7 @@ class GitImporterTest extends TestCase
 	 * Converts a string date to a DateTime object
 	 * 
 	 * @param string $strDate
-	 * @return \DateTime
+	 * @return \DateTime|false Returns either a datetime, or false if the conversion failed
 	 */
 	protected function stringToDate($strDate)
 	{
