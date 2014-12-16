@@ -21,6 +21,22 @@ abstract class TestCase extends \Openbuildings\PHPUnitSpiderling\Testcase_Spider
 	}
 
 	/**
+	 * Let's set add some logging here, to see why PhantomJS is flaky on Travis
+	 */
+	public function driver_phantomjs()
+	{
+		// We can supply a log location here (or omit to use /dev/null)
+		$logFile = '/tmp/phantom-awooga.log';
+		$connection = new \Openbuildings\Spiderling\Driver_Phantomjs_Connection();
+		$connection->start(null, $logFile);
+
+		$driver = new \Openbuildings\Spiderling\Driver_Phantomjs();
+		$driver->connection($connection);
+
+		return $driver;
+	}
+
+	/**
 	 * Creates the test database
 	 * 
 	 * @param \PDO $pdo
