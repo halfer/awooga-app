@@ -22,11 +22,20 @@ class TestListener extends \PHPUnit_Framework_BaseTestListener
 	{
 		if (!$this->hasInitialised)
 		{
+			$this->touchPhantomLog();
 			$this->startServer();
 			$this->hasInitialised = true;
 			$this->checkServer();
 			$this->removeSearchIndex();
 		}
+	}
+
+	/**
+	 * Create a new log file for PhantomJS, mainly useful for Travis
+	 */
+	protected function touchPhantomLog()
+	{
+		touch('/tmp/phantom-awooga.log');
 	}
 
 	protected function startServer()
