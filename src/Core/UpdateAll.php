@@ -94,6 +94,12 @@ class UpdateAll
 		);
 	}
 
+	/**
+	 * Fetches any remaining repos in the current run
+	 * 
+	 * @param integer $fromRepoId
+	 * @param integer $limit
+	 */
 	protected function fetchRemainingRows($fromRepoId, $limit)
 	{
 		$intLimit = (int) $limit;
@@ -123,6 +129,11 @@ class UpdateAll
 		return $statement->fetchAll(\PDO::FETCH_ASSOC);
 	}
 
+	/**
+	 * Fetches the next set of repos, starting from the start again
+	 * 
+	 * @param integer $limit
+	 */
 	protected function getFirstRepos($limit)
 	{
 		// @todo Can this share some SQL with fetchRemainingRows?
@@ -147,7 +158,7 @@ class UpdateAll
 	/**
 	 * Creates a run entry, returns a run ID
 	 * 
-	 * @return string Run ID
+	 * @return integer Run ID
 	 */
 	protected function createRun()
 	{

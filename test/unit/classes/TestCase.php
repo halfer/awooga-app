@@ -43,6 +43,11 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 		return $repoId;
 	}
 
+	/**
+	 * Creates a temporary repository folder
+	 * 
+	 * @return array Duple containing absolute and relative paths
+	 */
 	protected function createTempRepoFolder()
 	{
 		$relativePath = $this->randomLeafname();
@@ -62,11 +67,27 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 		return $this->runStatement($pdo, $sql, $params)->fetchAll(\PDO::FETCH_ASSOC);
 	}
 
+	/**
+	 * Fetches a single column for the given SQL statement
+	 * 
+	 * @param \PDO $pdo
+	 * @param string $sql
+	 * @param array $params
+	 * @return mixed
+	 */
 	public function fetchColumn(\PDO $pdo, $sql, array $params = array())
 	{
 		return $this->runStatement($pdo, $sql, $params)->fetchColumn();		
 	}
 
+	/**
+	 * Runs a parameterised piece of SQL and returns the statement object in which it was run
+	 * 
+	 * @param \PDO $pdo
+	 * @param string $sql
+	 * @param array $params
+	 * @return \PDOStatement
+	 */
 	protected function runStatement(\PDO $pdo, $sql, array $params)
 	{
 		$statement = $ok = $pdo->prepare($sql);
@@ -80,7 +101,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	 * 
 	 * @param \PDO $pdo Database connection
 	 * @param string $repoRoot Fully-qualified path to repository (optional)
-	 * @return \Awooga\Testing\GitImporterTestHarness
+	 * @return GitImporterTestHarness
 	 */
 	protected function getImporterInstance(\PDO $pdo = null, $repoRoot = null)
 	{
@@ -102,7 +123,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	 * @param \PDO $pdo
 	 * @param integer $runId
 	 * @param string $repoRoot
-	 * @return \Awooga\Testing\GitImporterHarness
+	 * @return GitImporterTestHarness
 	 */
 	protected function getImporterInstanceWithRun(\PDO $pdo, $runId, $repoRoot = null)
 	{
@@ -152,11 +173,21 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 		);
 	}
 
+	/**
+	 * Gets the fully-qualified path of the test repository folder
+	 * 
+	 * @return string
+	 */
 	protected function getTestRepoRoot()
 	{
 		return $this->getProjectRoot() . '/test/unit/repos';
 	}
 
+	/**
+	 * Gets the fully-qualified path of the temporary folder
+	 * 
+	 * @return string
+	 */
 	protected function getTempFolder()
 	{
 		return $this->getProjectRoot() . '/test/unit/tmp';		

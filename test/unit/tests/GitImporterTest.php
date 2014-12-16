@@ -497,6 +497,14 @@ class GitImporterTest extends TestCase
 		);
 	}
 
+	/**
+	 * A helper to run failed imports several times
+	 * 
+	 * @param integer $repoId
+	 * @param integer $count
+	 * @param callable $test
+	 * @param integer $oldMinutes
+	 */
 	protected function runRepeatedFails($repoId, $count, callable $test, $oldMinutes = null)
 	{
 		$pdo = $this->getDriver();
@@ -568,6 +576,12 @@ class GitImporterTest extends TestCase
 		return $updater->createRun();
 	}
 
+	/**
+	 * A helper method to check we have the right number of imports processed
+	 * 
+	 * @param GitImporter $importer
+	 * @param integer $expectedCount
+	 */
 	protected function checkFilesSeen(GitImporter $importer, $expectedCount)
 	{
 		// Check we've scanned the right number of reports
@@ -578,6 +592,12 @@ class GitImporterTest extends TestCase
 		);
 	}
 
+	/**
+	 * A helper method to check we have the right number of successful imports
+	 * 
+	 * @param integer $repoId
+	 * @param integer $expectedCount
+	 */
 	protected function checkReportsSuccessful($repoId, $expectedCount)
 	{
 		$sql = "SELECT COUNT(*) FROM report WHERE repository_id = :repo_id";
@@ -590,6 +610,11 @@ class GitImporterTest extends TestCase
 		);
 	}
 
+	/**
+	 * Retrieves logs for a specific repo
+	 * 
+	 * @param integer $repoId
+	 */
 	protected function getLogs($repoId)
 	{
 		$sql = "
@@ -605,6 +630,12 @@ class GitImporterTest extends TestCase
 		return $logs;
 	}
 
+	/**
+	 * Converts a string date to a DateTime object
+	 * 
+	 * @param string $strDate
+	 * @return \DateTime
+	 */
 	protected function stringToDate($strDate)
 	{
 		return \DateTime::createFromFormat('Y-m-d H:i:s', $strDate);

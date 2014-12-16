@@ -40,6 +40,9 @@ trait Pagination
 	 * Must be provided by the client class
 	 * 
 	 * (In practice this is often provided by the parent e.g. BaseController
+	 * 
+	 * @param string $name
+	 * @param array $values
 	 */
 	abstract protected function render($name, array $values = array());
 
@@ -74,6 +77,8 @@ trait Pagination
 
 	/**
 	 * Required for validatePageAndGetRows
+	 * 
+	 * @param integer $pageSize
 	 */
 	abstract protected function getPaginatedRows($pageSize);
 
@@ -107,6 +112,8 @@ trait Pagination
 	}
 
 	/**
+	 * Returns the largest permissible page number
+	 * 
 	 * @param integer $pageSize
 	 */
 	protected function getMaxPage($rowCount, $pageSize)
@@ -150,6 +157,11 @@ trait Pagination
 		return true;
 	}
 
+	/**
+	 * A helper method for controllers of paginated tables, to set the number of rows
+	 * 
+	 * @param string $table
+	 */
 	protected function baseSetRowCount($table)
 	{
 		$escaped = $this->getDriver()->quote($table);
@@ -167,6 +179,11 @@ trait Pagination
 	 */
 	abstract protected function getDriver();
 
+	/**
+	 * Performs a browser redirect
+	 * 
+	 * @param string $path
+	 */
 	protected function pageRedirectAndExit($path)
 	{
 		$url = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $path;

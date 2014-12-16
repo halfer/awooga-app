@@ -294,6 +294,11 @@ class ReportTest extends TestCase
 		$this->checkIssueDateResolvedValidity('nonsense');
 	}
 
+	/**
+	 * Helper method to test whether good and bad date formats can be told apart
+	 * 
+	 * @param string $strDate
+	 */
 	protected function checkIssueDateResolvedValidity($strDate)
 	{
 		// We need the database to access the issue codes
@@ -441,6 +446,9 @@ class ReportTest extends TestCase
 		}
 	}
 
+	/**
+	 * 
+	 */
 	protected function getRetrieveIssuesSql()
 	{
 		return "
@@ -460,6 +468,9 @@ class ReportTest extends TestCase
 		";
 	}
 
+	/**
+	 * 
+	 */
 	protected function getRetrieveUrlsSql()
 	{
 		return "
@@ -476,6 +487,9 @@ class ReportTest extends TestCase
 		";
 	}
 
+	/**
+	 * 
+	 */
 	public function testSaveWithNullAuthorNotificationDate()
 	{
 		$report = $this->buildDatabaseAndGetReport();
@@ -549,6 +563,11 @@ class ReportTest extends TestCase
 		$this->trySavingNewReportWithMissingField('issues');
 	}
 
+	/**
+	 * 
+	 * 
+	 * @param string $field
+	 */
 	protected function trySavingNewReportWithMissingField($field)
 	{
 		$report = $this->buildDatabaseAndGetReport();

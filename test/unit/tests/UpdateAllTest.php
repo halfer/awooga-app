@@ -198,7 +198,7 @@ class UpdateAllTest extends TestCase
 	/**
 	 * Sets up a number of copies of the same repo, ready to kick off the updater
 	 * 
-	 * @return \Awooga\Testing\UpdateAllTestHarness
+	 * @return UpdateAllTestHarness
 	 */
 	protected function setupReposToProcess()
 	{

@@ -7,6 +7,11 @@ namespace Awooga\Testing\Unit;
  */
 class ReportTestHarness extends \Awooga\Core\Report
 {
+	/**
+	 * A public helper to get protected class properties
+	 * 
+	 * @param string $property
+	 */
 	public function getProperty($property)
 	{
 		return $this->$property;
@@ -42,6 +47,8 @@ class ReportTestHarness extends \Awooga\Core\Report
 	/**
 	 * Returns the primary key for this record
 	 * 
+	 * @todo Can callers just use getProperty('repoId') here?
+	 * 
 	 * @return integer
 	 */
 	public function getId()
@@ -49,6 +56,13 @@ class ReportTestHarness extends \Awooga\Core\Report
 		return $this->repoId;
 	}
 
+	/**
+	 * Gets the protected issues property
+	 * 
+	 * @todo Can callers just use getProperty('issues') here?
+	 * 
+	 * @return array
+	 */
 	public function getIssues()
 	{
 		return $this->issues;

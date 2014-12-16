@@ -697,11 +697,21 @@ class GitImporter
 		return $this->searcher;
 	}
 
+	/**
+	 * Sets the search module, so we can do document indexing
+	 * 
+	 * @param Searcher $searcher
+	 */
 	public function setSearcher(Searcher $searcher)
 	{
 		$this->searcher = $searcher;
 	}
 
+	/**
+	 * Sets up a test mode, useful for running unit tests
+	 * 
+	 * @param boolean $failureExceptions
+	 */
 	public function setFailureExceptions($failureExceptions)
 	{
 		$this->failureExceptions = $failureExceptions;

@@ -4,6 +4,12 @@ namespace Awooga\Testing;
 
 trait BaseTestCase
 {
+	/**
+	 * Tries to run the SQL statements in the specified file
+	 * 
+	 * @throws \Exception
+	 * @param string $sqlPath
+	 */
 	protected function runSqlFile(\PDO $pdo, $sqlPath)
 	{
 		$sql = file_get_contents($sqlPath);
@@ -11,6 +17,12 @@ trait BaseTestCase
 		$this->runSql($pdo, $sql);
 	}
 
+	/**
+	 * Tries to run the SQL statements in the supplied string
+	 * 
+	 * @throws \Exception
+	 * @param string $sql
+	 */
 	protected function runSql(\PDO $pdo, $sql)
 	{
 		$rows = $pdo->exec($sql);
