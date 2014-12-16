@@ -60,14 +60,13 @@ class Searcher
 	/**
 	 * Adds report data to the text search index
 	 * 
-	 * @todo Can we hint $urls as being an array?
 	 * @todo Swap the ->index to ->getIndex, so we get exception protection
 	 * 
 	 * @param array $report
-	 * @param string|array $urls
+	 * @param array $urls
 	 * @param array $issues
 	 */
-	public function index(array $report, $urls, array $issues)
+	public function index(array $report, array $urls, array $issues)
 	{
 		// Compile the issues HTML
 		$issuesHtml = '';

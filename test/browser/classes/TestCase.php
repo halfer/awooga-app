@@ -65,6 +65,13 @@ abstract class TestCase extends \Openbuildings\PHPUnitSpiderling\Testcase_Spider
 		}
 	}
 
+	/**
+	 * Returns the URLs related to the specified report in an array
+	 * 
+	 * @param \PDO $pdo
+	 * @param integer $reportId
+	 * @return array
+	 */
 	protected function getUrls(\PDO $pdo, $reportId)
 	{
 		$statement = $pdo->prepare(
@@ -86,6 +93,13 @@ abstract class TestCase extends \Openbuildings\PHPUnitSpiderling\Testcase_Spider
 		return $urls;
 	}
 
+	/**
+	 * Returns the issues related to the specified report in an array
+	 * 
+	 * @param \PDO $pdo
+	 * @param integer $reportId
+	 * @return array
+	 */
 	protected function getIssues(\PDO $pdo, $reportId)
 	{
 		$statement = $pdo->prepare(
