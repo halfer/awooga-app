@@ -17,8 +17,11 @@ class Browse extends BaseController
 		// See if we are in search mode
 		if ($this->isSearchMode())
 		{
-			// @todo Tidy this up, needs to be configurable
-			$root = realpath(__DIR__ . '/../..') . '/filesystem/mount/search-index';
+			// Get correct search index path
+			$path = $this->getEnvConfig('search-index.path');
+
+			// Set up search system
+			$root = realpath(__DIR__ . '/../..') . $path;
 			$searcher = new \Awooga\Core\Searcher();
 			$searcher->connect($root);
 			$results = $searcher->search($_GET['search']);

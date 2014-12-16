@@ -25,6 +25,7 @@ class TestListener extends \PHPUnit_Framework_BaseTestListener
 			$this->startServer();
 			$this->hasInitialised = true;
 			$this->checkServer();
+			$this->removeSearchIndex();
 		}
 	}
 
@@ -68,6 +69,11 @@ class TestListener extends \PHPUnit_Framework_BaseTestListener
 				"Did not get expected result when checking the web server is up"
 			);
 		}
+	}
+
+	protected function removeSearchIndex()
+	{
+		system('rm -rf ' . $this->getProjectRoot() . '/filesystem/tmp/search-index');
 	}
 
 	/**

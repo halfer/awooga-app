@@ -7,7 +7,8 @@ return array(
 			'password' => 'password',
 			'host' => 'localhost',
 			'database' => 'awooga_test',
-		)
+		),
+		'search-index.path' => '/filesystem/tmp/search-index',
 	),
 	'local' => array(
 		'database' => array(
@@ -15,7 +16,8 @@ return array(
 			'password' => 'password',
 			'host' => 'localhost',
 			'database' => 'awooga',
-		)
+		),
+		'search-index.path' => '/filesystem/mount/search-index',
 	),
 	'staging' => array(
 		'database' => array(
@@ -23,7 +25,8 @@ return array(
 			'password' => 'password',
 			'host' => 'localhost',
 			'database' => 'awooga',
-		)
+		),
+		'search-index.path' => '/filesystem/mount/search-index',
 	),
 	'production' => array(
 		'database' => array(
@@ -31,6 +34,7 @@ return array(
 			'password' => 'password',
 			'host' => 'localhost',
 			'database' => 'awooga',
-		)
+		),
+		'search-index.path' => '/filesystem/mount/search-index',
 	),
 );

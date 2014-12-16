@@ -4,10 +4,15 @@ namespace Awooga\Core;
 
 class Searcher
 {
+	protected $verbose;
 	protected $index;
-	protected $logger;
 
 	use \Awooga\Core\Database;
+
+	public function __construct($verbose = false)
+	{
+		$this->verbose = $verbose;
+	}
 
 	/**
 	 * Opens or creates the search index folder
@@ -52,7 +57,16 @@ class Searcher
 		return $this->index;
 	}
 
-	// @todo Swap the ->index to ->getIndex, so we get exception protection
+	/**
+	 * Adds report data to the text search index
+	 * 
+	 * @todo Can we hint $urls as being an array?
+	 * @todo Swap the ->index to ->getIndex, so we get exception protection
+	 * 
+	 * @param array $report
+	 * @param string|array $urls
+	 * @param array $issues
+	 */
 	public function index(array $report, $urls, array $issues)
 	{
 		// Compile the issues HTML
@@ -67,7 +81,7 @@ class Searcher
 		$foundDocs = $this->index->find('pk:' . $report['id']);
 		if (count($foundDocs) > 1)
 		{
-			$this->log("Warning, deleting more than one doc");
+			$this->log("Warning, deleting more than one instance of report " . $report['id']);
 		}
 		foreach ($foundDocs as $foundDoc)
 		{
@@ -259,6 +273,9 @@ class Searcher
 	 */
 	protected function log($message)
 	{
-		echo $message . "\n";
+		if ($this->verbose)
+		{
+			echo $message . "\n";
+		}
 	}
 }

@@ -8,7 +8,7 @@ trait BaseTestCase
 	{
 		$sql = file_get_contents($sqlPath);
 
-		return $this->runSql($pdo, $sql);
+		$this->runSql($pdo, $sql);
 	}
 
 	protected function runSql(\PDO $pdo, $sql)
