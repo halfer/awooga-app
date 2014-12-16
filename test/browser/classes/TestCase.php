@@ -34,11 +34,16 @@ abstract class TestCase extends \Openbuildings\PHPUnitSpiderling\Testcase_Spider
 
 	/**
 	 * Adds the fixtures reports to a test search index
-	 * 
-	 * @todo If the searcher is set to verbose mode, 
 	 */
 	protected function indexDocuments()
 	{
+		// For now, if the index exists, let us not recreate it
+		$indexPath = $this->getProjectRoot() . '/filesystem/tmp/search-index';
+		if (file_exists($indexPath))
+		{
+			return;
+		}
+
 		$pdo = $this->getDriver();
 		$statement = $pdo->prepare(
 			'SELECT
@@ -48,7 +53,7 @@ abstract class TestCase extends \Openbuildings\PHPUnitSpiderling\Testcase_Spider
 		$statement->execute();
 
 		$searcher = new \Awooga\Core\Searcher();
-		$searcher->connect($this->getProjectRoot() . '/filesystem/tmp/search-index');
+		$searcher->connect($indexPath);
 
 		while ($report = $statement->fetch(\PDO::FETCH_ASSOC))
 		{
