@@ -119,6 +119,23 @@ trait Pagination
 		return true;
 	}
 
+	protected function baseSetRowCount($table)
+	{
+		$escaped = $this->getDriver()->quote($table);
+		$sql = "SELECT COUNT(*) FROM $escaped";
+		$statement = $this->getDriver()->prepare($sql);
+		$statement->execute();
+
+		$this->rowCount = $statement->fetchColumn();
+	}
+
+	/**
+	 * The database driver must be provided by the trait client
+	 * 
+	 * @return \PDO
+	 */
+	abstract protected function getDriver();
+
 	protected function pageRedirectAndExit($path)
 	{
 		$url = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $path;

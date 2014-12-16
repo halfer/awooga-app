@@ -43,14 +43,7 @@ class Logs extends BaseController
 
 	protected function setRowCount()
 	{
-		$sql = "
-			SELECT COUNT(*)
-			FROM repository_log
-		";
-		$statement = $this->getDriver()->prepare($sql);
-		$statement->execute();
-
-		$this->rowCount = $statement->fetchColumn();
+		$this->baseSetRowCount('repository_log');
 	}
 
 	protected function getMenuSlug()

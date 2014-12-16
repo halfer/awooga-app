@@ -29,14 +29,7 @@ class Issues extends BaseController
 
 	protected function setRowCount()
 	{
-		$sql = "
-			SELECT COUNT(*)
-			FROM issue
-		";
-		$statement = $this->getDriver()->prepare($sql);
-		$statement->execute();
-
-		$this->rowCount = $statement->fetchColumn();
+		$this->baseSetRowCount('issue');
 	}
 
 	protected function getMenuSlug()

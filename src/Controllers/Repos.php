@@ -48,14 +48,7 @@ class Repos extends BaseController
 
 	protected function setRowCount()
 	{
-		$sql = "
-			SELECT COUNT(*)
-			FROM repository
-		";
-		$statement = $this->getDriver()->prepare($sql);
-		$statement->execute();
-
-		$this->rowCount = $statement->fetchColumn();
+		$this->baseSetRowCount('repository');
 	}
 
 	protected function getMenuSlug()
