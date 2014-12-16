@@ -12,6 +12,13 @@ trait Pagination
 		$this->page = $page;
 	}
 
+	/**
+	 * Gets a rendered paginated page
+	 * 
+	 * @param string $templateName
+	 * @param integer $pageSize
+	 * @return string Generated HTML
+	 */
 	public function getPaginatedRender($templateName, $pageSize)
 	{
 		// Redirects if the page number is invalid, fetches rows
@@ -28,6 +35,13 @@ trait Pagination
 			)
 		);
 	}
+
+	/**
+	 * Must be provided by the client class
+	 * 
+	 * (In practice this is often provided by the parent e.g. BaseController
+	 */
+	abstract protected function render($name, array $values = array());
 
 	/**
 	 * Gets page number
