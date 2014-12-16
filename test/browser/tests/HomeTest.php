@@ -48,17 +48,7 @@ class HomeTest extends TestCase
 	public function testExampleSearches()
 	{
 		$this->visit(self::DOMAIN);
-		$links = $this->find('form small a');
-
-		foreach ($links as $link)
-		{
-			$link->
-				click()->
-				assertEquals('/browse', $this->current_path())
-			;
-			// Go back to home so we can check each link does something
-			$this->visit(self::DOMAIN);
-		}
+		$links = $this->all('form small a[href^="/browse"]');
 	}
 
 	/**
