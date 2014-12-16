@@ -173,6 +173,21 @@ trait Pagination
 	}
 
 	/**
+	 * A helper method to fetch the rows for a paginated screen
+	 * 
+	 * @param string $sql
+	 * @param integer $pageSize
+	 */
+	protected function baseGetPaginatedRows($sql, $pageSize)
+	{
+		$limitClause = $this->getLimitClause($pageSize);
+		$statement = $this->getDriver()->prepare($sql . ' ' . $limitClause);
+		$statement->execute();
+
+		return $statement->fetchAll(\PDO::FETCH_ASSOC);		
+	}
+
+	/**
 	 * The database driver must be provided by the trait client
 	 * 
 	 * @return \PDO

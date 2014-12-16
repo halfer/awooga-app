@@ -29,7 +29,6 @@ class Issues extends BaseController
 
 	protected function getPaginatedRows($pageSize)
 	{
-		$limitClause = $this->getLimitClause($pageSize);
 		$sql = "
 			SELECT
 				*,
@@ -39,11 +38,8 @@ class Issues extends BaseController
 				WHERE ir.issue_id = issue.id) report_count
 			FROM issue
 			ORDER BY report_count DESC
-			{$limitClause}
 		";
-		$statement = $this->getDriver()->prepare($sql);
-		$statement->execute();
 
-		return $statement->fetchAll(\PDO::FETCH_ASSOC);
+		return $this->baseGetPaginatedRows($sql, $pageSize);
 	}
 }

@@ -18,17 +18,13 @@ class Logs extends BaseController
 
 	protected function getPaginatedRows($pageSize)
 	{
-		$limitClause = $this->getLimitClause($pageSize);
 		$sql = "
 			SELECT *
 			FROM repository_log
 			ORDER BY id DESC
-			{$limitClause}
 		";
-		$statement = $this->getDriver()->prepare($sql);
-		$statement->execute();
 
-		return $statement->fetchAll(\PDO::FETCH_ASSOC);		
+		return $this->baseGetPaginatedRows($sql, $pageSize);
 	}
 
 	protected function setRowCount()

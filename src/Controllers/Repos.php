@@ -19,7 +19,6 @@ class Repos extends BaseController
 
 	protected function getPaginatedRows($pageSize)
 	{
-		$limitClause = $this->getLimitClause($pageSize);
 		$sql = "
 			SELECT
 				*,
@@ -28,12 +27,9 @@ class Repos extends BaseController
 				WHERE r.repository_id = repository.id) report_count
 			FROM repository
 			ORDER BY id
-			{$limitClause}
 		";
-		$statement = $this->getDriver()->prepare($sql);
-		$statement->execute();
 
-		return $statement->fetchAll(\PDO::FETCH_ASSOC);
+		return $this->baseGetPaginatedRows($sql, $pageSize);
 	}
 
 	protected function setRowCount()
