@@ -120,6 +120,9 @@ abstract class BaseController
 			$this->getDebugBar()->addCollector(
 				new \DebugBar\DataCollector\PDO\PDOCollector($traceablePDO)
 			);
+
+			// Report connection string
+			$this->debugMessage("Connection string: $dsn");
 		}
 
 		return $pdo;
@@ -146,6 +149,9 @@ abstract class BaseController
 			$debugbar = new StandardDebugBar();
 			$jsRenderer = $debugbar->getJavascriptRenderer('/assets/debugbar');
 			$this->slim->debugbar = $debugbar;
+
+			// Report the mode
+			$this->debugMessage("Environment: " . $this->slim->mode);
 		}
 		$this->engine->addData(
 			array('debugbarRenderer' => $jsRenderer, )
@@ -160,6 +166,11 @@ abstract class BaseController
 		}
 
 		return $this->slim->debugbar;
+	}
+
+	protected function debugMessage($message)
+	{
+		$this->getDebugBar()['messages']->addMessage($message);
 	}
 
 	protected function isProduction()
