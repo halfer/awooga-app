@@ -11,20 +11,10 @@ class Issues extends BaseController
 	 */
 	public function execute()
 	{
-		// Redirects if the page number is invalid, fetches rows
-		$issues = $this->validatePageAndGetRows($pageSize = 20);
-
 		$this->setPageTitle("Issue types");
 
 		// Render the reports
-		echo $this->render(
-			'issues',
-			array(
-				'issues' => $issues,
-				'currentPage' => $this->getPage(),
-				'maxPage' => $this->getMaxPage($this->getRowCount(), $pageSize),
-			)
-		);
+		echo $this->getPaginatedRender('issues', 20);
 	}
 
 	protected function setRowCount()

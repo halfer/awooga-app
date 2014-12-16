@@ -11,19 +11,9 @@ class Logs extends BaseController
 	 */
 	public function execute()
 	{
-		// Redirects if the page number is invalid, fetches rows
-		$logs = $this->validatePageAndGetRows($pageSize = 20);
-
 		$this->setPageTitle("Import logs");
 
-		echo $this->render(
-			'logs',
-			array(
-				'logs' => $logs,
-				'currentPage' => $this->getPage(),
-				'maxPage' => $this->getMaxPage($this->getRowCount(), $pageSize),
-			)
-		);
+		echo $this->getPaginatedRender('logs', 20);
 	}
 
 	protected function getPaginatedRows($pageSize)

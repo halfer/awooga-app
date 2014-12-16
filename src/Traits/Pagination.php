@@ -12,6 +12,23 @@ trait Pagination
 		$this->page = $page;
 	}
 
+	public function getPaginatedRender($templateName, $pageSize)
+	{
+		// Redirects if the page number is invalid, fetches rows
+		$rows = $this->validatePageAndGetRows($pageSize);
+
+		// Render the rows
+		return $this->render(
+			$templateName,
+			array(
+				// We use the template name as the primary array name too
+				$templateName => $rows,
+				'currentPage' => $this->getPage(),
+				'maxPage' => $this->getMaxPage($this->getRowCount(), $pageSize),
+			)
+		);
+	}
+
 	/**
 	 * Gets page number
 	 * 

@@ -11,20 +11,10 @@ class Repos extends BaseController
 	 */
 	public function execute()
 	{
-		// Redirects if the page number is invalid, fetches rows
-		$repos = $this->validatePageAndGetRows($pageSize = 10);
-
 		$this->setPageTitle("Source repositories");
 
 		// Render the reports
-		echo $this->render(
-			'repos',
-			array(
-				'repos' => $repos,
-				'currentPage' => $this->getPage(),
-				'maxPage' => $this->getMaxPage($this->getRowCount(), $pageSize),
-			)
-		);
+		echo $this->getPaginatedRender('repos', 10);
 	}
 
 	protected function getPaginatedRows($pageSize)
