@@ -37,3 +37,5 @@
 		<?php endforeach ?>
 	</tbody>
 </table>
+
+<?php /* @todo Missing a paginator device */ ?>
