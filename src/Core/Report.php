@@ -104,6 +104,8 @@ class Report
 	/**
 	 * Setter to accept the issue array
 	 * 
+	 * This is deliberately not array-hinted, so we can accept any JSON value and bork gracefully
+	 * 
 	 * @param array $issues
 	 */
 	public function setIssues($issues)

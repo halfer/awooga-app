@@ -41,7 +41,7 @@ class ReportTest extends TestCase
 	}
 
 	/**
-	 * Make sure non-strings are rejected
+	 * Make sure null is rejected
 	 * 
 	 * @expectedException \Awooga\Exceptions\TrivialException
 	 */
@@ -49,6 +49,16 @@ class ReportTest extends TestCase
 	{
 		$report = $this->getDummyReport();
 		$report->setTitle(null);
+	}
+
+	/**
+	 * Make sure non-string, non-null types are rejected
+	 * 
+	 * @expectedException \Awooga\Exceptions\TrivialException
+	 */
+	public function testTitleOfBadTypeAgain()
+	{
+		$report = $this->getDummyReport();
 		$report->setTitle(new \stdClass());
 	}
 
