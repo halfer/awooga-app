@@ -59,7 +59,7 @@ class TestListener extends \PHPUnit_Framework_BaseTestListener
 	protected function checkServer()
 	{
 		// Let's wait a litle for it to settle down
-		sleep(1);
+		sleep(3);
 
 		// Check the web server
 		$response = file_get_contents('http://localhost:8090/server-check');
