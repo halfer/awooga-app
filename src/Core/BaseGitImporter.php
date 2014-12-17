@@ -15,7 +15,10 @@ class BaseGitImporter
 	const LOG_LEVEL_ERROR_TRIVIAL = 'trivial';
 	const LOG_LEVEL_ERROR_SERIOUS = 'serious';
 
-	protected $debug;
+	protected $repoRoot;
+	protected $debug = false;
+
+	use Database;
 
 	/**
 	 * Deletes a folder from the filing system

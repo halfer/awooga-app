@@ -9,10 +9,7 @@ use \Awooga\Exceptions\SeriousException;
 class GitImporter extends BaseGitImporter
 {
 	protected $runId;
-	protected $repoRoot;
 	protected $searcher;
-
-	use Database;
 
 	/**
 	 * Constructs an importer object

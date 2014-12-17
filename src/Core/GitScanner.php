@@ -20,10 +20,7 @@ class GitScanner extends BaseGitImporter
 
 	protected $runId;
 	protected $repoId;
-	protected $repoRoot;
 	protected $searcher;
-
-	use Database;
 
 	/**
 	 * Initialises the Git scanner
@@ -37,7 +34,6 @@ class GitScanner extends BaseGitImporter
 		$this->runId = $runId;
 		$this->repoId = $repoId;
 		$this->repoRoot = $repoRoot;
-		$this->debug = false;
 	}
 
 	/**
