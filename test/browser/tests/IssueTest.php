@@ -15,8 +15,7 @@ class IssueTest extends TestCase
 	public function testIssues()
 	{
 		// Check number of issues
-		$this->visit(self::DOMAIN . '/issues');
-		$rows = $this->all('table tbody tr');
+		$rows = $this->visit(self::DOMAIN . '/issues')->all('table tbody tr');
 		$this->assertEquals(10, count($rows));
 
 		// Check the counts for the first issue
