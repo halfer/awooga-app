@@ -2,6 +2,9 @@
 
 namespace Awooga\Core;
 
+use \Awooga\Exceptions\SeriousException;
+use \Awooga\Exceptions\TrivialException;
+
 class GitImporter
 {
 	const LOG_TYPE_FETCH = 'fetch';
@@ -156,7 +159,7 @@ class GitImporter
 			$pdo->commit();
 			$this->repoLog($repoId, self::LOG_TYPE_SCAN);
 		}
-		catch (\Awooga\Exceptions\SeriousException $e)
+		catch (SeriousException $e)
 		{
 			// We'll already have logged, so no need to do it again
 			$exitEarly = true;
@@ -243,7 +246,7 @@ class GitImporter
 	 * 
 	 * @param string $url
 	 * @return string
-	 * @throws \Awooga\Exceptions\SeriousException
+	 * @throws SeriousException
 	 */
 	protected function cloneRepo($url)
 	{
@@ -256,7 +259,7 @@ class GitImporter
 
 		if (!$ok)
 		{
-			throw new \Awooga\Exceptions\SeriousException("Problem when cloning");
+			throw new SeriousException("Problem when cloning");
 		}
 
 		return $target;
@@ -305,7 +308,7 @@ class GitImporter
 	 *
 	 * @param integer $repoId
 	 * @param string $newPath
-	 * @throws \Awooga\Exceptions\SeriousException
+	 * @throws SeriousException
 	 */
 	protected function moveRepo($repoId, $newPath)
 	{
@@ -322,7 +325,7 @@ class GitImporter
 		// Let's bork if either of the queries failed
 		if (!$okRead || !$okWrite)
 		{
-			throw new \Awooga\Exceptions\SeriousException("Updating the repo path failed");
+			throw new SeriousException("Updating the repo path failed");
 		}
 
 		$this->writeDebug("Update path '{$newPath}' for repo #{$repoId}");
@@ -332,7 +335,7 @@ class GitImporter
 		{
 			if (!$this->deleteOldRepo($oldPath))
 			{
-				throw new \Awooga\Exceptions\SeriousException("Problem when deleting the old repo");
+				throw new SeriousException("Problem when deleting the old repo");
 			}
 
 			$this->writeDebug("Remove old location '{$oldPath}' for repo #{$repoId}");
@@ -362,14 +365,14 @@ class GitImporter
 	 * 
 	 * @param string $oldPath
 	 * @return boolean True on success
-	 * @throws \Awooga\Exceptions\SeriousException
+	 * @throws SeriousException
 	 */
 	protected function deleteOldRepo($oldPath)
 	{
 		// Halt if there's no root, to avoid a dangerous command :)
 		if (!$this->repoRoot)
 		{
-			throw new \Awooga\Exceptions\SeriousException(
+			throw new SeriousException(
 				"No repository root set, cannot delete old repo"
 			);
 		}
@@ -413,7 +416,7 @@ class GitImporter
 					$reportIds[] = $this->scanReport($repoId, $reportPath);
 					$this->writeDebug("\tFound report ..." . substr($reportPath, -80));
 				}
-				catch (\Awooga\Exceptions\TrivialException $e)
+				catch (TrivialException $e)
 				{
 					// Counting trivial exceptions still contributes to failure/stop limit
 					$this->repoLog($repoId, self::LOG_TYPE_SCAN, $e->getMessage(), self::LOG_LEVEL_ERROR_TRIVIAL);
@@ -426,7 +429,7 @@ class GitImporter
 				}
 			}
 		}
-		catch (\Awooga\Exceptions\SeriousException $e)
+		catch (SeriousException $e)
 		{
 			// These errors are always OK to save directly into the log
 			$this->repoLog($repoId, self::LOG_TYPE_SCAN, $e->getMessage(), self::LOG_LEVEL_ERROR_SERIOUS);
@@ -453,7 +456,7 @@ class GitImporter
 		// Unlikely to happen, we just scanned!
 		if (!file_exists($reportPath))
 		{
-			throw new \Awooga\Exceptions\SeriousException('File cannot be found');
+			throw new SeriousException('File cannot be found');
 		}
 
 		$size = filesize($reportPath);
@@ -468,7 +471,7 @@ class GitImporter
 		// If this is not an array, throw a trivial exception
 		if (!is_array($data))
 		{
-			throw new \Awooga\Exceptions\TrivialException("Could not parse report into an array");
+			throw new TrivialException("Could not parse report into an array");
 		}
 
 		// Parse the data
@@ -499,7 +502,7 @@ class GitImporter
 				$this->tryReindexing($report);
 				break;
 			default:
-				throw new \Awooga\Exceptions\TrivialException("Unrecognised version number");
+				throw new TrivialException("Unrecognised version number");
 		}
 
 		return $reportId;
@@ -538,7 +541,7 @@ class GitImporter
 
 		if ($statement->fetchColumn() > self::MAX_FAILS_BEFORE_DISABLE)
 		{
-			throw new \Awooga\Exceptions\SeriousException(
+			throw new SeriousException(
 				"Too many failures with this repo recently, please see log"
 			);
 		}
