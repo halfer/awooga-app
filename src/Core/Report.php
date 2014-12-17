@@ -123,42 +123,11 @@ class Report
 
 		foreach ($issues as $issue)
 		{
-			// If the issue doesn't have a issue_cat_code, bomb out
-			if (!isset($issue['issue_cat_code']))
-			{
-				throw new TrivialException("Issues must have an issue_cat_code entry");
-			}
-
-			// If the issue doesn't have a valid code, bomb out also
-			$issueCode = $issue['issue_cat_code'];
-			if (!$this->validateIssueCatCode($issueCode))
-			{
-				$issueCodeShort = substr($issueCode, 0, 50);
-				throw new TrivialException(
-					"'{$issueCodeShort}' does not seem to be a valid issue category code"
-				);
-			}
-
-			if (isset($issue['description']))
-			{
-				if (!is_string($issue['description']))
-				{
-					throw new TrivialException('Descriptions must be strings');
-				}
-			}
-
-			if (isset($issue['resolved_at']))
-			{
-				$date = \DateTime::createFromFormat('Y-m-d', $issue['resolved_at']);
-				if ($date === false || $this->getLastDateParseFailCount())
-				{
-					throw new TrivialException(
-						'A resolution date must be in the form yyyy-mm-dd'
-					);					
-				}
-			}
+			// Throw exception if this issue fails validation
+			$this->validateIssue($issue);
 
 			// Add the issue code to the list
+			$issueCode = $issue['issue_cat_code'];
 			$issueCodes[] = $issueCode;
 
 			// Strip out empty descriptions and any unrecognised keys
@@ -183,6 +152,50 @@ class Report
 		}
 
 		$this->issues = $issuesOut;
+	}
+
+	/**
+	 * Checks a single issue from an issue array
+	 * 
+	 * @param array $issue
+	 * @throws TrivialException
+	 */
+	protected function validateIssue($issue)
+	{
+		// If the issue doesn't have a issue_cat_code, bomb out
+		if (!isset($issue['issue_cat_code']))
+		{
+			throw new TrivialException("Issues must have an issue_cat_code entry");
+		}
+
+		// If the issue doesn't have a valid code, bomb out also
+		$issueCode = $issue['issue_cat_code'];
+		if (!$this->validateIssueCatCode($issueCode))
+		{
+			$issueCodeShort = substr($issueCode, 0, 50);
+			throw new TrivialException(
+				"'{$issueCodeShort}' does not seem to be a valid issue category code"
+			);
+		}
+
+		if (isset($issue['description']))
+		{
+			if (!is_string($issue['description']))
+			{
+				throw new TrivialException('Descriptions must be strings');
+			}
+		}
+
+		if (isset($issue['resolved_at']))
+		{
+			$date = \DateTime::createFromFormat('Y-m-d', $issue['resolved_at']);
+			if ($date === false || $this->getLastDateParseFailCount())
+			{
+				throw new TrivialException(
+					'A resolution date must be in the form yyyy-mm-dd'
+				);					
+			}
+		}
 	}
 
 	protected function getLastDateParseFailCount()
