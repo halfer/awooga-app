@@ -18,7 +18,6 @@ class GitScanner extends BaseGitImporter
 	const MAX_FAILS_BEFORE_DISABLE = 5;
 	const MAX_REPORT_SIZE = 60000;
 
-	protected $runId;
 	protected $repoId;
 	protected $searcher;
 

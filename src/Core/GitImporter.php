@@ -8,7 +8,6 @@ use \Awooga\Exceptions\SeriousException;
 
 class GitImporter extends BaseGitImporter
 {
-	protected $runId;
 	protected $searcher;
 
 	/**

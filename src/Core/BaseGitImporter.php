@@ -16,6 +16,7 @@ class BaseGitImporter
 	const LOG_LEVEL_ERROR_SERIOUS = 'serious';
 
 	protected $repoRoot;
+	protected $runId;
 	protected $debug = false;
 
 	use Database;
