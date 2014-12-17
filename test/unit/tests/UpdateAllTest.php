@@ -14,6 +14,7 @@ class UpdateAllTest extends TestCase
 		$root = $this->getProjectRoot();
 		require_once $root . '/test/unit/classes/UpdateAllTestHarness.php';
 		require_once $root . '/test/unit/classes/GitImporterTestHarness.php';
+		require_once $root . '/test/unit/classes/GitScannerTestHarness.php';
 	}
 
 	/**

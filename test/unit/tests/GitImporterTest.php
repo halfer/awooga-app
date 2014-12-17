@@ -3,6 +3,7 @@
 namespace Awooga\Testing\Unit;
 
 use Awooga\Core\GitImporter;
+use Awooga\Core\GitScanner;
 
 // Load the parent relative to dir location
 require_once realpath(__DIR__ . '/..') . '/classes/TestCase.php';
@@ -18,6 +19,7 @@ class GitImporterTest extends TestCase
 
 		$root = $this->getProjectRoot();
 		require_once $root . '/test/unit/classes/GitImporterTestHarness.php';
+		require_once $root . '/test/unit/classes/GitScannerTestHarness.php';
 		require_once $root . '/test/unit/classes/UpdateAllTestHarness.php';
 	}
 
@@ -195,13 +197,25 @@ class GitImporterTest extends TestCase
 		$this->checkLogsGenerated(0, 0, 0);
 
 		// Scan everything in this repo
-		$importer = $this->getImporterInstanceWithRun($this->getDriver(), $this->createRun());
-		$importer->scanRepo($repoId, $newRelativePath = 'fail');
+		$scanner = $this->getScannerInstanceWithRun($repoId);
+		$scanner->scanRepo($newRelativePath = 'fail');
 
 		// Check the numbers of scanned vs successful
-		$this->checkFilesSeen($importer, 1);
+		$this->checkFilesSeen($scanner, 1);
 		$this->checkReportsSuccessful($repoId, 0);
 		$this->checkLogsGenerated(0, 0, 1);
+	}
+
+	protected function getScannerInstanceWithRun($repoId, $repoRoot = null)
+	{
+		$scanner = new GitScannerTestHarness(
+			$this->createRun(),
+			$repoId,
+			is_null($repoRoot) ? $this->getTestRepoRoot() : $repoRoot
+		);
+		$scanner->setDriver($this->getDriver());
+
+		return $scanner;
 	}
 
 	/**
@@ -217,11 +231,11 @@ class GitImporterTest extends TestCase
 		// Set up a pretend repo
 		$tempRoot = $this->getTempFolder();
 		$pdo = $this->getDriver();
-		$importer = $this->getImporterInstanceWithRun($pdo, $this->createRun(), $tempRoot);
+		$scanner = $this->getScannerInstanceWithRun($repoId, $tempRoot);
 
 		// Create a repo and a few bad reports
 		list($absolutePath, $relativePath) = $this->createTempRepoFolder();
-		$maxFails = GitImporter::MAX_FAILS_BEFORE_DISABLE;
+		$maxFails = GitScanner::MAX_FAILS_BEFORE_DISABLE;
 		for ($i = 0; $i < $maxFails * 2; $i++)
 		{
 			file_put_contents(
@@ -234,7 +248,7 @@ class GitImporterTest extends TestCase
 		$throwsException = false;
 		try
 		{
-			$importer->scanRepo($repoId, $relativePath);
+			$scanner->scanRepo($relativePath); // new
 		}
 		catch (\Awooga\Exceptions\SeriousException $e)
 		{
@@ -251,7 +265,7 @@ class GitImporterTest extends TestCase
 		$this->assertFalse($isEnabled, "Check the repository is now disabled");
 
 		// Check that the number of files seen is less than the total
-		$this->checkFilesSeen($importer, $maxFails + 1);
+		$this->checkFilesSeen($scanner, $maxFails + 1);
 
 		// The extra row is the extra item to explain the repo has been disabled
 		$this->checkLogsGenerated(0, 1, $maxFails + 1);
@@ -272,7 +286,7 @@ class GitImporterTest extends TestCase
 
 		// Set up a pretend repo
 		$tempRoot = $this->getTempFolder();
-		$importer = $this->getImporterInstanceWithRun($this->getDriver(), $this->createRun(), $tempRoot);
+		$scanner = $this->getScannerInstanceWithRun($repoId, $tempRoot);
 
 		// Create a repo and one huge report that should fail
 		list($absolutePath, $relativePath) = $this->createTempRepoFolder();
@@ -291,15 +305,15 @@ class GitImporterTest extends TestCase
 		);
 
 		// Do some scanning!
-		$importer->scanRepo($repoId, $relativePath);
+		$scanner->scanRepo($relativePath);
 
 		// Check the numbers of scanned vs successful
-		$this->checkFilesSeen($importer, 1);
+		$this->checkFilesSeen($scanner, 1);
 		$this->checkReportsSuccessful($repoId, 0);
 		$this->checkLogsGenerated(0, 0, 1);
 
 		// Remove temporary repo
-		$importer->deleteOldRepo($relativePath);
+		$scanner->deleteOldRepo($relativePath);
 	}
 
 	/**
@@ -579,11 +593,16 @@ class GitImporterTest extends TestCase
 	/**
 	 * A helper method to check we have the right number of imports processed
 	 * 
-	 * @param GitImporter $importer
+	 * @param GitImporter|GitScanner $importer
 	 * @param integer $expectedCount
 	 */
-	protected function checkFilesSeen(GitImporter $importer, $expectedCount)
+	protected function checkFilesSeen($importer, $expectedCount)
 	{
+		if (!$importer instanceof GitImporter && !$importer instanceof GitScanner)
+		{
+			throw new \Exception('Cannot count reports from this type');
+		}
+
 		// Check we've scanned the right number of reports
 		$this->assertEquals(
 			$expectedCount,

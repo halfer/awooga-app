@@ -2,28 +2,15 @@
 
 namespace Awooga\Core;
 
+require_once 'BaseGitImporter.php';
+
 use \Awooga\Exceptions\SeriousException;
-use \Awooga\Exceptions\TrivialException;
 
-class GitImporter
+class GitImporter extends BaseGitImporter
 {
-	const LOG_TYPE_FETCH = 'fetch';
-	const LOG_TYPE_MOVE = 'move';
-	const LOG_TYPE_SCAN = 'scan';
-	const LOG_TYPE_RESCHED = 'resched';
-
-	const LOG_LEVEL_SUCCESS = 'success';
-	const LOG_LEVEL_ERROR_TRIVIAL = 'trivial';
-	const LOG_LEVEL_ERROR_SERIOUS = 'serious';
-
-	// @todo Is this misnamed? Currently only throws exception, doesn't disable
-	const MAX_FAILS_BEFORE_DISABLE = 5;
-	const MAX_REPORT_SIZE = 60000;
-
 	protected $runId;
 	protected $repoRoot;
 	protected $searcher;
-	protected $debug;
 
 	use Database;
 
@@ -135,12 +122,20 @@ class GitImporter
 	 */
 	public function scanRepoWithLogging($repoId, $repoPath)
 	{
+		// Initialisation
 		$pdo = $this->getDriver();
+		$scanner = $this->getScanner($repoId, $this->repoRoot);
+		$scanner->setDriver($pdo);
+		if ($this->searcher)
+		{
+			$scanner->setSearcher($this->searcher);
+		}
+
 		$exitEarly = false;
 		try
 		{
 			$pdo->beginTransaction();
-			$this->scanRepo($repoId, $repoPath);
+			$scanner->scanRepo($repoPath);
 			$pdo->commit();
 			$this->repoLog($repoId, self::LOG_TYPE_SCAN);
 		}
@@ -171,6 +166,18 @@ class GitImporter
 		}
 
 		return true;
+	}
+
+	/**
+	 * An easily overridable class to get a new scanning object
+	 * 
+	 * @param integer $repoId
+	 * @param string $repoRoot
+	 * @return GitScanner
+	 */
+	protected function getScanner($repoId, $repoRoot)
+	{
+		return new GitScanner($this->runId, $repoId, $repoRoot);
 	}
 
 	/**
@@ -336,227 +343,6 @@ class GitImporter
 	}
 
 	/**
-	 * Deletes a folder from the filing system
-	 * 
-	 * @param string $oldPath
-	 * @return boolean True on success
-	 * @throws SeriousException
-	 */
-	protected function deleteOldRepo($oldPath)
-	{
-		// Halt if there's no root, to avoid a dangerous command :)
-		if (!$this->repoRoot)
-		{
-			throw new SeriousException(
-				"No repository root set, cannot delete old repo"
-			);
-		}
-
-		$output = $return = null;
-		$command = "rm -rf {$this->repoRoot}/{$oldPath}";
-		exec($command, $output, $return);
-
-		// Write debug to screen if required
-		$this->writeDebug("System command: $command");
-
-		return $return === 0;
-	}
-
-	/**
-	 * Scans a folder for JSON reports
-	 * 
-	 * @param integer $repoId
-	 * @param string $repoPath
-	 * @throws Exception
-	 */
-	protected function scanRepo($repoId, $repoPath)
-	{
-		// Set up iterator to find JSON files
-		$directory = new \RecursiveDirectoryIterator($this->repoRoot . '/' . $repoPath);
-		$iterator = new \RecursiveIteratorIterator($directory);
-		$regex = new \RegexIterator($iterator, '/^.+\.json$/i', \RecursiveRegexIterator::GET_MATCH);
-
-		$this->writeDebug("Finding files in repo:");
-
-		// Keep a log of reports we create/update
-		$reportIds = array();
-
-		try
-		{
-			foreach ($regex as $file)
-			{
-				$reportPath = $file[0];
-				try
-				{
-					$reportIds[] = $this->scanReport($repoId, $reportPath);
-					$this->writeDebug("\tFound report ..." . substr($reportPath, -80));
-				}
-				catch (TrivialException $e)
-				{
-					// Counting trivial exceptions still contributes to failure/stop limit
-					$this->repoLog($repoId, self::LOG_TYPE_SCAN, $e->getMessage(), self::LOG_LEVEL_ERROR_TRIVIAL);
-					$this->doesErrorCountRequireHalting($repoId);
-				}
-				// For serious/other exceptions, rethrow to outer catch
-				catch (\Exception $e)
-				{
-					throw $e;
-				}
-			}
-		}
-		catch (SeriousException $e)
-		{
-			// These errors are always OK to save directly into the log
-			$this->repoLog($repoId, self::LOG_TYPE_SCAN, $e->getMessage(), self::LOG_LEVEL_ERROR_SERIOUS);
-			$this->disableRepo($repoId);
-
-			// Rethrow for benefit of caller
-			throw $e;
-		}
-
-		return $reportIds;
-	}
-
-	/**
-	 * Scans a single report and commits it to the database
-	 * 
-	 * Review the JSON recursion limit, is this OK?
-	 * 
-	 * @param integer $repoId
-	 * @param string $reportPath
-	 * @throws Exception
-	 */
-	protected function scanReport($repoId, $reportPath)
-	{
-		// Unlikely to happen, we just scanned!
-		if (!file_exists($reportPath))
-		{
-			throw new SeriousException('File cannot be found');
-		}
-
-		$size = filesize($reportPath);
-		if ($size > self::MAX_REPORT_SIZE)
-		{
-			throw new \Awooga\Exceptions\FileException('Report of ' . $size . ' bytes is too large');
-		}
-
-		// Let's get this in array form
-		$data = json_decode(file_get_contents($reportPath), true, 4);
-
-		// If this is not an array, throw a trivial exception
-		if (!is_array($data))
-		{
-			throw new TrivialException("Could not parse report into an array");
-		}
-
-		// Parse the data
-		$version = $this->grabElement($data, 'version');
-		$url = $this->grabElement($data, 'url');
-		$issues = $this->grabElement($data, 'issues');
-		// @todo Move these back to var names, or better still move them to setters directly
-		$reportData = array(
-			'title' => $this->grabElement($data, 'title'),
-			'description' => $this->grabElement($data, 'description'),
-			'notified_date' => $this->grabElement($data, 'author_notified_date'),
-		);
-
-		// Handle depending on version
-		switch ($version)
-		{
-			case 1:
-				$report = new Report($repoId);
-				$report->setDriver($this->pdo);
-				$report->setTitle($reportData['title']);
-				$report->setUrl($url);
-				$report->setDescription($reportData['description']);
-				$report->setIssues($issues);
-				$report->setAuthorNotifiedDate($reportData['notified_date']);
-				$reportId = $report->save();
-				
-				// This will only be called if the above does not throw an exception
-				$this->tryReindexing($report);
-				break;
-			default:
-				throw new TrivialException("Unrecognised version number");
-		}
-
-		return $reportId;
-	}
-
-	/**
-	 * Bomb out if there's been too many errors recently
-	 * 
-	 * @param integer $repoId
-	 */
-	protected function doesErrorCountRequireHalting($repoId)
-	{
-		// If there are too many errors in this run, throw Exceptions\SeriousException
-		$sql = "
-			SELECT COUNT(*) count
-			FROM repository_log
-			WHERE
-				repository_id = :repo_id
-				AND run_id = :run_id
-				AND log_level = :level_trivial
-		";
-		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute(
-			array(
-				':repo_id' => $repoId,
-				':run_id' => $this->runId,
-				':level_trivial' => self::LOG_LEVEL_ERROR_TRIVIAL,
-			)
-		);
-
-		// Make sure the query went ok
-		if (!$ok)
-		{
-			throw new \Exception('Query to count trivial errors did not run');
-		}
-
-		if ($statement->fetchColumn() > self::MAX_FAILS_BEFORE_DISABLE)
-		{
-			throw new SeriousException(
-				"Too many failures with this repo recently, please see log"
-			);
-		}
-	}
-
-	/**
-	 * Disables the specified repo
-	 * 
-	 * @param integer $repoId
-	 */
-	protected function disableRepo($repoId)
-	{
-		$sql = "
-			UPDATE repository
-			SET is_enabled = false
-				WHERE id = :repo_id
-		";
-		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute(array(':repo_id' => $repoId, ));
-		if (!$ok)
-		{
-			throw new \Exception('Failed disabling this repo');
-		}
-
-		return $ok;
-	}
-
-	/**
-	 * Grabs a keyed value from a hash
-	 * 
-	 * @param array $data
-	 * @param string $key
-	 * @return mixed
-	 */
-	protected function grabElement(array $data, $key)
-	{
-		return isset($data[$key]) ? $data[$key] : null;
-	}
-
-	/**
 	 * Readies this repo to be pulled in four hours from now
 	 * 
 	 * Maybe this should be configurable?
@@ -655,18 +441,8 @@ class GitImporter
 		return $failCount;
 	}
 
-	protected function tryReindexing(Report $report)
-	{
-		if ($searcher = $this->getSearcher())
-		{
-			$report->index($searcher);
-		}
-	}
-
 	/**
 	 * Gets the currently set searcher
-	 * 
-	 * Fails silently if no searcher has been set
 	 * 
 	 * @return Searcher
 	 */
@@ -683,58 +459,5 @@ class GitImporter
 	public function setSearcher(Searcher $searcher)
 	{
 		$this->searcher = $searcher;
-	}
-
-	/**
-	 * Logs a message against a repo
-	 * 
-	 * @param integer $repoId
-	 * @param string $logType
-	 * @param string $message
-	 * @param string $logLevel
-	 * @throws \Exception
-	 */
-	protected function repoLog($repoId, $logType, $message = null, $logLevel = self::LOG_LEVEL_SUCCESS)
-	{
-		// Check the type is OK
-		$allowedTypes = array(
-			self::LOG_TYPE_FETCH,
-			self::LOG_TYPE_MOVE,
-			self::LOG_TYPE_SCAN,
-			self::LOG_TYPE_RESCHED,
-		);
-		if (!in_array($logType, $allowedTypes))
-		{
-			throw new \Exception("The supplied type is not valid");
-		}
-
-		$sql = "
-			INSERT INTO repository_log
-			(repository_id, run_id, log_type, message, created_at, log_level)
-			VALUES
-			(:repository_id, :run_id, :log_type, :message, NOW(), :log_level)
-		";
-		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute(
-			array(
-				':repository_id' => $repoId, ':run_id' => $this->runId,
-				':log_type' => $logType, ':message' => $message, ':log_level' => $logLevel,
-			)
-		);
-		if (!$ok)
-		{
-			throw new \Exception('Adding a log message seems to have failed');
-		}
-
-		$successType = ($logLevel == self::LOG_LEVEL_SUCCESS) ? 'success' : 'failure';
-		$this->writeDebug("Adding {$successType} log message for '{$logType}' op");
-	}
-
-	protected function writeDebug($message)
-	{
-		if ($this->debug)
-		{
-			echo $message . "\n";
-		}
 	}
 }

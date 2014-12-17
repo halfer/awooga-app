@@ -12,9 +12,9 @@ class GitImporterTestHarness extends \Awooga\Core\GitImporter
 
 	protected $nextGitFails = false;
 	protected $nextMoveFails = false;
-	protected $reportCount = 0;
 	protected $scanMode = self::SCAN_MODE_NORMAL;
 	protected $checkoutPath;
+	protected $scanner;
 
 	// If on, rethrows any exception after logging
 	protected $failureExceptions = false;
@@ -143,7 +143,7 @@ class GitImporterTestHarness extends \Awooga\Core\GitImporter
 		$ok = parent::scanRepoWithLogging($repoId, $repoPath);
 		if (!$ok && $this->failureExceptions)
 		{
-			throw new \Exception();
+			throw new \Exception('A problem occured in GitImporterTestHarness::scanRepoWithLogging');
 		}
 
 		return $ok;
@@ -188,33 +188,10 @@ class GitImporterTestHarness extends \Awooga\Core\GitImporter
 	{
 		return parent::moveRepo($repoId, $newPath);
 	}
-	/**
-	 * A public entry point for the scan method
-	 * 
-	 * @param integer $repoId
-	 * @param string $repoPath
-	 */
-	public function scanRepo($repoId, $repoPath)
-	{
-		return parent::scanRepo($repoId, $repoPath);
-	}
-
-	/**
-	 * Used to count the reports processed
-	 * 
-	 * @param integer $repoId
-	 * @param string $reportPath
-	 */
-	public function scanReport($repoId, $reportPath)
-	{
-		$this->reportCount++;
-
-		return parent::scanReport($repoId, $reportPath);
-	}
 
 	public function getReportCount()
 	{
-		return $this->reportCount;
+		return $this->scanner->getReportCount();
 	}
 
 	/**
@@ -282,5 +259,12 @@ class GitImporterTestHarness extends \Awooga\Core\GitImporter
 	public function setFailureExceptions($failureExceptions)
 	{
 		$this->failureExceptions = $failureExceptions;
+	}
+
+	protected function getScanner($repoId, $repoRoot)
+	{
+		$this->scanner = new GitScannerTestHarness($this->runId, $repoId, $repoRoot);
+
+		return $this->scanner;
 	}
 }
