@@ -32,14 +32,11 @@ class ReportTest extends TestCase
 	/**
 	 * Make sure null/empty titles are rejected
 	 * 
-	 * @todo Some of these $report vars are unnecessary, use fluent interface
-	 * 
 	 * @expectedException \Awooga\Exceptions\TrivialException
 	 */
 	public function testNoTitle()
 	{
-		$report = $this->getDummyReport();
-		$report->setTitle(null);
+		$this->getDummyReport()->setTitle(null);
 	}
 
 	/**
@@ -49,8 +46,7 @@ class ReportTest extends TestCase
 	 */
 	public function testTitleOfBadType()
 	{
-		$report = $this->getDummyReport();
-		$report->setTitle(null);
+		$this->getDummyReport()->setTitle(null);
 	}
 
 	/**
@@ -60,8 +56,7 @@ class ReportTest extends TestCase
 	 */
 	public function testTitleOfBadTypeAgain()
 	{
-		$report = $this->getDummyReport();
-		$report->setTitle(new \stdClass());
+		$this->getDummyReport()->setTitle(new \stdClass());
 	}
 
 	/**
@@ -97,8 +92,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetArrayContainingEmptyUrls()
 	{
-		$report = $this->getDummyReport();
-		$report->setUrl(
+		$this->getDummyReport()->setUrl(
 			array(
 				'',
 				'http://example.com/two',
@@ -113,8 +107,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetArrayContainingUrlsOfWrongType()
 	{
-		$report = $this->getDummyReport();
-		$report->setUrl(
+		$this->getDummyReport()->setUrl(
 			array(
 				'http://example.com/something',
 				5,
@@ -129,8 +122,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetArrayContainingDuplicateUrls()
 	{
-		$report = $this->getDummyReport();
-		$report->setUrl(
+		$this->getDummyReport()->setUrl(
 			array(
 				'http://example.com/something',
 				'http://example.com/something',
@@ -156,8 +148,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetEmptyDescription()
 	{
-		$report = $this->getDummyReport();
-		$report->setDescription(null);
+		$this->getDummyReport()->setDescription(null);
 	}
 
 	/**
@@ -167,8 +158,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetDescriptionOfBadType()
 	{
-		$report = $this->getDummyReport();
-		$report->setDescription(6);		
+		$this->getDummyReport()->setDescription(6);
 	}
 
 	public function testSetGoodIssues()
@@ -196,8 +186,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetNullIssues()
 	{
-		$report = $this->getDummyReport();
-		$report->setIssues(null);
+		$this->getDummyReport()->setIssues(null);
 	}
 
 	/**
@@ -207,8 +196,7 @@ class ReportTest extends TestCase
 	 */
 	public function testSetEmptyIssueDescription()
 	{
-		$report = $this->getDummyReport();
-		$report->setIssues(array());
+		$this->getDummyReport()->setIssues(array());
 	}
 
 	/**
@@ -219,9 +207,7 @@ class ReportTest extends TestCase
 	public function testSetArrayContainingDuplicateIssues()
 	{
 		// We need the database to access the issue codes
-		$report = $this->buildDatabaseAndGetReport();
-
-		$report->setIssues(
+		$this->buildDatabaseAndGetReport()->setIssues(
 			array(
 				array('issue_cat_code' => 'xss', 'description' => 'Description goes here', ),
 				array('issue_cat_code' => 'xss', 'description' => 'Different description does not matter', ),
@@ -258,12 +244,10 @@ class ReportTest extends TestCase
 	public function testInvalidIssueCatCode()
 	{
 		// We need the database to access the issue codes
-		$report = $this->buildDatabaseAndGetReport();
-
 		$issues = array(
 			array('issue_cat_code' => 'this-does-not-exist', ),
 		);
-		$report->setIssues($issues);
+		$this->buildDatabaseAndGetReport()->setIssues($issues);
 	}
 
 	public function testIssueValidResolvedDate()
