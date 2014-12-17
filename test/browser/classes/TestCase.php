@@ -12,7 +12,7 @@ require_once realpath(__DIR__ . '/../..') . '/traits/BaseTestCase.php';
  * 
  * @method \Openbuildings\Spiderling\Page visit($uri, array $query = array()) Initiate a visit with the currently selected driver
  * @method string content() Return the content of the last request from the currently selected driver
- * @method string current_path Return the current browser url without the domain
+ * @method string current_path() Return the current browser url without the domain
  * @method string current_url() Return the current url
  */
 abstract class TestCase extends \Openbuildings\PHPUnitSpiderling\Testcase_Spiderling

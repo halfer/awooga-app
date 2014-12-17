@@ -47,8 +47,7 @@ class HomeTest extends TestCase
 	 */
 	public function testExampleSearches()
 	{
-		$this->visit(self::DOMAIN);
-		$links = $this->all('form small a[href^="/browse"]');
+		$links = $this->visit(self::DOMAIN)->all('form small a[href^="/browse"]');
 		$this->assertEquals(5, count($links), "Check we have the right number of example searches");
 	}
 
