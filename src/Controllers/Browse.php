@@ -136,9 +136,7 @@ class Browse extends BaseController
 				{$limitClause}
 			";
 		}
-		$statement = $this->getDriver()->prepare($sql);
-		$statement->execute();
 
-		return $statement->fetchAll(\PDO::FETCH_ASSOC);
+		return $this->fetchAll($sql);
 	}
 }

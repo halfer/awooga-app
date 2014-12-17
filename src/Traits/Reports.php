@@ -14,10 +14,8 @@ trait Reports
 			/* Get them in order of creation, first one is regarded as 'primary' */
 			ORDER BY id
 		";
-		$statement = $this->getDriver()->prepare($sql);
-		$statement->execute();
 
-		return $statement->fetchAll(\PDO::FETCH_ASSOC);
+		return $this->fetchAll($sql);
 	}
 
 	protected function getRelatedIssues(array $reportIds)
@@ -35,9 +33,22 @@ trait Reports
 			/* Get them in order of type */
 			ORDER BY r.issue_id
 		";
-		$statement = $this->getDriver()->prepare($sql);
-		$statement->execute();
 
-		return $statement->fetchAll(\PDO::FETCH_ASSOC);
+		return $this->fetchAll($sql);
 	}
+
+	/**
+	 * The database driver must be provided by the trait client
+	 * 
+	 * @return \PDO
+	 */
+	abstract protected function getDriver();
+
+	/**
+	 * This fetch method must be provided by the trait client
+	 * 
+	 * @param string $sql
+	 * @return array
+	 */
+	abstract protected function fetchAll($sql);
 }

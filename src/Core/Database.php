@@ -31,4 +31,19 @@ trait Database
 
 		return $this->pdo;
 	}
+
+	/**
+	 * Returns all rows for the given SQL
+	 * 
+	 * (The callers of this method currently assume it will be successful)
+	 * 
+	 * @return array
+	 */
+	protected function fetchAll($sql)
+	{
+		$statement = $this->getDriver()->prepare($sql);
+		$statement->execute();
+
+		return $statement->fetchAll(\PDO::FETCH_ASSOC);
+	}
 }
