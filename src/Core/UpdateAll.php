@@ -31,11 +31,7 @@ class UpdateAll
 		// Import each repository
 		foreach ($repoRows as $repoRow)
 		{
-			$importer->processRepo(
-				$repoRow['id'],
-				$repoRow['url'],
-				$repoRow['mount_path']
-			);
+			$importer->processRepo($repoRow['id'], $repoRow['url']);
 			if ($sleep)
 			{
 				sleep(2);

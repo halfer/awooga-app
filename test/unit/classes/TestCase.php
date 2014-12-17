@@ -90,8 +90,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	 */
 	protected function runStatement(\PDO $pdo, $sql, array $params)
 	{
-		$statement = $ok = $pdo->prepare($sql);
-		$ok = $statement->execute($params);
+		$statement = $pdo->prepare($sql);
+		$statement->execute($params);
 
 		return $statement;
 	}
