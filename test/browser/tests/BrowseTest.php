@@ -31,12 +31,7 @@ class BrowseTest extends TestCase
 	 */
 	public function testDomainSearch()
 	{
-		$this->
-			visit(self::DOMAIN . '/browse?search=phppot.com')->
-			assertHasCss('#addressSearch[value="phppot.com"]')->
-			assertHasCss('h3:contains("11 results")')->
-			assertHasNoCss('#paginator')
-		;
+		$this->checkSearch('phppot.com', 11);
 	}
 
 	/**
@@ -46,12 +41,7 @@ class BrowseTest extends TestCase
 	 */
 	public function testKeywordSearch()			
 	{
-		$this->
-			visit(self::DOMAIN . '/browse?search=AJAX')->
-			assertHasCss('#addressSearch[value="AJAX"]')->
-			assertHasCss('h3:contains("10 results")')->
-			assertHasNoCss('#paginator')
-		;
+		$this->checkSearch('AJAX', 10);
 	}
 
 	/**
@@ -61,14 +51,7 @@ class BrowseTest extends TestCase
 	 */
 	public function testTitleSearch()
 	{
-		$search = '"Creating a Login System in PHP"';
-		$this->
-			visit(self::DOMAIN . '/browse?search=' . urlencode($search))->
-			// @todo &quot; didn't seem to work here - are literal quotes better?
-			assertHasCss("#addressSearch[value*='$search']")->
-			assertHasCss('h3:contains("1 results")')->
-			assertHasNoCss('#paginator')
-		;
+		$this->checkSearch('"Creating a Login System in PHP"', 1);
 	}
 
 	/**
@@ -78,13 +61,7 @@ class BrowseTest extends TestCase
 	 */
 	public function testUrlSearch()
 	{
-		$search = 'http://www.amitpatil.me/youtube-like-rating-script-jquery-php/';
-		$this->
-			visit(self::DOMAIN . '/browse?search=' . urlencode($search))->
-			assertHasCss("#addressSearch[value*='$search']")->
-			assertHasCss('h3:contains("1 results")')->
-			assertHasNoCss('#paginator')
-		;
+		$this->checkSearch('http://www.amitpatil.me/youtube-like-rating-script-jquery-php/', 1);
 	}
 
 	/**
@@ -94,11 +71,24 @@ class BrowseTest extends TestCase
 	 */
 	public function testIssueSearch()
 	{
+		$this->checkSearch('sql-injection', 23, true);
+	}
+
+	/**
+	 * Generalised method to check if the search module is working
+	 * 
+	 * @param string $search
+	 * @param integer $expectedResults
+	 * @param boolean $hasPaginator
+	 */
+	protected function checkSearch($search, $expectedResults, $hasPaginator = false)
+	{
+		$assertHasPaginator = $hasPaginator ? 'assertHasCss' : 'assertHasNoCss';
 		$this->
-			visit(self::DOMAIN . '/browse?search=sql-injection')->
-			assertHasCss("#addressSearch[value='sql-injection']")->
-			assertHasCss('h3:contains("23 results")')->
-			assertHasCss('#paginator')
-		;		
+			visit(self::DOMAIN . '/browse?search=' . urlencode($search))->
+			assertHasCss("#addressSearch[value*='$search']")->
+			assertHasCss("h3:contains('$expectedResults results')")->
+			$assertHasPaginator('#paginator')
+		;
 	}
 }
