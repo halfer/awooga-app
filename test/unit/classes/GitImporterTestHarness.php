@@ -16,6 +16,9 @@ class GitImporterTestHarness extends \Awooga\Core\GitImporter
 	protected $scanMode = self::SCAN_MODE_NORMAL;
 	protected $checkoutPath;
 
+	// If on, rethrows any exception after logging
+	protected $failureExceptions = false;
+
 	public function makeGitFail()
 	{
 		$this->nextGitFails = true;
@@ -87,6 +90,50 @@ class GitImporterTestHarness extends \Awooga\Core\GitImporter
 	public function setScanMode($scanMode)
 	{
 		$this->scanMode = $scanMode;
+	}
+
+	public function cloneRepoWithLogging($repoId, $url)
+	{
+		$result = parent::cloneRepoWithLogging($repoId, $url);
+		if ($result === false && $this->failureExceptions)
+		{
+			throw new \Exception();
+		}
+
+		return $result;
+	}
+
+	public function moveRepoWithLogging($repoId, $newPath)
+	{
+		$ok = parent::moveRepoWithLogging($repoId, $newPath);
+		if (!$ok && $this->failureExceptions)
+		{
+			throw new \Exception();
+		}
+
+		return $ok;
+	}
+
+	public function scanRepoWithLogging($repoId, $repoPath)
+	{
+		$ok = parent::scanRepoWithLogging($repoId, $repoPath);
+		if (!$ok && $this->failureExceptions)
+		{
+			throw new \Exception();
+		}
+
+		return $ok;
+	}
+
+	public function rescheduleRepoWithLogging($repoId, $wasSuccessful)
+	{
+		$ok = parent::rescheduleRepoWithLogging($repoId, $wasSuccessful);
+		if (!$ok && $this->failureExceptions)
+		{
+			throw new \Exception();
+		}
+
+		return $ok;		
 	}
 
 	/**
@@ -193,5 +240,15 @@ class GitImporterTestHarness extends \Awooga\Core\GitImporter
 	public function setCheckoutPath($checkoutPath)
 	{
 		$this->checkoutPath = $checkoutPath;
+	}
+
+	/**
+	 * Useful for ensuring that tests don't fail silently
+	 * 
+	 * @param boolean $failureExceptions
+	 */
+	public function setFailureExceptions($failureExceptions)
+	{
+		$this->failureExceptions = $failureExceptions;
 	}
 }
