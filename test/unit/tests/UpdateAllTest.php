@@ -132,10 +132,10 @@ class UpdateAllTest extends TestCase
 	{
 		// Create repos, and then disable half of them
 		$updater = $this->setupReposToProcess();
-		$statement = $this->getDriver()->prepare(
+		$this->runStatement(
+			$this->getDriver(),
 			"UPDATE repository SET is_enabled = 0 WHERE id <= 5"
 		);
-		$statement->execute();
 
 		// Ensure only half of the repos are returned as due
 		list(, $repoRows) = $updater->getNextRepos(10);

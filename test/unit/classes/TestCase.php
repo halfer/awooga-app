@@ -88,7 +88,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	 * @param array $params
 	 * @return \PDOStatement
 	 */
-	protected function runStatement(\PDO $pdo, $sql, array $params)
+	protected function runStatement(\PDO $pdo, $sql, array $params = array())
 	{
 		$statement = $pdo->prepare($sql);
 		$statement->execute($params);
@@ -96,7 +96,16 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 		return $statement;
 	}
 
-	protected function runStatementWithException(\PDO $pdo, $sql, array $params)
+	/**
+	 * Runs SQL, throwing an error if it does not exist, and returns the statement object
+	 * 
+	 * @param \PDO $pdo
+	 * @param string $sql
+	 * @param array $params
+	 * @return \PDOStatement
+	 * @throws \Exception
+	 */
+	protected function runStatementWithException(\PDO $pdo, $sql, array $params = array())
 	{
 		$statement = $pdo->prepare($sql);
 		$ok = $statement->execute($params);

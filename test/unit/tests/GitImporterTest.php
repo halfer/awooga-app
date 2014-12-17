@@ -642,8 +642,7 @@ class GitImporterTest extends TestCase
 			WHERE repository_id = :repo_id
 			ORDER BY id
 		";
-		$statement = $this->getDriver()->prepare($sql);
-		$statement->execute(array(':repo_id' => $repoId, ));
+		$statement = $this->runStatement($this->getDriver(), $sql, array(':repo_id' => $repoId, ));
 		$logs = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
 		return $logs;
