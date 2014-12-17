@@ -120,12 +120,6 @@ class GitImporter
 				self::LOG_LEVEL_ERROR_SERIOUS
 			);
 
-			// Rethrow exception on failure, if requested
-			if ($this->failureExceptions)
-			{
-				throw $e;
-			}
-
 			return false;
 		}
 
