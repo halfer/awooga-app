@@ -145,7 +145,7 @@ class UpdateAllTest extends TestCase
 			"Ensure disabled repos are not processed"
 		);
 
-		$this->cleanupTemporaryRepos();
+		//$this->cleanupTemporaryRepos();
 	}
 
 	/**
@@ -160,7 +160,7 @@ class UpdateAllTest extends TestCase
 		// Let's examine some logs here to see if it worked
 		$this->checkLogsGenerated(40, 0, 0);
 
-		$this->cleanupTemporaryRepos();
+		//$this->cleanupTemporaryRepos();
 	}
 
 	/**
@@ -193,7 +193,7 @@ class UpdateAllTest extends TestCase
 			"Ensure repos become due later"
 		);
 
-		$this->cleanupTemporaryRepos();
+		//$this->cleanupTemporaryRepos();
 	}
 
 	/**
@@ -229,8 +229,10 @@ class UpdateAllTest extends TestCase
 	/**
 	 * Deletes repositories that have just been created
 	 */
+	/*
 	protected function cleanupTemporaryRepos()
 	{
 		// @todo Needs implementing
 	}
+	*/
 }
