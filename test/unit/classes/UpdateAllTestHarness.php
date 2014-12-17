@@ -11,12 +11,19 @@ class UpdateAllTestHarness extends \Awooga\Core\UpdateAll
 
 	/**
 	 * Public entry point for the run create method
+	 * 
+	 * @return integer Run ID
 	 */
 	public function createRun()
 	{
 		return parent::createRun();
 	}
 
+	/**
+	 * Injects the importer object for this module
+	 * 
+	 * @param \Awooga\Core\GitImporter $importer
+	 */
 	public function setImporter(\Awooga\Core\GitImporter $importer)
 	{
 		$this->importer = $importer;
@@ -34,6 +41,8 @@ class UpdateAllTestHarness extends \Awooga\Core\UpdateAll
 
 	/**
 	 * Return the date/time in string format, taking into account the offset
+	 * 
+	 * @return string
 	 */
 	protected function getCurrentDateTime()
 	{
