@@ -92,6 +92,14 @@ class GitImporterTestHarness extends \Awooga\Core\GitImporter
 		$this->scanMode = $scanMode;
 	}
 
+	/**
+	 * Similar to the parent, but can throw an exception
+	 * 
+	 * @param integer $repoId
+	 * @param string $url
+	 * @return string
+	 * @throws \Exception
+	 */
 	public function cloneRepoWithLogging($repoId, $url)
 	{
 		$result = parent::cloneRepoWithLogging($repoId, $url);
@@ -103,6 +111,14 @@ class GitImporterTestHarness extends \Awooga\Core\GitImporter
 		return $result;
 	}
 
+	/**
+	 * Similar to the parent, but can throw an exception
+	 * 
+	 * @param integer $repoId
+	 * @param string $newPath
+	 * @return boolean
+	 * @throws \Exception
+	 */
 	public function moveRepoWithLogging($repoId, $newPath)
 	{
 		$ok = parent::moveRepoWithLogging($repoId, $newPath);
@@ -114,6 +130,14 @@ class GitImporterTestHarness extends \Awooga\Core\GitImporter
 		return $ok;
 	}
 
+	/**
+	 * Similar to the parent, but can throw an exception
+	 * 
+	 * @param integer $repoId
+	 * @param string $repoPath
+	 * @return boolean
+	 * @throws \Exception
+	 */
 	public function scanRepoWithLogging($repoId, $repoPath)
 	{
 		$ok = parent::scanRepoWithLogging($repoId, $repoPath);
@@ -125,6 +149,14 @@ class GitImporterTestHarness extends \Awooga\Core\GitImporter
 		return $ok;
 	}
 
+	/**
+	 * Similar to the parent, but can throw an exception
+	 * 
+	 * @param integer $repoId
+	 * @param string $wasSuccessful
+	 * @return boolean
+	 * @throws \Exception
+	 */
 	public function rescheduleRepoWithLogging($repoId, $wasSuccessful)
 	{
 		$ok = parent::rescheduleRepoWithLogging($repoId, $wasSuccessful);
