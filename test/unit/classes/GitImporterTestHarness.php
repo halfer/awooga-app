@@ -153,7 +153,7 @@ class GitImporterTestHarness extends \Awooga\Core\GitImporter
 	 * Similar to the parent, but can throw an exception
 	 * 
 	 * @param integer $repoId
-	 * @param string $wasSuccessful
+	 * @param boolean $wasSuccessful
 	 * @return boolean
 	 * @throws \Exception
 	 */
