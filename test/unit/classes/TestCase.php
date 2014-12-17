@@ -96,6 +96,21 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 		return $statement;
 	}
 
+	protected function runStatementWithException(\PDO $pdo, $sql, array $params)
+	{
+		$statement = $pdo->prepare($sql);
+		$ok = $statement->execute($params);
+
+		if ($ok === false)
+		{
+			throw new \Exception(
+				"Database call failed:" . print_r($statement->errorInfo(), true)
+			);
+		}
+
+		return $statement;		
+	}
+
 	/**
 	 * Returns a new importer instance pointing to the current test repo
 	 * 

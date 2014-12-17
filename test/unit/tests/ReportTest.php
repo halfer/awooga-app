@@ -32,6 +32,8 @@ class ReportTest extends TestCase
 	/**
 	 * Make sure null/empty titles are rejected
 	 * 
+	 * @todo Some of these $report vars are unnecessary, use fluent interface
+	 * 
 	 * @expectedException \Awooga\Exceptions\TrivialException
 	 */
 	public function testNoTitle()
@@ -405,14 +407,11 @@ class ReportTest extends TestCase
 		);
 
 		// Check issues
-		$statement = $pdo->prepare($this->getRetrieveIssuesSql());
-		$ok = $statement->execute(array(':repo_id' => $report->getId(), ));
-		if ($ok === false)
-		{
-			throw new \Exception(
-				"Database call failed:" . print_r($statement->errorInfo(), true)
-			);
-		}
+		$statement = $this->runStatementWithException(
+			$pdo,
+			$this->getRetrieveIssuesSql(),
+			array(':repo_id' => $report->getId(), )
+		);
 
 		$issuesData = $statement->fetchAll(\PDO::FETCH_ASSOC);
 		foreach ($issuesData as $issueData)
@@ -427,14 +426,11 @@ class ReportTest extends TestCase
 		}
 
 		// Check urls
-		$statement2 = $pdo->prepare($this->getRetrieveUrlsSql());
-		$ok2 = $statement2->execute(array(':repo_id' => $report->getId(), ));
-		if ($ok2 === false)
-		{
-			throw new \Exception(
-				"Database call failed:" . print_r($statement->errorInfo(), true)
-			);
-		}
+		$statement2 = $this->runStatementWithException(
+			$pdo,
+			$this->getRetrieveUrlsSql(),
+			array(':repo_id' => $report->getId(), )
+		);
 
 		$urlsData = $statement2->fetchAll(\PDO::FETCH_ASSOC);
 		foreach ($urlsData as $urlData)
@@ -518,8 +514,11 @@ class ReportTest extends TestCase
 				repository_id = :repo_id
 				AND author_notified_at IS NULL
 		";
-		$statement = $this->getDriver()->prepare($sql);
-		$statement->execute(array('repo_id' => $report->getId(), ));
+		$statement=  $this->runStatement(
+			$this->getDriver(),
+			$sql,
+			array('repo_id' => $report->getId(), )
+		);
 		$this->assertEquals(1, $statement->rowCount());
 	}
 
@@ -632,14 +631,11 @@ class ReportTest extends TestCase
 		$report2->save();
 
 		// Get the reports for this repo
-		$statement = $pdo->prepare($this->getRetrieveIssuesSql());
-		$ok = $statement->execute(array(':repo_id' => $repoId, ));
-		if ($ok === false)
-		{
-			throw new \Exception(
-				"Database call failed:" . print_r($statement->errorInfo(), true)
-			);
-		}
+		$statement = $this->runStatementWithException(
+			$pdo,
+			$this->getRetrieveIssuesSql(),
+			array(':repo_id' => $repoId, )
+		);
 
 		// Ensure we only have one report
 		$issuesData = $statement->fetchAll(\PDO::FETCH_ASSOC);
