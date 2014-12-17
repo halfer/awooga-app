@@ -14,6 +14,7 @@ require_once realpath(__DIR__ . '/../..') . '/traits/BaseTestCase.php';
  * @method string content() Return the content of the last request from the currently selected driver
  * @method string current_path() Return the current browser url without the domain
  * @method string current_url() Return the current url
+ * @method \Openbuildings\Spiderling\Functest_Node assertHasCss($node, $selector, array $filters = array(), $message = NULL)
  */
 abstract class TestCase extends \Openbuildings\PHPUnitSpiderling\Testcase_Spiderling
 {
