@@ -7,6 +7,7 @@ class UpdateAll
 	protected $importer;
 
 	use Database;
+	use \Awooga\Traits\Runner;
 
 	/**
 	 * Constructor for this class
@@ -112,11 +113,12 @@ class UpdateAll
 				)
 			LIMIT $intLimit
 		";
-		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute(
+		$statement = $this->runStatement(
+			$this->getDriver(),
+			$sql,
 			array(':repo_id' => $fromRepoId, ':now' => $this->getCurrentDateTime(), )
 		);
-		if (!$ok)
+		if ($statement === false)
 		{
 			// @todo Throw an exception here please
 			print_r($statement->errorInfo(), true);
@@ -145,10 +147,12 @@ class UpdateAll
 				)
 			LIMIT $intLimit
 		";
-		$statement = $this->getDriver()->prepare($sql);
-		$statement->execute(array(':now' => $this->getCurrentDateTime(), ));
 
-		return $statement->fetchAll(\PDO::FETCH_ASSOC);
+		return $this->fetchResults(
+			$this->getDriver(),
+			$sql,
+			array(':now' => $this->getCurrentDateTime(), )
+		);
 	}
 
 	/**
@@ -158,22 +162,16 @@ class UpdateAll
 	 */
 	protected function createRun()
 	{
-		$sql = "
-			INSERT INTO run
-			(created_at)
-			VALUES (:created_at)
-		";
 		$pdo = $this->getDriver();
-		$statement = $pdo->prepare($sql);
-		$ok = $statement->execute(
+		$statement = $this->runStatement(
+			$pdo,
+			"INSERT INTO run (created_at) VALUES (:created_at)",
 			array(':created_at' => $this->getCurrentDateTime(), )
 		);
 
-		if (!$ok)
+		if ($statement === false)
 		{
-			throw new \Exception(
-				"Run could not be created"
-			);
+			throw new \Exception("Run could not be created");
 		}
 
 		return $pdo->lastInsertId();

@@ -37,6 +37,8 @@ trait Database
 	 * 
 	 * (The callers of this method currently assume it will be successful)
 	 * 
+	 * @todo This duplicates Runner->fetchResults, decide which one we are keeping!
+	 * 
 	 * @return array
 	 */
 	protected function fetchAll($sql)
