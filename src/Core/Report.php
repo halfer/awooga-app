@@ -16,6 +16,7 @@ class Report
 	protected $notifiedDate;
 
 	use Database;
+	use \Awooga\Traits\Runner;
 
 	/**
 	 * Creates this report and attaches it to a specific repo ID
@@ -215,14 +216,12 @@ class Report
 	 */
 	protected function validateIssueCatCode($catCode)
 	{
-		$sql = "
-			SELECT 1 FROM
-			issue
-			WHERE code = :issue_code
-		";
-		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute(array(':issue_code' => $catCode, ));
-		if (!$ok)
+		$statement = $this->runStatement(
+			$this->getDriver(),
+			"SELECT 1 FROM issue WHERE code = :issue_code",
+			array(':issue_code' => $catCode, )
+		);
+		if ($statement === false)
 		{
 			throw new \Exception();
 		}
@@ -330,16 +329,15 @@ class Report
 	{
 		// For extra safety
 		$tableUntainted = preg_replace('/[^A-Z_]/i', '', $table);
-		
-		$sql = "
-			DELETE FROM {$tableUntainted}
-			WHERE report_id = :report_id
-		";
-		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute(array(':report_id' => $reportId, ));
+
+		$statement = $this->runStatement(
+			$this->getDriver(),
+			"DELETE FROM {$tableUntainted} WHERE report_id = :report_id",
+			array(':report_id' => $reportId, )
+		);
 
 		// Bork if there is an issue
-		if ($ok === false)
+		if ($statement === false)
 		{
 			throw new \Awooga\Exceptions\SeriousException(
 				"Could not delete rows from $tableUntainted"
@@ -456,6 +454,8 @@ class Report
 			(report_id, description, description_html, issue_id, resolved_at)
 			VALUES (:report_id, :description, :description_html, :issue_id, :resolved_at)
 		";
+		$statement = $this->getDriver()->prepare($sql);
+
 		foreach ($this->issues as &$issue)
 		{
 			$description = isset($issue['description']) && $issue['description'] ?
@@ -472,13 +472,14 @@ class Report
 				':description_html' => $issue['description_html'],
 				':resolved_at' => $resolvedAt,
 			);
-			$statement = $this->getDriver()->prepare($sql);
 			$statement->execute($params);
 		}
 	}
 
 	/**
 	 * Converts an issue code into an ID
+	 * 
+	 * @todo Rewrite using Runner->fetchColumn
 	 * 
 	 * @param string $code
 	 * @return string
