@@ -36,5 +36,4 @@ class GitScannerTestHarness extends \Awooga\Core\GitScanner
 	{
 		return parent::deleteOldRepo($oldPath);
 	}
-
 }

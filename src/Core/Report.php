@@ -15,7 +15,7 @@ class Report
 	protected $issues;
 	protected $notifiedDate;
 
-	use Database;
+	use \Awooga\Traits\Database;
 	use \Awooga\Traits\Runner;
 
 	/**

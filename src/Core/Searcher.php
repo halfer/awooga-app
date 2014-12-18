@@ -7,7 +7,7 @@ class Searcher
 	protected $verbose;
 	protected $index;
 
-	use \Awooga\Core\Database;
+	use \Awooga\Traits\Database;
 
 	public function __construct($verbose = false)
 	{

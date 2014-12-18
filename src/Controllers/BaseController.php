@@ -12,7 +12,7 @@ abstract class BaseController
 	protected $engine;
 	protected $pageTitle;
 
-	use \Awooga\Core\Database;
+	use \Awooga\Traits\Database;
 
 	public function __construct(Slim $slim, Engine $engine)
 	{

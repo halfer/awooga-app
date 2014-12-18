@@ -6,7 +6,7 @@ class UpdateAll
 {
 	protected $importer;
 
-	use Database;
+	use \Awooga\Traits\Database;
 	use \Awooga\Traits\Runner;
 
 	/**

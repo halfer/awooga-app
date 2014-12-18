@@ -19,7 +19,7 @@ class BaseGitImporter
 	protected $runId;
 	protected $debug = false;
 
-	use Database;
+	use \Awooga\Traits\Database;
 
 	/**
 	 * Deletes a folder from the filing system

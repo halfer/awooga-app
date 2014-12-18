@@ -1,6 +1,6 @@
 <?php
 
-namespace Awooga\Core;
+namespace Awooga\Traits;
 
 trait Database
 {

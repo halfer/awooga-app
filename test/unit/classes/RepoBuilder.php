@@ -4,7 +4,7 @@ namespace Awooga\Testing\Unit;
 
 class RepoBuilder
 {
-	use \Awooga\Core\Database;
+	use \Awooga\Traits\Database;
 
 	/**
 	 * Creates a dummy repo account
