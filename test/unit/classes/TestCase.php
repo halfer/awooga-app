@@ -68,14 +68,15 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	 * 
 	 * @param \PDO $pdo Database connection
 	 * @param string $repoRoot Fully-qualified path to repository (optional)
+	 * @param integer $runId
 	 * @return GitImporterTestHarness
 	 */
-	protected function getImporterInstance(\PDO $pdo = null, $repoRoot = null)
+	protected function getImporterInstance(\PDO $pdo = null, $repoRoot = null, $runId = 1)
 	{
 		$importer = new GitImporterTestHarness(
 			is_null($repoRoot) ? $this->getTestRepoRoot() : $repoRoot
 		);
-		$importer->setRunId(1);
+		$importer->setRunId($runId);
 		if ($pdo)
 		{
 			$importer->setDriver($pdo);
@@ -94,13 +95,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	 */
 	protected function getImporterInstanceWithRun(\PDO $pdo, $runId, $repoRoot = null)
 	{
-		$importer = new GitImporterTestHarness(
-			is_null($repoRoot) ? $this->getTestRepoRoot() : $repoRoot
-		);
-		$importer->setDriver($pdo);
-		$importer->setRunId($runId);
-
-		return $importer;
+		return $this->getImporterInstance($pdo, $repoRoot, $runId);
 	}
 
 	/**
