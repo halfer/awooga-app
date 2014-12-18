@@ -10,6 +10,8 @@ class GitImporter extends BaseGitImporter
 {
 	protected $searcher;
 
+	use \Awooga\Traits\Runner;
+
 	/**
 	 * Constructs an importer object
 	 * 
@@ -291,17 +293,17 @@ class GitImporter extends BaseGitImporter
 	protected function moveRepo($repoId, $newPath)
 	{
 		// Get the old path
-		$statementRead = $this->getDriver()->prepare(
-			$sql = "SELECT mount_path FROM repository WHERE id = :repo_id"
+		$oldPath = $this->fetchColumn(
+			$this->getDriver(),
+			"SELECT mount_path FROM repository WHERE id = :repo_id",
+			array(':repo_id' => $repoId, )
 		);
-		$okRead = $statementRead->execute(array(':repo_id' => $repoId, ));
-		$oldPath = $statementRead->fetchColumn();
 
 		// Update the row with the new location
 		$okWrite = $this->updateMountPath($repoId, $newPath);
 
-		// Let's bork if either of the queries failed
-		if (!$okRead || !$okWrite)
+		// Let's bork if the mount failed
+		if (!$okWrite)
 		{
 			throw new SeriousException("Updating the repo path failed");
 		}
@@ -331,11 +333,11 @@ class GitImporter extends BaseGitImporter
 	 */
 	public function updateMountPath($repoId, $newPath)
 	{
-		$statement = $this->getDriver()->prepare(
-			"UPDATE repository SET mount_path = :path WHERE id = :repo_id"
+		return $this->runStatement(
+			$this->getDriver(),
+			"UPDATE repository SET mount_path = :path WHERE id = :repo_id",
+			array(':path' => $newPath, ':repo_id' => $repoId, )
 		);
-
-		return $statement->execute(array(':path' => $newPath, ':repo_id' => $repoId, ));		
 	}
 
 	/**
@@ -355,15 +357,12 @@ class GitImporter extends BaseGitImporter
 				SET due_at = NOW() + INTERVAL :time_minutes MINUTE
 				WHERE id = :repo_id
 		";
-		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute(
-			array(
-				':repo_id' => $repoId,
-				':time_minutes' => $minutes,
-			)
-		);
 
-		return $ok;
+		return $this->runStatement(
+			$this->getDriver(),
+			$sql,
+			array(':repo_id' => $repoId, ':time_minutes' => $minutes, )
+		);
 	}
 
 	/**
@@ -380,7 +379,7 @@ class GitImporter extends BaseGitImporter
 	}
 
 	/**
-	 * Counts the number of recent consectuve serious failures in the logs
+	 * Counts the number of recent consecutive serious failures in the logs
 	 * 
 	 * @param integer $repoId
 	 */
