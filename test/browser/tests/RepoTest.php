@@ -10,6 +10,8 @@ class RepoTest extends TestCase
 	/**
 	 * Ensure the count is correct for this repo
 	 * 
+	 * @todo Need a page title test
+	 * 
 	 * @driver phantomjs
 	 */
 	public function testRepos()

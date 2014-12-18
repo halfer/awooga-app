@@ -4,10 +4,10 @@ namespace Awooga\Controllers;
 
 class About extends BaseController
 {
+	protected $pageTitle = 'About';
+
 	public function execute()
 	{
-		$this->setPageTitle("About");
-
 		echo $this->render('about');
 	}
 

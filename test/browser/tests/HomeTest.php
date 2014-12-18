@@ -10,6 +10,8 @@ class HomeTest extends TestCase
 	/**
 	 * Ensure the menus and footers look OK
 	 * 
+	 * @todo Need a page title test
+	 * 
 	 * @driver phantomjs
 	 */
 	public function testBasicPageShape()

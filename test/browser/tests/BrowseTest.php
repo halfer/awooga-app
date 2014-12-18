@@ -10,6 +10,8 @@ class BrowseTest extends TestCase
 	/**
 	 * General table browsing
 	 * 
+	 * @todo Need a page title test
+	 * 
 	 * @driver phantomjs
 	 */
 	public function testBrowse()

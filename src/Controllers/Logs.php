@@ -6,14 +6,13 @@ class Logs extends PaginatedController
 {
 	protected $baseTable = 'repository_log';
 	protected $menuSlug = 'logs';
+	protected $pageTitle = 'Import logs';
 
 	/**
 	 * Controller for logs screen
 	 */
 	public function execute()
 	{
-		$this->setPageTitle("Import logs");
-
 		echo $this->getPaginatedRender('logs', 20);
 	}
 

@@ -10,6 +10,7 @@ abstract class BaseController
 {
 	protected $slim;
 	protected $engine;
+	protected $pageTitle;
 
 	use \Awooga\Core\Database;
 
@@ -71,6 +72,12 @@ abstract class BaseController
 	{
 		$values['selectedMenu'] = $this->getMenuSlug();
 		$values['countData'] = $this->getCounts();
+
+		// Inject static title if one is set
+		if ($this->pageTitle)
+		{
+			$this->setPageTitle($this->pageTitle);
+		}
 
 		return $this->getEngine()->render($name, $values);
 	}

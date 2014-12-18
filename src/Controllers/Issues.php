@@ -6,14 +6,13 @@ class Issues extends PaginatedController
 {
 	protected $baseTable = 'issue';
 	protected $menuSlug = 'issues';
+	protected $pageTitle = 'Issue types';
 
 	/**
 	 * Controller for report browsing
 	 */
 	public function execute()
 	{
-		$this->setPageTitle("Issue types");
-
 		// Render the reports
 		echo $this->getPaginatedRender('issues', 20);
 	}

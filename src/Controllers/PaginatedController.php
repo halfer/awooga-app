@@ -7,7 +7,7 @@ abstract class PaginatedController extends BaseController
 	protected $baseTable;
 	protected $menuSlug;
 
-	// @todo Can the trait methods just be merged into this controller?
+	// These are separated out, as some paginated controllers don't use PaginatedController
 	use \Awooga\Traits\Pagination;
 
 	/**

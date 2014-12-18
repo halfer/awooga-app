@@ -8,6 +8,7 @@ class Browse extends BaseController
 	use \Awooga\Traits\Reports;
 
 	protected $searchKeys;
+	protected $pageTitle = 'Browse reports';
 
 	/**
 	 * Controller for report browsing
@@ -34,8 +35,6 @@ class Browse extends BaseController
 
 		// Redirects if the page number is invalid, fetches rows
 		$reports = $this->validatePageAndGetRows($pageSize = 20);
-
-		$this->setPageTitle("Browse reports");
 
 		// Render the reports
 		$rowCount = $this->getRowCount();

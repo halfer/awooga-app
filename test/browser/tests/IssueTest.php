@@ -10,6 +10,8 @@ class IssueTest extends TestCase
 	/**
 	 * Check the issues table works
 	 * 
+	 * @todo Need a page title test
+	 * 
 	 * @driver phantomjs
 	 */
 	public function testIssues()
