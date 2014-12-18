@@ -2,9 +2,10 @@
 
 namespace Awooga\Controllers;
 
-class Issues extends BaseController
+class Issues extends PaginatedController
 {
-	use \Awooga\Traits\Pagination;
+	protected $baseTable = 'issue';
+	protected $menuSlug = 'issues';
 
 	/**
 	 * Controller for report browsing
@@ -15,16 +16,6 @@ class Issues extends BaseController
 
 		// Render the reports
 		echo $this->getPaginatedRender('issues', 20);
-	}
-
-	protected function setRowCount()
-	{
-		$this->baseSetRowCount('issue');
-	}
-
-	protected function getMenuSlug()
-	{
-		return 'issues';
 	}
 
 	protected function getPaginatedRows($pageSize)

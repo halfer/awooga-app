@@ -2,9 +2,10 @@
 
 namespace Awooga\Controllers;
 
-class Repos extends BaseController
+class Repos extends PaginatedController
 {
-	use \Awooga\Traits\Pagination;
+	protected $baseTable = 'repository';
+	protected $menuSlug = 'repos';
 
 	/**
 	 * Controller for repos screen
@@ -30,15 +31,5 @@ class Repos extends BaseController
 		";
 
 		return $this->baseGetPaginatedRows($sql, $pageSize);
-	}
-
-	protected function setRowCount()
-	{
-		$this->baseSetRowCount('repository');
-	}
-
-	protected function getMenuSlug()
-	{
-		return 'repos';
 	}
 }

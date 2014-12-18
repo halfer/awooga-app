@@ -2,9 +2,10 @@
 
 namespace Awooga\Controllers;
 
-class Logs extends BaseController
+class Logs extends PaginatedController
 {
-	use \Awooga\Traits\Pagination;
+	protected $baseTable = 'repository_log';
+	protected $menuSlug = 'logs';
 
 	/**
 	 * Controller for logs screen
@@ -18,22 +19,9 @@ class Logs extends BaseController
 
 	protected function getPaginatedRows($pageSize)
 	{
-		$sql = "
-			SELECT *
-			FROM repository_log
-			ORDER BY id DESC
-		";
-
-		return $this->baseGetPaginatedRows($sql, $pageSize);
-	}
-
-	protected function setRowCount()
-	{
-		$this->baseSetRowCount('repository_log');
-	}
-
-	protected function getMenuSlug()
-	{
-		return 'logs';
+		return $this->baseGetPaginatedRows(
+			"SELECT * FROM repository_log ORDER BY id DESC",
+			$pageSize
+		);
 	}
 }
