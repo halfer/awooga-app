@@ -157,27 +157,45 @@ class Searcher
 			}
 
 			// Is there a www part?
-			$count = 0;
-			$noWwwHost = preg_replace('/^www\./', '', $host, 1, $count);
-			if ($count)
+			$urls = array_merge($urls, $this->fetchNonWwwUrls($scheme, $host, $path));
+		}
+
+		return $urls;
+	}
+
+	/**
+	 * For an URL composed of these parts, return non-www forms
+	 * 
+	 * @param string $scheme
+	 * @param string $host
+	 * @param string $path
+	 * @param array Extra URLs to add to the list
+	 */
+	protected function fetchNonWwwUrls($scheme, $host, $path)
+	{
+		$urls = array();
+		$count = 0;
+
+		// See if there is a www to strip from the URL
+		$noWwwHost = preg_replace('/^www\./', '', $host, 1, $count);
+		if ($count)
+		{
+			// Add the non-www host on its own
+			$urls[] = $noWwwHost;
+
+			if ($scheme)
 			{
-				// Add the non-www host on its own
-				$urls[] = $noWwwHost;
-
-				if ($scheme)
-				{
-					$urls[] = $scheme . '://' . $noWwwHost;
-
-					if ($path)
-					{
-						$urls[] = $scheme . '://' . $noWwwHost . $path;
-					}
-				}
+				$urls[] = $scheme . '://' . $noWwwHost;
 
 				if ($path)
 				{
-					$urls[] = $noWwwHost . $path;
+					$urls[] = $scheme . '://' . $noWwwHost . $path;
 				}
+			}
+
+			if ($path)
+			{
+				$urls[] = $noWwwHost . $path;
 			}
 		}
 
