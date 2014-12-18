@@ -2,22 +2,8 @@
 
 namespace Awooga\Testing\Unit;
 
-// Load the parent relative to dir location
-require_once realpath(__DIR__ . '/..') . '/classes/TestCase.php';
-
 class SearcherTest extends TestCase
 {
-	/**
-	 * Loads the classes we need
-	 */
-	public function setUp()
-	{
-		parent::setUp();
-
-		$root = $this->getProjectRoot();
-		require_once $root . '/test/unit/classes/SearcherTestHarness.php';
-	}
-
 	public function testQuotedExplode()
 	{
 		$searcher = new SearcherTestHarness();

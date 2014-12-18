@@ -2,8 +2,6 @@
 
 namespace Awooga\Core;
 
-require_once 'BaseGitImporter.php';
-
 use \Awooga\Exceptions\SeriousException;
 use \Awooga\Exceptions\TrivialException;
 

@@ -2,22 +2,8 @@
 
 namespace Awooga\Testing\Unit;
 
-// Load the parent relative to dir location
-require_once realpath(__DIR__ . '/..') . '/classes/TestCase.php';
-
 class ReportTest extends TestCase
 {
-	/**
-	 * Set-up routine for every test method
-	 */
-	public function setUp()
-	{
-		parent::setUp();
-
-		$root = $this->getProjectRoot();
-		require_once $root . '/test/unit/classes/ReportTestHarness.php';
-	}
-
 	/**
 	 * A test to check that setting a string title is OK
 	 */

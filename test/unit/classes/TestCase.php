@@ -2,23 +2,10 @@
 
 namespace Awooga\Testing\Unit;
 
-// Load the parent relative to dir location
-require_once realpath(__DIR__ . '/../..') . '/traits/BaseTestCase.php';
-
 abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
 	use \Awooga\Testing\BaseTestCase;
 	use \Awooga\Traits\Runner;
-
-	/**
-	 * Common library loading for all test classes
-	 */
-	public function setUp()
-	{
-		$root = $this->getProjectRoot();
-		require_once $root . '/src/autoload.php';
-		require_once $root . '/test/unit/classes/RepoBuilder.php';
-	}
 
 	/**
 	 * Creates the test database

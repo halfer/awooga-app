@@ -5,24 +5,8 @@ namespace Awooga\Testing\Unit;
 use Awooga\Core\GitImporter;
 use Awooga\Core\GitScanner;
 
-// Load the parent relative to dir location
-require_once realpath(__DIR__ . '/..') . '/classes/TestCase.php';
-
 class GitImporterTest extends TestCase
 {
-	/**
-	 * Loads the classes we need
-	 */
-	public function setUp()
-	{
-		parent::setUp();
-
-		$root = $this->getProjectRoot();
-		require_once $root . '/test/unit/classes/GitImporterTestHarness.php';
-		require_once $root . '/test/unit/classes/GitScannerTestHarness.php';
-		require_once $root . '/test/unit/classes/UpdateAllTestHarness.php';
-	}
-
 	/**
 	 * Checks that an ordinary clone works fine
 	 */

@@ -2,9 +2,6 @@
 
 namespace Awooga\Testing\Browser;
 
-// Load the parent relative to dir location
-require_once realpath(__DIR__ . '/../..') . '/traits/BaseTestCase.php';
-
 /**
  * Let's have some declarations for magic methods
  *
