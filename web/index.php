@@ -22,6 +22,13 @@ $app->get('/about', function() use ($app, $engine)
 	$controller->initAndExecute();
 });
 
+// Auth screen
+$app->get('/auth', function() use ($app, $engine)
+{
+	$controller = new \Awooga\Controllers\Auth($app, $engine);
+	$controller->initAndExecute();
+});
+
 // Set up common front controller for browsing
 $browse = function($page = null) use ($app, $engine)
 {

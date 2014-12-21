@@ -40,6 +40,9 @@
 						<li class="<?php echo $selectedMenu == 'about' ? 'active' : '' ?>">
 							<a href="/about">About</a>
 						</li>
+						<li class="<?php echo $selectedMenu == 'auth' ? 'active' : '' ?>">
+							<a href="/auth">Login</a>
+						</li>
 					</ul>
 					<div class="nav navbar-nav navbar-right">
 						<p class="navbar-text">
