@@ -18,11 +18,7 @@ class Auth extends BaseController
 		$currentUri = $uriFactory->createFromSuperGlobalArray($_SERVER);
 		$currentUri->setQuery('');
 
-		// Get query strings we need
-		session_start();
-		$provider = $this->getProviderName();
-
-		if ($provider == 'github')
+		if ($this->getProviderName() == 'github')
 		{
 			// Just using GitHub at the moment
 			$service = $this->getAuthService($currentUri);

@@ -4,6 +4,9 @@ $root = dirname(__DIR__);
 require_once $root . '/vendor/autoload.php';
 require_once $root . '/src/autoload.php';
 
+// The Slim docs say we have to start a session before creating the Slim app
+session_start();
+
 // Set up the framework and template system (mode comes from SLIM_MODE in vhost)
 $app = new \Slim\Slim();
 $engine = new \League\Plates\Engine($root . '/src/templates');
