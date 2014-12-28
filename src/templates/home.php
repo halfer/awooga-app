@@ -39,7 +39,6 @@
 		id="more-questions"
 		href="/about"
 		class="btn btn-default"
-		alt="More information about this site"
 	>More interesting questions...</a>
 </p>
 
