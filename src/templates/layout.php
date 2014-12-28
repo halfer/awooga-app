@@ -55,7 +55,7 @@
 					<div class="nav navbar-nav navbar-right">
 						<ul class="nav navbar-nav">
 							<li>
-								<a href="report/new">New report</a>
+								<a href="/report/new">New report</a>
 							</li>
 						</ul>
 					</div>
