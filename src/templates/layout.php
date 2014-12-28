@@ -43,20 +43,22 @@
 							<a href="/about">About</a>
 						</li>
 						<?php if ($username): ?>
-							<li>
-								<a href="/logout">Logout <?php echo $this->escape($username) ?></a>
-							</li>
-						<?php else: ?>
-							<li class="<?php echo $selectedMenu == 'auth' ? 'active' : '' ?>">
-								<a href="/auth">Login</a>
+							<li class="<?php echo $selectedMenu == 'new' ? 'active' : '' ?>">
+								<a href="/report/new">New report</a>
 							</li>
 						<?php endif ?>
 					</ul>
 					<div class="nav navbar-nav navbar-right">
 						<ul class="nav navbar-nav">
-							<li>
-								<a href="/report/new">New report</a>
-							</li>
+							<?php if ($username): ?>
+								<li>
+									<a href="/logout">Logout <?php echo $this->escape($username) ?></a>
+								</li>
+							<?php else: ?>
+								<li class="<?php echo $selectedMenu == 'auth' ? 'active' : '' ?>">
+									<a href="/auth">Login</a>
+								</li>
+							<?php endif ?>
 						</ul>
 					</div>
 				</div>
