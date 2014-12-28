@@ -13,6 +13,18 @@ class Auth extends BaseController
 	 */
 	public function execute()
 	{
+		if (!$this->isAuthenticated())
+		{
+			$this->loginProcess();
+		}
+		else
+		{
+			$this->getSlim()->redirect('/');
+		}
+	}
+
+	protected function loginProcess()
+	{
 		// Supply a URI so we can build return addresses
 		$uriFactory = new \OAuth\Common\Http\Uri\UriFactory();
 		$currentUri = $uriFactory->createFromSuperGlobalArray($_SERVER);
@@ -28,13 +40,16 @@ class Auth extends BaseController
 			{
 				// This was a callback request from github, get the token
 				$service->requestAccessToken($code);
-				$result = json_decode($service->request('user/emails'), true);
+				$result = json_decode($service->request('user'), true);
 
 				// Clear intermediate session vars
 				unset($_SESSION['provider']);
 
-				echo 'The first email on your github account is ' . $result[0];
-				exit();
+				if (isset($result['html_url']))
+				{
+					$this->logon($result['html_url']);
+					$this->getSlim()->redirect('/');
+				}
 			}
 			else
 			{
@@ -98,9 +113,9 @@ class Auth extends BaseController
 		return $provider;
 	}
 
-	protected function isAuthenticated()
+	protected function logon($username)
 	{
-		return (boolean) isset($_SESSION['username']);
+		$_SESSION['username'] = $username;
 	}
 
 	public function getMenuSlug()

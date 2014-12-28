@@ -40,9 +40,15 @@
 						<li class="<?php echo $selectedMenu == 'about' ? 'active' : '' ?>">
 							<a href="/about">About</a>
 						</li>
-						<li class="<?php echo $selectedMenu == 'auth' ? 'active' : '' ?>">
-							<a href="/auth">Login</a>
-						</li>
+						<?php if ($username): ?>
+							<li>
+								<a href="/logout">Logout <?php echo $this->escape($username) ?></a>
+							</li>
+						<?php else: ?>
+							<li class="<?php echo $selectedMenu == 'auth' ? 'active' : '' ?>">
+								<a href="/auth">Login</a>
+							</li>
+						<?php endif ?>
 					</ul>
 					<div class="nav navbar-nav navbar-right">
 						<p class="navbar-text">

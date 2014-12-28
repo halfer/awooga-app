@@ -20,16 +20,6 @@ abstract class BaseController
 		$this->engine = $engine;
 	}
 
-	/**
-	 * Gets the Plates engine
-	 * 
-	 * @return \League\Plates\Engine
-	 */
-	protected function getEngine()
-	{
-		return $this->engine;
-	}
-
 	protected function getCounts()
 	{
 		return array(
@@ -72,6 +62,7 @@ abstract class BaseController
 	{
 		$values['selectedMenu'] = $this->getMenuSlug();
 		$values['countData'] = $this->getCounts();
+		$values['username'] = $this->getSignedInUsername();
 
 		// Inject static title if one is set
 		if ($this->pageTitle)
@@ -133,6 +124,21 @@ abstract class BaseController
 		}
 
 		return $pdo;
+	}
+
+	/**
+	 * Returns whether a user is logged on to the current session
+	 * 
+	 * @return boolean
+	 */
+	protected function isAuthenticated()
+	{
+		return (boolean) $this->getSignedInUsername();
+	}
+
+	protected function getSignedInUsername()
+	{
+		return isset($_SESSION['username']) ? $_SESSION['username'] : null;
 	}
 
 	/**
@@ -209,6 +215,26 @@ abstract class BaseController
 		}
 
 		return $configs[$mode][$key];
+	}
+
+	/**
+	 * Gets the app singleton
+	 * 
+	 * @return Slim
+	 */
+	protected function getSlim()
+	{
+		return $this->slim;
+	}
+
+	/**
+	 * Gets the Plates engine
+	 * 
+	 * @return \League\Plates\Engine
+	 */
+	protected function getEngine()
+	{
+		return $this->engine;
 	}
 
 	/**
