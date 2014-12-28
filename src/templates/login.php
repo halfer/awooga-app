@@ -3,4 +3,4 @@
 	array('selectedMenu' => $selectedMenu, 'countData' => $countData, )
 ) ?>
 
-<a href="<?php echo $url ?>">Login with GitHub</a>
+<a href="?provider=github">Login with GitHub</a>
