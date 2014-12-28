@@ -32,6 +32,13 @@ $app->get('/auth', function() use ($app, $engine)
 	$controller->initAndExecute();
 });
 
+// Log out link
+$app->get('/logout', function() use ($app, $engine)
+{
+	$controller = new \Awooga\Controllers\Logout($app, $engine);
+	$controller->initAndExecute();
+});
+
 // Set up common front controller for browsing
 $browse = function($page = null) use ($app, $engine)
 {

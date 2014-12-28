@@ -127,6 +127,20 @@ abstract class BaseController
 	}
 
 	/**
+	 * Logs on the specified username
+	 * 
+	 * @param string $username
+	 */
+	protected function logon($username)
+	{
+		// Prevent session fixation
+		session_regenerate_id();
+
+		// Store the username for cross-referencing with the database
+		$_SESSION['username'] = $username;
+	}
+
+	/**
 	 * Returns whether a user is logged on to the current session
 	 * 
 	 * @return boolean

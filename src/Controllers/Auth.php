@@ -113,11 +113,6 @@ class Auth extends BaseController
 		return $provider;
 	}
 
-	protected function logon($username)
-	{
-		$_SESSION['username'] = $username;
-	}
-
 	public function getMenuSlug()
 	{
 		return 'auth';
