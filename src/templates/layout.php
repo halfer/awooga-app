@@ -26,10 +26,12 @@
 							<a href="/">Awooga</a>
 						</li>
 						<li class="<?php echo $selectedMenu == 'browse' ? 'active' : '' ?>">
-							<a href="/browse">Browse</a>
+							<a href="/browse">Browse
+								<span class="badge"><?php echo $countData['report_count'] ?></span></a>
 						</li>
 						<li class="<?php echo $selectedMenu == 'issues' ? 'active' : '' ?>">
-							<a href="/issues">Issues</a>
+							<a href="/issues">Issues
+								<span class="badge"><?php echo $countData['issue_count'] ?></span></a>
 						</li>
 						<li class="<?php echo $selectedMenu == 'repos' ? 'active' : '' ?>">
 							<a href="/repos">Repositories</a>
@@ -51,10 +53,11 @@
 						<?php endif ?>
 					</ul>
 					<div class="nav navbar-nav navbar-right">
-						<p class="navbar-text">
-							Awooga has <?php echo $countData['issue_count'] ?> issues
-							in <?php echo $countData['report_count'] ?> reports
-						</p>
+						<ul class="nav navbar-nav">
+							<li>
+								<a href="report/new">New report</a>
+							</li>
+						</ul>
 					</div>
 				</div>
 			</nav>
