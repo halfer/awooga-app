@@ -38,7 +38,7 @@ class Auth extends BaseController
 			$service = $this->getAuthService($currentUri);
 			$code = isset($_GET['code']) ? $_GET['code'] : null;
 
-			if ($code)
+			if ($code && $this->getProviderNameFromSession())
 			{
 				// This was a callback request from GitHub, get the token
 				try
@@ -62,7 +62,7 @@ class Auth extends BaseController
 					$this->getSlim()->redirect('/');
 				}
 			}
-			else
+			elseif ($this->getProviderNameFromQueryString())
 			{
 				$url = $service->getAuthorizationUri();
 				$_SESSION['provider'] = 'github';
@@ -126,13 +126,23 @@ class Auth extends BaseController
 
 	protected function getProviderName()
 	{
-		$provider = isset($_GET['provider']) ? $_GET['provider'] : null;
+		$provider = $this->getProviderNameFromQueryString();
 		if (!$provider)
 		{
-			$provider = isset($_SESSION['provider']) ? $_SESSION['provider'] : null;
+			$provider = $this->getProviderNameFromSession();
 		}
 
 		return $provider;
+	}
+
+	protected function getProviderNameFromQueryString()
+	{
+		return isset($_GET['provider']) ? $_GET['provider'] : null;
+	}
+
+	protected function getProviderNameFromSession()
+	{
+		return isset($_SESSION['provider']) ? $_SESSION['provider'] : null;		
 	}
 
 	public function getMenuSlug()
