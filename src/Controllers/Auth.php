@@ -56,7 +56,14 @@ class Auth extends BaseController
 				// Clear intermediate session vars
 				unset($_SESSION['provider']);
 
-				if (isset($result['html_url']))
+				// See if the security token matches, to ensure the request came from us
+				$suppliedState = isset($_GET['state']) ? $_GET['state'] : 1;
+				$savedState = isset($_SESSION['state']) ? $_SESSION['state'] : 2;
+				if ($suppliedState != $savedState)
+				{
+					$error = "The login attempt appears not to have come from GitHub";
+				}
+				elseif (isset($result['html_url']))
 				{
 					$this->logon($result['html_url']);
 					$this->getSlim()->redirect('/');
@@ -65,8 +72,10 @@ class Auth extends BaseController
 			elseif ($this->getProviderNameFromQueryString())
 			{
 				$url = $service->getAuthorizationUri();
+				$state = rand(1, 9999999);
+				$_SESSION['state'] = $state;
 				$_SESSION['provider'] = 'github';
-				$url .= '&state=' . rand(1, 999999);
+				$url .= '&state=' . $state;
 				$this->slim->redirect($url);
 			}
 		}
