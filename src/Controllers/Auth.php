@@ -5,6 +5,7 @@ namespace Awooga\Controllers;
 use OAuth\Common\Storage\Session;
 use OAuth\Common\Consumer\Credentials;
 use OAuth\Common\Http\Uri\UriInterface;
+use OAuth\Common\Http\Exception\TokenResponseException;
 
 class Auth extends BaseController
 {
@@ -30,6 +31,7 @@ class Auth extends BaseController
 		$currentUri = $uriFactory->createFromSuperGlobalArray($_SERVER);
 		$currentUri->setQuery('');
 
+		$error = null;
 		if ($this->getProviderName() == 'github')
 		{
 			// Just using GitHub at the moment
@@ -38,9 +40,18 @@ class Auth extends BaseController
 
 			if ($code)
 			{
-				// This was a callback request from github, get the token
-				$service->requestAccessToken($code);
-				$result = json_decode($service->request('user'), true);
+				// This was a callback request from GitHub, get the token
+				try
+				{
+					$service->requestAccessToken($code);
+					$result = json_decode($service->request('user'), true);
+				}
+				catch (TokenResponseException $e)
+				{
+					// This seems safe to report to the user
+					$error = $e->getMessage();
+					$result = array();
+				}
 
 				// Clear intermediate session vars
 				unset($_SESSION['provider']);
@@ -61,7 +72,7 @@ class Auth extends BaseController
 		}
 
 		// Present user with login link
-		echo $this->render('login');
+		echo $this->render('login', array('error' => $error, ));
 	}
 
 	protected function getAuthService(UriInterface $uri)
@@ -76,14 +87,23 @@ class Auth extends BaseController
 			$uri->getAbsoluteUri()
 		);
 
+		// Currently I am using a child service class that improves error handling
 		$serviceFactory = new \OAuth\ServiceFactory();
-		$service = $serviceFactory->createService('GitHub', $credentials, $storage, array('user:email'));
+		$serviceFactory->registerService('GitHubAuthService', '\\Awooga\\Core\\GitHubAuthService');
+		$service = $serviceFactory->createService(
+			'GitHubAuthService',
+			$credentials,
+			$storage,
+			array('user:email', )
+		);
 
 		return $service;
 	}
 
 	/**
 	 * Get the key for the chosen auth provider
+	 * 
+	 * @todo Don't show the login button if this is not set
 	 * 
 	 * @return string
 	 */
@@ -95,11 +115,13 @@ class Auth extends BaseController
 	/**
 	 * Get the secret for the chosen auth provider
 	 * 
+	 * @todo Don't show the login button if this is not set
+	 * 
 	 * @return string
 	 */
 	protected function getSecret()
 	{
-		return getenv('GITHUB_CLIENT_SECRET');		
+		return getenv('GITHUB_CLIENT_SECRET');
 	}
 
 	protected function getProviderName()
