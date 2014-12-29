@@ -59,8 +59,8 @@ class RepoBuilder
 		$sql = "
 			INSERT INTO
 				user
-			(last_login_at)
-			VALUES ('2014-12-29')
+			(username, last_login_at)
+			VALUES ('test_user', '2014-12-29')
 		";
 		$pdo = $this->getDriver();
 		$statement = $pdo->prepare($sql);

@@ -53,6 +53,6 @@
 		<?php echo $report['description_html'] ?>
 	</td>
 	<td>
-		#<?php echo $report['repository_id'] ?>
+		<?php $this->insert('partials/source', ['report' => $report, ]) ?>
 	</td>
 </tr>

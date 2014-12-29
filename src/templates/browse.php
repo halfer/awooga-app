@@ -24,7 +24,7 @@
 				<th>Links</th>
 				<th>Issues</th>
 				<th>Description</th>
-				<th>Repository</th>
+				<th>Source</th>
 			</tr>
 		</thead>
 		<tbody>

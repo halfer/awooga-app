@@ -105,8 +105,6 @@ class Browse extends BaseController
 	/**
 	 * Gets a block of reports
 	 * 
-	 * @todo Need to swap '*' for a specific field list
-	 * 
 	 * @param integer $pageSize
 	 * @return array|false
 	 */
@@ -116,10 +114,7 @@ class Browse extends BaseController
 		{
 			// @todo Need to take the right page slice out of here
 			$where = implode(',', $this->searchKeys);
-			$sql = "
-				SELECT *
-				FROM report
-				WHERE is_enabled = 1
+			$sql = $this->getSqlToReadReports() . "
 				AND id IN ($where)
 				ORDER BY id DESC
 			";			
@@ -127,10 +122,7 @@ class Browse extends BaseController
 		else
 		{
 			$limitClause = $this->getLimitClause($pageSize);
-			$sql = "
-				SELECT *
-				FROM report
-				WHERE is_enabled = 1
+			$sql = $this->getSqlToReadReports() . "
 				ORDER BY id DESC
 				{$limitClause}
 			";

@@ -77,5 +77,11 @@
 				<?php echo $report['description_html'] ?>
 			</td>
 		</tr>
+		<tr>
+			<th>Source</th>
+			<td colspan="3">
+				<?php $this->insert('partials/source', ['report' => $report, ]) ?>
+			</td>
+		</tr>
 	</tbody>
 </table>

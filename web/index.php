@@ -52,11 +52,11 @@ $app->get('/browse', $browse);
 $app->get('/browse/:page', $browse);
 
 // A controller to create a new report
-$app->get('/report/new', function() use ($app, $engine)
+$app->map('/report/new', function() use ($app, $engine)
 {
 	$controller = new \Awooga\Controllers\NewReport($app, $engine);
 	$controller->initAndExecute();
-});
+})->via('GET', 'POST');
 
 // A controller for a single report
 $app->get('/report/:report', function($reportId) use ($app, $engine)

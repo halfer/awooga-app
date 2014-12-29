@@ -43,14 +43,14 @@ class Report extends BaseController
 
 	protected function getReport()
 	{
-		$sql = "
-			SELECT * FROM report
-			WHERE
-				id = :report_id
-				AND is_enabled = 1
-		";
+		$sql = $this->getSqlToReadReports() . " AND report.id = :report_id";
 		$statement = $this->getDriver()->prepare($sql);
-		$statement->execute(array(':report_id' => $this->reportId, ));
+		$ok = $statement->execute(array(':report_id' => $this->reportId, ));
+
+		if (!$ok)
+		{
+			throw new \Exception('Could not fetch report');
+		}
 
 		return $statement->fetch(\PDO::FETCH_ASSOC);
 	}

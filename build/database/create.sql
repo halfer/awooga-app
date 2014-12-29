@@ -24,7 +24,7 @@ CREATE TABLE issue (
 CREATE TABLE user (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL,
 	/* This can be for a nicer username that does not relate to the auth provider */
-	username VARCHAR(128),
+	username VARCHAR(128) NOT NULL,
 	access_level ENUM ('reporter', 'admin') DEFAULT 'reporter' NOT NULL,
 	last_login_at DATETIME NOT NULL
 );

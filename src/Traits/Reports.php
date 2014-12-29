@@ -4,6 +4,26 @@ namespace Awooga\Traits;
 
 trait Reports
 {
+	/**
+	 * Shared block of SQL to retrieve report(s)
+	 * 
+	 * @todo Need to swap 'report.*' for a specific field list
+	 * 
+	 * @return string
+	 */
+	protected function getSqlToReadReports()
+	{
+		return "
+			SELECT
+				report.*,
+				user.username
+			FROM report
+			LEFT JOIN user ON (report.user_id = user.id)
+			WHERE
+				is_enabled = 1
+		";
+	}
+
 	protected function getRelatedUrls(array $reportIds)
 	{
 		$strIds = implode(',', $reportIds);
