@@ -20,9 +20,32 @@ CREATE TABLE issue (
 	description VARCHAR(1024)
 );
 
+/* Users are separate from their auth usernames, so we can support several per user */
+CREATE TABLE user (
+	id INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	/* This can be for a nicer username that does not relate to the auth provider */
+	username VARCHAR(128),
+	access_level ENUM ('reporter', 'admin') DEFAULT 'reporter' NOT NULL,
+	last_login_at DATETIME NOT NULL
+);
+
+/* Store provider-specific data here */
+CREATE TABLE user_auth (
+	id INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	user_id INTEGER NOT NULL,
+	/* Provider-specific username */
+	username VARCHAR(128) NOT NULL,
+	provider VARCHAR(32) NOT NULL,
+	last_login_at DATETIME NOT NULL,
+
+	CONSTRAINT user_auth_user_fk FOREIGN KEY (user_id) REFERENCES `user` (id)
+);
+
 CREATE TABLE report (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL,
-	repository_id INTEGER NOT NULL,
+	/* We use either a repo +or+ a user, hence the lack of NOT NULL constraints */
+	repository_id INTEGER,
+	user_id INTEGER,
 	title VARCHAR(256) NOT NULL,
 	/* Description is in markdown */
 	description VARCHAR(1024),
@@ -31,7 +54,8 @@ CREATE TABLE report (
 	author_notified_at DATE,
 	is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
 
-	CONSTRAINT report_repo_fk FOREIGN KEY (repository_id) REFERENCES repository (id)
+	CONSTRAINT report_repo_fk FOREIGN KEY (repository_id) REFERENCES repository (id),
+	CONSTRAINT report_user_fk FOREIGN KEY (user_id) REFERENCES `user` (id)
 );
 
 CREATE TABLE resource_url (

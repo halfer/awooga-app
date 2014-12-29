@@ -3,10 +3,12 @@
 namespace Awooga\Core;
 
 use \Awooga\Exceptions\TrivialException;
+use \Awooga\Exceptions\SeriousException;
 
 class Report
 {
 	protected $repoId;
+	protected $userId;
 	protected $id;
 	protected $title;
 	protected $urls;
@@ -22,10 +24,12 @@ class Report
 	 * Creates this report and attaches it to a specific repo ID
 	 * 
 	 * @param integer $repoId
+	 * @param integer $userId
 	 */
-	public function __construct($repoId)
+	public function __construct($repoId, $userId = null)
 	{
 		$this->repoId = $repoId;
+		$this->userId = $userId;
 	}
 
 	/**
@@ -339,7 +343,7 @@ class Report
 		// Bork if there is an issue
 		if ($statement === false)
 		{
-			throw new \Awooga\Exceptions\SeriousException(
+			throw new SeriousException(
 				"Could not delete rows from $tableUntainted"
 			);
 		}
@@ -354,6 +358,24 @@ class Report
 		$this->setDescription($this->description);
 		$this->setUrl($this->urls);
 		$this->setIssues($this->issues);
+		$this->checkForeignKeys();
+	}
+
+	protected function checkForeignKeys()
+	{
+		if (!$this->repoId && !$this->userId)
+		{
+			throw new SeriousException(
+				"Neither a repo or a user ID has been set in this report"
+			);
+		}
+
+		if ($this->repoId && $this->userId)
+		{
+			throw new SeriousException(
+				"This report can only be associated with either a repo or a user"
+			);			
+		}
 	}
 
 	/**

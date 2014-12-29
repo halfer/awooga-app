@@ -11,6 +11,7 @@ class RepoBuilder
 	 * 
 	 * @param integer $repoId
 	 * @param string $url
+	 * @return integer
 	 */
 	public function create($repoId = 1, $url = null)
 	{
@@ -43,5 +44,36 @@ class RepoBuilder
 		}
 
 		return $repoId;
+	}
+
+	/**
+	 * Creates a new user
+	 * 
+	 * @todo Rename the class, as it builds more than repos now
+	 * 
+	 * @return integer
+	 * @throws \Exception
+	 */
+	public function createUser()
+	{
+		$sql = "
+			INSERT INTO
+				user
+			(last_login_at)
+			VALUES ('2014-12-29')
+		";
+		$pdo = $this->getDriver();
+		$statement = $pdo->prepare($sql);
+		$ok = $statement->execute();
+
+		// Bork if the query fails (e.g. PK clash)
+		if (!$ok)
+		{
+			throw new \Exception(
+				"Creating a repository row failed:" . print_r($statement->errorInfo(), true)
+			);
+		}
+
+		return $pdo->lastInsertId();
 	}
 }

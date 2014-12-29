@@ -12,23 +12,31 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	 * 
 	 * @param \PDO $pdo
 	 * @param boolean $createRepo
+	 * @param boolean $createUser
 	 * @return integer Repository ID
 	 */
-	protected function buildDatabase(\PDO $pdo, $createRepo = true)
+	protected function buildDatabase(\PDO $pdo, $createRepo = true, $createUser = false)
 	{
 		$this->runSqlFile($pdo, $this->getProjectRoot() . '/test/build/init.sql');
 		$this->runSqlFile($pdo, $this->getProjectRoot() . '/build/database/create.sql');
 
+		// Set up the entity builder in case we need it
+		$builder = new RepoBuilder();
+		$builder->setDriver($pdo);
+		$id = null;
+
 		// Create a repo if required
-		$repoId = null;
 		if ($createRepo)
 		{
-			$builder = new RepoBuilder();
-			$builder->setDriver($pdo);
-			$repoId = $builder->create(1);
+			$id = $builder->create(1);
+		}
+		// Create a user if required
+		elseif ($createUser)
+		{
+			$id = $builder->createUser();
 		}
 
-		return $repoId;
+		return $id;
 	}
 
 	/**

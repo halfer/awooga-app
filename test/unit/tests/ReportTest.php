@@ -2,6 +2,8 @@
 
 namespace Awooga\Testing\Unit;
 
+use \Awooga\Core\Report;
+
 class ReportTest extends TestCase
 {
 	/**
@@ -582,16 +584,13 @@ class ReportTest extends TestCase
 		// Create a report
 		$report = new ReportTestHarness($repoId);
 		$report->setDriver($pdo);
-		$report->setUrl('http://example.com');
-		$report->setTitle('Title');
-		$report->setDescription('Description');
-		$report->setIssues(array(array('issue_cat_code' => 'xss', ),));
+		$this->setDummyReportData($report);
 		$report->save();
 
 		// Resave the +same+ report
 		$report2 = new ReportTestHarness($repoId);
 		$report2->setDriver($pdo);
-		$report2->setUrl($url = 'http://example.com');
+		$report2->setUrl($report->getUrl());
 		// Change all the data here, it's still the same report
 		$report2->setTitle($title = 'Different title');
 		$report2->setDescription($description = 'Different description');
@@ -639,34 +638,105 @@ class ReportTest extends TestCase
 		// Create a report
 		$report = new ReportTestHarness($repoId);
 		$report->setDriver($pdo);
-		$report->setUrl($url1 = 'http://example.com');
-		$report->setTitle('Title');
-		$report->setDescription('Description');
-		$report->setIssues(array(array('issue_cat_code' => 'xss', ),));
+		$this->setDummyReportData($report);
 		$report->save();
 
 		// Create another report
 		$report2 = new ReportTestHarness($repoId);
 		$report2->setDriver($pdo);
+		$this->setDummyReportData($report2);
 		$report2->setUrl($url2 = 'http://example.com/different');
-		$report2->setTitle('Title');
-		$report2->setDescription('Description');
-		$report2->setIssues(array(array('issue_cat_code' => 'xss', ),));
 		$report2->save();
 
 		// Try to create a report that would span these two URLs
 		$report3 = new ReportTestHarness($repoId);
 		$report3->setDriver($pdo);
-		$report3->setUrl(array($url1, $url2));
-		$report3->setTitle('Title');
-		$report3->setDescription('Description');
-		$report3->setIssues(array(array('issue_cat_code' => 'xss', ),));
+		$this->setDummyReportData($report3);
+		$report3->setUrl(array($report->getUrl(), $url2));
 		$report3->save();
 	}
 
+	public function testReportAttachedToUser()
+	{
+		$pdo = $this->getDriver();
+		$userId = $this->buildDatabase($pdo, false, true);
+		$report = new ReportTestHarness(null, $userId);
+		$report->setDriver($pdo);
+		$this->setDummyReportData($report);
+		$reportId = $report->save();
+
+		// Check it was written OK
+		$actualTitle = $this->fetchColumn(
+			$pdo,
+			'SELECT title FROM report WHERE id = :report_id',
+			array('report_id' => $reportId, )
+		);
+		$this->assertEquals(
+			$report->getProperty('title'),
+			$actualTitle,
+			'Ensure report saves correctly for a user-based report'
+		);
+	}
+
+	/**
+	 * Check foreign key validation (with neither, which is invalid)
+	 * 
+	 * @expectedException \Awooga\Exceptions\SeriousException
+	 */
+	public function testReportCannotHaveUserAndRepo()
+	{
+		$report = new ReportTestHarness(null);
+		$report->setDriver($this->getDriver());
+		$this->setDummyReportData($report);
+		$report->save();
+	}
+
+	/**
+	 * Check foreign key validation (with both, which is invalid)
+	 * 
+	 * @expectedException \Awooga\Exceptions\SeriousException
+	 */
+	public function testReportMustHaveUserOrRepo()
+	{
+		$report = new ReportTestHarness(1, 1);
+		$report->setDriver($this->getDriver());
+		$this->setDummyReportData($report);
+		$report->save();		
+	}
+
+	/**
+	 * Helper method to fill in dummy data
+	 * 
+	 * @param \Awooga\Testing\Unit\Report $report
+	 */
+	protected function setDummyReportData(Report $report)
+	{
+		$report->setUrl('http://example.com');
+		$report->setTitle('Title');
+		$report->setDescription('Description');
+		$report->setIssues(array(array('issue_cat_code' => 'xss', ),));
+	}
+
+	/**
+	 * Returns a report to test against
+	 * 
+	 * @todo Rename to getDummyRepoBasedReport?
+	 * 
+	 * @return \Awooga\Testing\Unit\ReportTestHarness
+	 */
 	protected function getDummyReport()
 	{
 		return new ReportTestHarness(1);
+	}
+
+	/**
+	 * Returns a report to test against
+	 * 
+	 * @return \Awooga\Testing\Unit\ReportTestHarness
+	 */
+	protected function getDummyUserBasedReport()
+	{
+		return new ReportTestHarness(null);		
 	}
 
 	protected function buildDatabaseAndGetReport()
