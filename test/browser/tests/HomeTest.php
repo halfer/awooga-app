@@ -29,9 +29,9 @@ class HomeTest extends TestCase
 			assertHasCss("nav a:contains('Logs')")->
 			assertHasCss("nav a:contains('About')")->
 
-			// Report/issues counter (line break means two tests are necessary)
-			assertHasCss("nav p:contains('Awooga has 54 issues')")->
-			assertHasCss("nav p:contains('in 26 reports')")->
+			// Report/issues badges
+			assertHasCss("nav ul li.nav-issues span.badge:contains('54')")->
+			assertHasCss("nav ul li.nav-reports span.badge:contains('26')")->
 
 			// Footer
 			assertHasCss("footer a:contains('GitHub')")->

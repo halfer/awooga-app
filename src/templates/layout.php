@@ -25,11 +25,11 @@
 						<li class="<?php echo $selectedMenu == 'home' ? 'active' : '' ?>">
 							<a href="/">Awooga</a>
 						</li>
-						<li class="<?php echo $selectedMenu == 'browse' ? 'active' : '' ?>">
+						<li class="nav-reports <?php echo $selectedMenu == 'browse' ? 'active' : '' ?>">
 							<a href="/browse">Browse
 								<span class="badge"><?php echo $countData['report_count'] ?></span></a>
 						</li>
-						<li class="<?php echo $selectedMenu == 'issues' ? 'active' : '' ?>">
+						<li class="nav-issues <?php echo $selectedMenu == 'issues' ? 'active' : '' ?>">
 							<a href="/issues">Issues
 								<span class="badge"><?php echo $countData['issue_count'] ?></span></a>
 						</li>
