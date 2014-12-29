@@ -62,7 +62,9 @@ abstract class BaseController
 	{
 		$values['selectedMenu'] = $this->getMenuSlug();
 		$values['countData'] = $this->getCounts();
-		$values['username'] = $this->getSignedInUsername();
+
+		// Remove any protocol from the username
+		$values['username'] = preg_replace('#^https?://#', '', $this->getSignedInUsername());
 
 		// Inject static title if one is set
 		if ($this->pageTitle)
