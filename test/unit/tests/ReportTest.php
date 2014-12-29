@@ -378,11 +378,13 @@ class ReportTest extends TestCase
 			"Check report ID is generated OK"
 		);
 
-		// Check issues
+		// Check issues by counting reports either by repo or user, as appropriate
+		$repoId = $report->getProperty('repoId');
+		$userId = $report->getProperty('userId');
 		$statement = $this->runStatementWithException(
 			$pdo,
-			$this->getRetrieveIssuesSql(),
-			array(':repo_id' => $report->getId(), )
+			$this->getRetrieveIssuesSql((bool) $repoId),
+			$repoId ? array(':repo_id' => $repoId, ) : array(':user_id' => $userId, )
 		);
 
 		$issuesData = $statement->fetchAll(\PDO::FETCH_ASSOC);
@@ -397,11 +399,11 @@ class ReportTest extends TestCase
 			next($issues);
 		}
 
-		// Check urls
+		// Check urls by counting reports either by repo or user, as appropriate
 		$statement2 = $this->runStatementWithException(
 			$pdo,
-			$this->getRetrieveUrlsSql(),
-			array(':repo_id' => $report->getId(), )
+			$this->getRetrieveUrlsSql((bool) $repoId),
+			$repoId ? array(':repo_id' => $repoId, ) : array(':user_id' => $userId, )
 		);
 
 		$urlsData = $statement2->fetchAll(\PDO::FETCH_ASSOC);
@@ -416,9 +418,13 @@ class ReportTest extends TestCase
 
 	/**
 	 * 
+	 * @param boolean $byRepo
+	 * @return string
 	 */
-	protected function getRetrieveIssuesSql()
+	protected function getRetrieveIssuesSql($byRepo)
 	{
+		$filter = $byRepo ? 'r.repository_id = :repo_id' : 'r.user_id = :user_id';
+
 		return "
 			SELECT
 				r.*,
@@ -430,7 +436,7 @@ class ReportTest extends TestCase
 				INNER JOIN report_issue ri ON (r.id = ri.report_id)
 				INNER JOIN issue i ON (ri.issue_id = i.id)
 			WHERE
-				r.repository_id = :repo_id
+				{$filter}
 			ORDER BY
 				i.code				
 		";
@@ -438,9 +444,13 @@ class ReportTest extends TestCase
 
 	/**
 	 * 
+	 * @param boolean $byRepo
+	 * @return string
 	 */
-	protected function getRetrieveUrlsSql()
+	protected function getRetrieveUrlsSql($byRepo)
 	{
+		$filter = $byRepo ? 'r.repository_id = :repo_id' : 'r.user_id = :user_id';
+
 		return "
 			SELECT
 				r.*,
@@ -449,7 +459,7 @@ class ReportTest extends TestCase
 				report r
 				INNER JOIN resource_url u ON (r.id = u.report_id)
 			WHERE
-				r.repository_id = :repo_id
+				{$filter}
 			ORDER BY
 				u.url
 		";
@@ -489,7 +499,7 @@ class ReportTest extends TestCase
 		$statement=  $this->runStatement(
 			$this->getDriver(),
 			$sql,
-			array('repo_id' => $report->getId(), )
+			array('repo_id' => $report->getProperty('repoId'), )
 		);
 		$this->assertEquals(1, $statement->rowCount());
 	}
@@ -572,23 +582,49 @@ class ReportTest extends TestCase
 	}
 
 	/**
-	 * Check that a repo ID and URL match updates a report, rather than creating a new one
-	 * 
-	 * @throws \Exception
+	 * Checks that two reports in the same repo and with the same URL are regarded as the same
 	 */
-	public function testUpdateOldReport()
+	public function testUpdateOldRepoReport()
 	{
+		// Create two reports linked to a repo
 		$pdo = $this->getDriver();
 		$repoId = $this->buildDatabase($pdo);
+		$report1 = new ReportTestHarness($repoId);
+		$report2 = new ReportTestHarness($repoId);
 
-		// Create a report
-		$report = new ReportTestHarness($repoId);
+		$this->checkUpdateOldReport($pdo, $report1, $report2);
+	}
+
+	/**
+	 * Checks that two reports for the same user and with the same URL are regarded as the same
+	 */
+	public function testUpdateOldUserReport()
+	{
+		// Create two reports linked to a user
+		$pdo = $this->getDriver();
+		$userId = $this->buildDatabase($pdo, false, true);
+		$report1 = new ReportTestHarness(null, $userId);
+		$report2 = new ReportTestHarness(null, $userId);
+
+		$this->checkUpdateOldReport($pdo, $report1, $report2);
+	}
+
+	/**
+	 * Check that a repo/user and URL match updates a report, rather than creating a new one
+	 * 
+	 * @param \PDO $pdo
+	 * @param Report $report
+	 * @param Report $report2
+	 * @throws \Exception
+	 */
+	protected function checkUpdateOldReport(\PDO $pdo, Report $report, Report $report2)
+	{
+		// Save a report with dummy data
 		$report->setDriver($pdo);
 		$this->setDummyReportData($report);
 		$report->save();
 
 		// Resave the +same+ report
-		$report2 = new ReportTestHarness($repoId);
 		$report2->setDriver($pdo);
 		$report2->setUrl($report->getUrl());
 		// Change all the data here, it's still the same report
@@ -599,11 +635,13 @@ class ReportTest extends TestCase
 		);
 		$report2->save();
 
-		// Get the reports for this repo
+		// Get the reports for this repo/user as appropriate
+		$repoId = $report->getProperty('repoId');
+		$userId = $report->getProperty('userId');
 		$statement = $this->runStatementWithException(
 			$pdo,
-			$this->getRetrieveIssuesSql(),
-			array(':repo_id' => $repoId, )
+			$this->getRetrieveIssuesSql((bool) $repoId),
+			$repoId ? array(':repo_id' => $repoId, ) : array(':user_id' => $userId, )
 		);
 
 		// Ensure we only have one report
@@ -611,7 +649,7 @@ class ReportTest extends TestCase
 		$this->assertEquals(
 			1,
 			count($issuesData),
-			"Check number of reports in this repo"
+			"Check number of reports against this repo/user"
 		);
 
 		// Check the report was updated and not duplicated

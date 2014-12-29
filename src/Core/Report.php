@@ -390,6 +390,7 @@ class Report
 		$sql = "
 			UPDATE report SET
 				repository_id = :repo_id,
+				user_id = :user_id,
 				title = :title,
 				description = :description,
 				description_html = :description_html,
@@ -411,8 +412,8 @@ class Report
 	{
 		$sql = "
 			INSERT INTO report
-			(repository_id, title, description, description_html, author_notified_at)
-			VALUES (:repo_id, :title, :description, :description_html, :notified_at)
+			(repository_id, user_id, title, description, description_html, author_notified_at)
+			VALUES (:repo_id, :user_id, :title, :description, :description_html, :notified_at)
 		";
 
 		$this->runSaveCommand($sql);
@@ -433,6 +434,7 @@ class Report
 		$this->descriptionHtml = $this->convertFromMarkdown($this->description);
 		$params = array(
 			':repo_id' => $this->repoId,
+			':user_id' => $this->userId,
 			':title' => $this->title,
 			':description' => $this->description,
 			':description_html' => $this->descriptionHtml,
@@ -539,7 +541,7 @@ class Report
 	/**
 	 * Check if we need to do an update rather than an insert
 	 * 
-	 * Search for all the URLs for this repo. If they point to more than one report,
+	 * Search for all the URLs for this repo/user. If they point to more than one report,
 	 * then let's chuck it out with a trivial exception. Hopefully one of the other
 	 * reports will end up deleted and it will work out on the next pass.
 	 * 
@@ -548,22 +550,25 @@ class Report
 	protected function getCurrentReport()
 	{
 		// Set up the test for each URL
+		$filter = $this->repoId ? 'r.repository_id = :repo_id' : 'r.user_id = :user_id';
 		$sql = "
 			SELECT r.id report_id
 			FROM report r
 			INNER JOIN resource_url u ON (r.id = u.report_id)
 			WHERE
-				r.repository_id = :repo_id
-				AND u.url = :url
+				{$filter} AND u.url = :url
 		";
 		$statement = $this->getDriver()->prepare($sql);
 
 		$reportId = null;
 		foreach ($this->urls as $url)
 		{
+			// Use either the repo or user ID as a filter
 			$statement->execute(
-				array(':repo_id' => $this->repoId, ':url' => $url, )
+				array(':url' => $url, ) +
+				($this->repoId ? array(':repo_id' => $this->repoId) : array(':user_id' => $this->userId, ))
 			);
+
 			// If we have some rows returned from the query
 			if ($statement->rowCount())
 			{

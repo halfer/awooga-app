@@ -45,18 +45,6 @@ class ReportTestHarness extends \Awooga\Core\Report
 	}
 
 	/**
-	 * Returns the primary key for this record
-	 * 
-	 * @todo Can callers just use getProperty('repoId') here?
-	 * 
-	 * @return integer
-	 */
-	public function getId()
-	{
-		return $this->repoId;
-	}
-
-	/**
 	 * Gets the protected issues property
 	 * 
 	 * @todo Can callers just use getProperty('issues') here?
