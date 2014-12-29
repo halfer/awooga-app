@@ -43,7 +43,7 @@
 							<a href="/about">About</a>
 						</li>
 						<?php if ($username): ?>
-							<li class="<?php echo $selectedMenu == 'new' ? 'active' : '' ?>">
+							<li class="<?php echo $selectedMenu == '/report/new' ? 'active' : '' ?>">
 								<a href="/report/new">New report</a>
 							</li>
 						<?php endif ?>
