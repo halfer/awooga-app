@@ -12,7 +12,7 @@
 	introductory notes on the <a href="/">home page</a>.
 </div>
 
-<h1><?php echo htmlentities($report['title'], ENT_HTML5, 'UTF-8') ?></h1>
+<h1><?php echo $this->escape($report['title']) ?></h1>
 
 <table class="table table-bordered" id="report">
 	<tbody>
@@ -26,10 +26,10 @@
 				<?php endif ?>
 				<td colspan="3">
 					<a
-						href="<?php echo htmlentities($url['url'], ENT_HTML5, 'UTF-8') ?>"
+						href="<?php echo $this->escape($url['url']) ?>"
 						alt="Link to learning resource"
 						rel="nofollow"
-					><?php echo htmlentities($url['url'], ENT_HTML5, 'UTF-8') ?></a>
+					><?php echo $this->escape($url['url']) ?></a>
 				</td>
 			<?php endforeach ?>
 		</tr>
@@ -45,10 +45,10 @@
 					<?php if ($issue['resolved_at']): ?>
 						<?php // Doesn't need escaping,  but let's do it anyway ?>
 						<span class="label label-success"
-							><?php echo htmlentities($issue['code'], ENT_HTML5, 'UTF-8') ?></span>
+							><?php echo $this->escape($issue['code']) ?></span>
 					<?php else: ?>
 						<span class="label label-danger"
-							><?php echo htmlentities($issue['code'], ENT_HTML5, 'UTF-8') ?></span>
+							><?php echo $this->escape($issue['code']) ?></span>
 					<?php endif ?>
 				</td>
 				<?php // This is the date resolved column ?>

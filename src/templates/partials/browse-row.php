@@ -5,13 +5,13 @@
 		<a
 			href="/report/<?php echo $report['id'] ?>"
 			alt="More info"
-		><?php echo htmlentities($report['title'], ENT_HTML5, 'UTF-8') ?></a>
+		><?php echo $this->escape($report['title']) ?></a>
 	</td>
 	<td>
 		<?php // If there is a 0th URL (there should be) let's use that ?>
 		<?php if (isset($report['urls'][0])): ?>
 			<a
-				href="<?php echo htmlentities($report['urls'][0], ENT_HTML5, 'UTF-8') ?>"
+				href="<?php echo $this->escape($report['urls'][0]) ?>"
 				alt="Primary link for this resource"
 				rel="nofollow"
 				target="_blank"
@@ -22,7 +22,7 @@
 				<small>[
 					<?php for($urlId = 1; $urlId < count($report['urls']); $urlId++): ?>
 						<a
-							href="<?php echo htmlentities($report['urls'][$urlId], ENT_HTML5, 'UTF-8') ?>"
+							href="<?php echo $this->escape($report['urls'][$urlId]) ?>"
 							alt="Secondary link for this resource"
 							nofollow="nofollow"
 							target="_blank"
@@ -31,7 +31,7 @@
 				]</small>
 			<?php endif ?>
 		<?php else: ?>
-			<?php echo htmlentities($report['title'], ENT_HTML5, 'UTF-8') ?>
+			<?php echo $this->escape($report['title']) ?>
 		<?php endif ?>
 	</td>
 	<?php // Here are the issues lozenges ?>

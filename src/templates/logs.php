@@ -30,7 +30,7 @@
 					</span>
 				</td>
 				<td>
-					<?php echo htmlentities($log['message'], ENT_HTML5, 'UTF-8') ?>
+					<?php echo $this->escape($log['message']) ?>
 				</td>
 				<td>
 					<?php echo $log['created_at'] ?>

@@ -28,7 +28,7 @@
 					<span class="label label-danger"><?php echo $issue['code'] ?></span>
 				</td>
 				<td>
-					<?php echo htmlentities($issue['description'], ENT_HTML5, 'UTF-8') ?>
+					<?php echo $this->escape($issue['description']) ?>
 				</td>
 				<td>
 					<?php echo $issue['report_count'] ?>
