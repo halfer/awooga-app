@@ -10,4 +10,11 @@
 	</div>
 <?php endif ?>
 
+<?php // We've come from a requires auth redirect ?>
+<?php if ($requiresAuth): ?>
+	<div class="alert alert-info" role="alert">
+		That operation requires you to sign in first; you can do that on this page.
+	</div>	
+<?php endif ?>
+
 <a href="?provider=github">Login with GitHub</a>

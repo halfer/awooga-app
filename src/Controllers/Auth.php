@@ -81,7 +81,14 @@ class Auth extends BaseController
 		}
 
 		// Present user with login link
-		echo $this->render('login', array('error' => $error, ));
+		echo $this->render(
+			'login',
+			array(
+				'error' => $error,
+				// Show the requires auth message (comes from a redirect)
+				'requiresAuth' => isset($_GET['require-auth']),
+			)
+		);
 	}
 
 	protected function getAuthService(UriInterface $uri)

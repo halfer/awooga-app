@@ -6,7 +6,12 @@ class NewReport extends BaseController
 {
 	public function execute()
 	{
-		// @todo Redirect if not signed in
+		// Redirect if not signed in
+		if (!$this->isAuthenticated())
+		{
+			$this->getSlim()->redirect('/auth?require-auth=1');
+		}
+
 		echo $this->render('new-report');
 	}
 
