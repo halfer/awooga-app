@@ -7,7 +7,7 @@ class Logout extends BaseController
 	public function execute()
 	{
 		// Sign out the current user, then redirect
-		$this->logon(null);
+		$_SESSION[self::SESSION_KEY_USERNAME] = null;
 		$this->getSlim()->redirect('/');
 	}
 

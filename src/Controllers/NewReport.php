@@ -29,17 +29,11 @@ class NewReport extends BaseController
 	 */
 	protected function handleSave()
 	{
-		// This will fail silently if it is already created, just skeleton code for now
-		// @todo Remove this
-		$pdo = $this->getDriver();
-		$statement = $pdo->prepare(
-			"INSERT INTO user (id, last_login_at) VALUES (1, NOW())"
-		);
-		$statement->execute();
+		// @todo This needs to be attached to the current user, not hardwired
 
 		// Create/update the report attached to this user
 		$report = new Report(null, 1);
-		$report->setDriver($pdo);
+		$report->setDriver($this->getDriver());
 		$report->setUrl('http://example.com');
 		$report->setTitle('My title');
 		$report->setDescription('My description');
