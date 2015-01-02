@@ -37,3 +37,8 @@ html body {
 .footer .container .text-muted {
 	margin: 20px 0;
 }
+
+/* Hide HTML templates */
+#template-url, #template-issue {
+	display: none;
+}

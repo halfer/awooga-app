@@ -7,9 +7,9 @@
 	A page to create new reports.
 </p>
 
-<form method="post" class="form-horizontal">
+<form id="edit-report" method="post" class="form-horizontal">
 
-	<div class="form-group">
+	<div id="first-url" class="form-group url-group">
 		<label for="inputUrl" class="col-sm-2 control-label">URL(s):</label>
 		<div class="col-sm-10">
 			<div class="input-group">
@@ -20,8 +20,8 @@
 					placeholder="The web address(es) for this tutorial, including the http/https protocol"
 				/>
 				<span class="input-group-btn">
-					<button id="url-add" class="btn btn-default" type="button">+</button>
-					<button id="url-remove" class="btn btn-default" type="button">-</button>
+					<button class="url-add btn btn-default" type="button">+</button>
+					<button class="url-remove btn btn-default" type="button">-</button>
 				</span>
 			</div>
 		</div>
@@ -52,7 +52,7 @@
 		</div>
 	</div>
 
-	<div class="form-group">
+	<div class="form-group issue-group">
 		<label for="issueType" class="col-sm-2 control-label">Issue(s):</label>
 		<div class="col-sm-10">
 			<div class="input-group">
@@ -64,8 +64,8 @@
 					<option>XSS</option>
 				</select>
 				<span class="input-group-btn">
-					<button id="issue-add" class="btn btn-default" type="button">+</button>
-					<button id="issue-remove" class="btn btn-default" type="button">-</button>
+					<button class="issue-add btn btn-default" type="button">+</button>
+					<button class="issue-remove btn btn-default" type="button">-</button>
 				</span>
 			</div>
 			<!-- @todo How to do this in Bootstrap? -->
@@ -102,19 +102,53 @@
 
 </form>
 
+<?php // Move this outside of the form, so elements aren't detected inside it ?>
+<?php $this->insert('partials/new-report-templates') ?>
+
+
 <script type="text/javascript">
 	$(document).ready(function() {
-		$('#url-add').on('click', function() {
-			alert('Add');
+		function cloneBlock(type) {
+			var lastGroup = $('#edit-report div.' + type + '-group').last();
+			$('#template-' + type).
+				clone().
+				removeAttr('id').
+				insertAfter(lastGroup).
+				css('display', 'block');			
+		}
+
+		$('#edit-report').on('click', '.url-add', function() {
+			cloneBlock('url');
 		});
-		$('#url-remove').on('click', function() {
-			alert('Remove');
+		$('#edit-report').on('click', '.issue-add', function() {
+			cloneBlock('issue');
 		});
-		$('#issue-add').on('click', function() {
-			alert('Add');
+
+		function removeBlock(clicked, type) {
+			// See if we are allowed to delete
+			if ($('#edit-report .' + type + '-group').length === 1) {
+				alert("You must have at least one " + type);
+				return;
+			}
+
+			// If the add button is not hidden, then we deleted the top row
+			var add = clicked.siblings('.' + type + '-add.hide');
+
+			if (add.length === 0) {
+				// ... need to make a new top row
+				var secondRow = $('#edit-report .' + type + '-group').eq(1);
+				secondRow.find('.' + type + '-add').removeClass('hide');
+				secondRow.find('label').css('visibility', 'visible');
+			}
+
+			clicked.parents('.form-group').remove();
+		}
+
+		$('#edit-report').on('click', '.url-remove', function() {
+			removeBlock($(this), 'url');
 		});
-		$('#issue-remove').on('click', function() {
-			alert('Remove');
+		$('#edit-report').on('click', '.issue-remove', function() {
+			removeBlock($(this), 'issue');
 		});
 	});
 </script>
