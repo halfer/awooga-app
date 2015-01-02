@@ -20,8 +20,8 @@
 					placeholder="The web address(es) for this tutorial, including the http/https protocol"
 				/>
 				<span class="input-group-btn">
-					<button class="btn btn-default" type="button">+</button>
-					<button class="btn btn-default" type="button">-</button>
+					<button id="url-add" class="btn btn-default" type="button">+</button>
+					<button id="url-remove" class="btn btn-default" type="button">-</button>
 				</span>
 			</div>
 		</div>
@@ -64,8 +64,8 @@
 					<option>XSS</option>
 				</select>
 				<span class="input-group-btn">
-					<button class="btn btn-default" type="button">+</button>
-					<button class="btn btn-default" type="button">-</button>
+					<button id="issue-add" class="btn btn-default" type="button">+</button>
+					<button id="issue-remove" class="btn btn-default" type="button">-</button>
 				</span>
 			</div>
 			<!-- @todo How to do this in Bootstrap? -->
@@ -89,11 +89,32 @@
 				id="inputDate"
 				class="form-control"
 				name="author-notified-date"
-				placeholder="The date the author was notified (optional)"
+				placeholder="The date the author was notified, in the format yyyy-mm-dd (optional)"
 			/>
 		</div>
 	</div>
 
-	<input type="submit" value="Save" />
+	<input
+		type="submit"
+		class="btn btn-default"
+		value="Save"
+	/>
 
 </form>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#url-add').on('click', function() {
+			alert('Add');
+		});
+		$('#url-remove').on('click', function() {
+			alert('Remove');
+		});
+		$('#issue-add').on('click', function() {
+			alert('Add');
+		});
+		$('#issue-remove').on('click', function() {
+			alert('Remove');
+		});
+	});
+</script>

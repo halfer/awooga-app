@@ -10,6 +10,7 @@
 			<title>Awooga</title>
 		<?php endif ?>
 		<link rel="stylesheet" href="/assets/main.css">
+		<script src="/assets/jquery.min.js"></script>
 		<link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
 		<script src="/assets/bootstrap/js/bootstrap.min.js"></script>
 		<?php if ($debugbarRenderer): ?>
