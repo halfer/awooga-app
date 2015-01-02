@@ -10,6 +10,7 @@ before_script:
   - COMPOSER=composer.travis.json composer install
   - mysql -u root < test/build/create-user.sql
   - export PATH=`pwd`/bin:$PATH
+  - cp config/env-config.php.example config/env-config.php
 script:
   - phpunit --coverage-clover=coverage.clover
   - wget https://scrutinizer-ci.com/ocular.phar
