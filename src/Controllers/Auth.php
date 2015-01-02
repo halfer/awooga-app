@@ -119,17 +119,32 @@ class Auth extends BaseController
 	/**
 	 * Get the key for the chosen auth provider
 	 * 
+	 * This can come from server variables or from file config
+	 * 
 	 * @todo Don't show the login button if this is not set
 	 * 
 	 * @return string
 	 */
 	protected function getKey()
 	{
-		return getenv('GITHUB_CLIENT_ID');
+		if ($authConfig = $this->getEnvConfig('auth-service.github', false))
+		{
+			return $authConfig['client-id'];
+		}
+
+		$clientId = getenv('GITHUB_CLIENT_ID');
+		if (!$clientId)
+		{
+			throw new \Exception("Cannot find auth provider client ID in server or file config");
+		}
+
+		return $clientId;
 	}
 
 	/**
 	 * Get the secret for the chosen auth provider
+	 * 
+	 * This can come from server variables or from file config
 	 * 
 	 * @todo Don't show the login button if this is not set
 	 * 
@@ -137,7 +152,18 @@ class Auth extends BaseController
 	 */
 	protected function getSecret()
 	{
-		return getenv('GITHUB_CLIENT_SECRET');
+		if ($authConfig = $this->getEnvConfig('auth-service.github', false))
+		{
+			return $authConfig['client-secret'];
+		}
+
+		$clientSecret = getenv('GITHUB_CLIENT_SECRET');
+		if (!$clientSecret)
+		{
+			throw new \Exception("Cannot find auth provider client secret in server or file config");
+		}
+
+		return $clientSecret;
 	}
 
 	protected function getProviderName()

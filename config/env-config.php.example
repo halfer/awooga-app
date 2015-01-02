@@ -9,6 +9,13 @@ return array(
 			'database' => 'awooga_test',
 		),
 		'search-index.path' => '/filesystem/tmp/search-index',
+		/*
+		 * Auth config is supported, or we can get them from Apache variables (see Auth.php)
+		'auth-service.github' => array(
+			'client-id' => 'add-client-id-here',
+			'client-secret' => 'add-client-secret-here'
+		)
+		*/
 	),
 	'local' => array(
 		'database' => array(
@@ -18,6 +25,13 @@ return array(
 			'database' => 'awooga',
 		),
 		'search-index.path' => '/filesystem/mount/search-index',
+		/*
+		 * Auth config is supported, or we can get them from Apache variables (see Auth.php)
+		'auth-service.github' => array(
+			'client-id' => 'add-client-id-here',
+			'client-secret' => 'add-client-secret-here'
+		)
+		*/
 	),
 	'staging' => array(
 		'database' => array(
@@ -27,6 +41,13 @@ return array(
 			'database' => 'awooga',
 		),
 		'search-index.path' => '/filesystem/mount/search-index',
+		/*
+		 * Auth config is supported, or we can get them from Apache variables (see Auth.php)
+		'auth-service.github' => array(
+			'client-id' => 'add-client-id-here',
+			'client-secret' => 'add-client-secret-here'
+		)
+		*/
 	),
 	'production' => array(
 		'database' => array(
@@ -36,5 +57,12 @@ return array(
 			'database' => 'awooga',
 		),
 		'search-index.path' => '/filesystem/mount/search-index',
+		/*
+		 * Auth config is supported, or we can get them from Apache variables (see Auth.php)
+		'auth-service.github' => array(
+			'client-id' => 'add-client-id-here',
+			'client-secret' => 'add-client-secret-here'
+		)
+		*/
 	),
 );

@@ -9,9 +9,11 @@ trait Config
 	 * 
 	 * @param string $mode
 	 * @param string $key
+	 * @param boolean $errorOnNotFound
+	 * @throws \Exception
 	 * @return string
 	 */
-	protected function getEnvConfigForMode($mode, $key)
+	protected function getEnvConfigForMode($mode, $key, $errorOnNotFound = true)
 	{
 		$configs = require($this->getProjectRoot() . '/config/env-config.php');
 
@@ -22,12 +24,12 @@ trait Config
 		}
 
 		// If we don't have an entry for this key, bork
-		if (!array_key_exists($key, $configs[$mode]))
+		if ($errorOnNotFound && !array_key_exists($key, $configs[$mode]))
 		{
 			throw new \Exception("Configuration key '$key' for mode '$mode' not found");
 		}
 
-		return $configs[$mode][$key];
+		return isset($configs[$mode][$key]) ? $configs[$mode][$key] : null;
 	}
 
 	/**

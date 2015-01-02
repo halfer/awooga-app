@@ -4,6 +4,9 @@ filesystem/
 # Ignore test temp folder
 test/unit/tmp/
 
+# Ignore local configuration
+config/env-config.php
+
 # Ignore IDE stuff
 nbproject/
 

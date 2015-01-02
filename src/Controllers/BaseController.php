@@ -202,11 +202,12 @@ abstract class BaseController
 	 * Retrieves the specified config value from environment-specific settings
 	 * 
 	 * @param string $key
+	 * @param boolean $errorOnNotFound
 	 * @return string
 	 */
-	protected function getEnvConfig($key)
+	protected function getEnvConfig($key, $errorOnNotFound = true)
 	{
-		return $this->getEnvConfigForMode($this->slim->mode, $key);
+		return $this->getEnvConfigForMode($this->slim->mode, $key, $errorOnNotFound);
 	}
 
 	/**
