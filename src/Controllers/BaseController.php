@@ -15,6 +15,7 @@ abstract class BaseController
 	protected $pageTitle;
 
 	use \Awooga\Traits\Database;
+	use \Awooga\Traits\Config;
 
 	public function __construct(Slim $slim, Engine $engine)
 	{
@@ -205,22 +206,7 @@ abstract class BaseController
 	 */
 	protected function getEnvConfig($key)
 	{
-		$configs = require($this->getProjectRoot() . '/config/env-config.php');
-		$mode = $this->slim->mode;
-
-		// If we don't have an entry for this mode, bork
-		if (!array_key_exists($mode, $configs))
-		{
-			throw new \Exception("Configuration for mode '$mode' not found");
-		}
-
-		// If we don't have an entry for this key, bork
-		if (!array_key_exists($key, $configs[$mode]))
-		{
-			throw new \Exception("Configuration key '$key' for mode '$mode' not found");
-		}
-
-		return $configs[$mode][$key];
+		return $this->getEnvConfigForMode($this->slim->mode, $key);
 	}
 
 	/**

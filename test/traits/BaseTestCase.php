@@ -4,6 +4,8 @@ namespace Awooga\Testing;
 
 trait BaseTestCase
 {
+	use \Awooga\Traits\Config;
+
 	/**
 	 * Tries to run the SQL statements in the specified file
 	 * 
@@ -38,20 +40,35 @@ trait BaseTestCase
 	/**
 	 * Gets a PDO driver
 	 * 
-	 * @todo Pull this from env config
+	 * @todo This copies the initDriver code in BaseController, can we move to Database trait?
 	 * 
 	 * @param boolean $selectDatabase
 	 * @return \PDO
 	 */
 	protected function getDriver($selectDatabase = true)
 	{
+		// Get database settings
+		$config = $this->getEnvConfig('database');
+
 		// Connect to the database
-		$database = $selectDatabase ? 'dbname=awooga_test;' : '';
-		$dsn = "mysql:{$database}host=localhost;username=awooga_user_test;password=password";
-		$pdo = new \PDO($dsn, 'awooga_user_test', 'password');
+		$database = $selectDatabase ? "dbname={$config['database']};" : '';
+		$dsn = "mysql:{$database}host={$config['host']};username={$config['username']};password={$config['password']}";
+		$pdo = new \PDO($dsn, $config['username'], $config['password']);
 
 		return $pdo;
 	}
+
+	/**
+	 * Retrieves the specified config value from environment-specific settings
+	 * 
+	 * @param string $key
+	 * @return string
+	 */
+	protected function getEnvConfig($key)
+	{
+		return $this->getEnvConfigForMode('test', $key);
+	}
+
 
 	/**
 	 * Gets the path for the project root
