@@ -9,6 +9,12 @@ Also run this to populate with test data:
 
     cat build/database/local/repositories_local.sql | mysql -u root -p
 
+To set up web app configuration:
+
+	cp config/env-config.php.example config/env-config.php
+
+(And then edit the new file with your database settings)
+
 To delete:
 
     cat build/database/destroy.sql | mysql -u root -p
