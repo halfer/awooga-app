@@ -70,6 +70,15 @@ class Report
 				{
 					$formatFail = true;
 				}
+
+				// Check the URL has a protocol
+				$hasProtocol = preg_match('#^https?://#', $urlItem);
+				if (!$hasProtocol)
+				{
+					throw new TrivialException(
+						"The URL \"" . substr($urlItem, 0, 1024) . "\" does not have a recognised protocol"
+					);
+				}
 			}
 		}
 		else

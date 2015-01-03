@@ -67,7 +67,7 @@ class ReportTest extends TestCase
 		$report = $this->getDummyReport();
 		$urls = array(
 			'http://example.com/one',
-			'http://example.com/two',
+			'https://example.com/two',
 		);
 		$report->setUrl($urls);
 		$this->assertEquals($urls, $report->getUrl());
@@ -116,6 +116,16 @@ class ReportTest extends TestCase
 				'http://example.com/something',
 			)
 		);
+	}
+
+	/**
+	 * Make sure unrecognised protocols are rejected
+	 * 
+	 * @expectedException \Awooga\Exceptions\TrivialException
+	 */
+	public function testUnrecognisedProtocolUrl()
+	{
+		$this->getDummyReport()->setUrl('ftp://example.com/');		
 	}
 
 	/**
