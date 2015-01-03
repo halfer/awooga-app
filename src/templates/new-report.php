@@ -1,3 +1,10 @@
+<?php
+/*
+ * @var array $report A report to edit
+ * @var array $errors A list of errors to report, as a result of a failed validation/save
+ */
+?>
+
 <?php $this->layout(
 	'layout',
 	array('selectedMenu' => $selectedMenu, 'countData' => $countData, 'username' => $username, )
@@ -7,31 +14,43 @@
 	A page to create new reports.
 </p>
 
+<?php // Report any errors here ?>
+<?php if (count($errors) == 1): ?>
+	<div class="alert alert-warning">
+		<?php echo $this->escape(current($errors)) ?>
+	</div>
+<?php elseif (count($errors) > 1): ?>
+	<div class="alert alert-warning">
+		<ul>
+			<?php foreach ($errors as $error): ?>
+				<li>
+					<?php echo $this->escape($error) ?>
+				</li>
+			<?php endforeach ?>
+		</ul>
+	</div>
+<?php endif ?>
+
 <form id="edit-report" method="post" class="form-horizontal">
 
-	<div id="first-url" class="form-group url-group">
-		<label for="inputUrl" class="col-sm-2 control-label">URL(s):</label>
-		<div class="col-sm-10">
-			<div class="input-group">
-				<input
-					type="text"
-					id="inputUrl"
-					class="form-control"
-					placeholder="The web address(es) for this tutorial, including the http/https protocol"
-				/>
-				<span class="input-group-btn">
-					<button class="url-add btn btn-default" type="button">+</button>
-					<button class="url-remove btn btn-default" type="button">-</button>
-				</span>
-			</div>
-		</div>
-	</div>
+	<?php foreach ($report['urls'] as $ord => $url): ?>
+		<?php $this->insert(
+			'partials/new-report/url',
+			array(
+				'id' => false,
+				'url' => $url,
+				'firstItem' => $ord === 0,
+			)
+		) ?>
+	<?php endforeach ?>
 	
 	<div class="form-group">
 		<label for="inputTitle" class="col-sm-2 control-label">Title:</label>
 		<div class="col-sm-10">
 			<input
 				type="text"
+				name="title"
+				value="<?php echo $this->escape($report['title']) ?>"
 				id="inputTitle"
 				class="form-control"
 				placeholder="The title of the resource (you can just copy and paste this from the resource)"
@@ -48,38 +67,21 @@
 				class="form-control"
 				rows="3"
 				placeholder="An English description of the problem(s) should go here (Markdown is supported)"
-			></textarea>
+			><?php echo $this->escape($report['description']) ?></textarea>
 		</div>
 	</div>
 
-	<div class="form-group issue-group">
-		<label for="issueType" class="col-sm-2 control-label">Issue(s):</label>
-		<div class="col-sm-10">
-			<div class="input-group">
-				<select
-					id="issueType"
-					class="form-control"
-				>
-					<option>SQL injection</option>
-					<option>XSS</option>
-				</select>
-				<span class="input-group-btn">
-					<button class="issue-add btn btn-default" type="button">+</button>
-					<button class="issue-remove btn btn-default" type="button">-</button>
-				</span>
-			</div>
-			<!-- @todo How to do this in Bootstrap? -->
-			<div style="margin-top: 8px;">
-				<textarea
-					name="description"
-					id="issueDescription"
-					class="form-control"
-					rows="3"
-					placeholder="An optional English description of this issue can go here (Markdown is supported)"
-				></textarea>
-			</div>
-		</div>
-	</div>
+	<?php foreach ($report['issues'] as $ord => $issue): ?>
+		<?php $this->insert(
+			'partials/new-report/issue',
+			array(
+				'id' => false,
+				'description' => $issue['description'],
+				'typeCode' => $issue['type_code'],
+				'firstItem' => $ord === 0,
+			)
+		) ?>
+	<?php endforeach ?>
 
 	<div class="form-group">
 		<label for="inputDate" class="col-sm-2 control-label">Author notified date:</label>
@@ -103,7 +105,7 @@
 </form>
 
 <?php // Move this outside of the form, so elements aren't detected inside it ?>
-<?php $this->insert('partials/new-report-templates') ?>
+<?php $this->insert('partials/new-report/templates') ?>
 
 
 <script type="text/javascript">
@@ -124,6 +126,7 @@
 			cloneBlock('issue');
 		});
 
+		// @todo In some cases we need to add in an 'id' to get the label working
 		function removeBlock(clicked, type) {
 			// See if we are allowed to delete
 			if ($('#edit-report .' + type + '-group').length === 1) {
