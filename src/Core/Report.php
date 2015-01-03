@@ -382,7 +382,6 @@ class Report
 	 * Internal save command to do an update
 	 *
 	 * @param integer $reportId
-	 * @return boolean|null
 	 * @throws TrivialException
 	 */
 	protected function update($reportId)
@@ -399,7 +398,7 @@ class Report
 				id = :report_id
 		";
 		
-		return $this->runSaveCommand($sql, $reportId);
+		$this->runSaveCommand($sql, $reportId);
 	}
 
 	/**
@@ -418,7 +417,7 @@ class Report
 
 		$this->runSaveCommand($sql);
 
-		return $this->getDriver()->lastInsertId();
+		return (int) $this->getDriver()->lastInsertId();
 	}
 
 	/**
@@ -583,7 +582,7 @@ class Report
 						);
 					}
 				}
-				$reportId = $row['report_id'];
+				$reportId = (int) $row['report_id'];
 			}
 		}
 

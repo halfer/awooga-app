@@ -21,7 +21,7 @@ class NewReport extends BaseController
 			'description' => '',
 			'issues' => array(
 				array(
-					'type_code' => '',
+					'issue_cat_code' => '',
 					'description' => '',
 				),
 			),
@@ -80,7 +80,7 @@ class NewReport extends BaseController
 		{
 			foreach ($post['issue-type-code'] as $ord => $code)
 			{
-				$report['issues'][$ord]['type_code'] = $code;
+				$report['issues'][$ord]['issue_cat_code'] = $code;
 				$report['issues'][$ord]['description'] = '';
 			}
 		}
@@ -91,9 +91,9 @@ class NewReport extends BaseController
 			foreach ($post['issue-description'] as $ord => $description)
 			{
 				$report['issues'][$ord]['description'] = $description;
-				if (!isset($report['issues'][$ord]['type_code']))
+				if (!isset($report['issues'][$ord]['issue_cat_code']))
 				{
-					$report['issues'][$ord]['type_code'] = null;
+					$report['issues'][$ord]['issue_cat_code'] = null;
 				}
 			}
 		}
@@ -104,24 +104,49 @@ class NewReport extends BaseController
 	/**
 	 * Carries out the save operation
 	 */
-	protected function handleSave()
+	protected function handleSave(array $reportInput)
 	{
-		// @todo This needs to be attached to the current user, not hardwired
-
 		// Create/update the report attached to this user
-		$report = new Report(null, 1);
+		$report = new Report(null, $this->getUserId());
 		$report->setDriver($this->getDriver());
-		$report->setUrl('http://example.com');
-		$report->setTitle('My title');
-		$report->setDescription('My description');
-		$report->setIssues(array(array('issue_cat_code' => 'sql-injection',)));
-		//$reportId = $report->save();
 
-		return array(
-			'widget' => 'The widget failed to align with the thingamajig',
-		);
+		// These can blow up, so we wrap in catch block
+		$errors = array();
+		try
+		{
+			$report->setUrl($reportInput['urls']);
+			$report->setTitle($reportInput['title']);
+			$report->setDescription($reportInput['description']);
+			$report->setIssues($reportInput['issues']);
+		}
+		catch (\Exception $e)
+		{
+			// @todo This will only report the first error, need to fix that
+			$errors[] = $e->getMessage();
+		}
 
-		// @todo Return success or fail boolean
+		if (!$errors)
+		{
+			try
+			{
+				$reportId = $report->save();
+			}
+			catch (\Exception $e)
+			{
+				$errors[] = "Save failed";
+			}
+		}
+
+		return $errors ? $errors : $reportId;
+	}
+
+	protected function getUserId()
+	{
+		$sql = "SELECT id FROM user WHERE username = :username";
+		$statement = $this->getDriver()->prepare($sql);
+		$statement->execute(array(':username' => $this->getSignedInUsername()));
+
+		return $statement->fetchColumn();
 	}
 
 	public function getMenuSlug()

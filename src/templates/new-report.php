@@ -77,7 +77,7 @@
 			array(
 				'id' => false,
 				'description' => $issue['description'],
-				'typeCode' => $issue['type_code'],
+				'typeCode' => $issue['issue_cat_code'],
 				'firstItem' => $ord === 0,
 			)
 		) ?>
