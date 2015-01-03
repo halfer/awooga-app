@@ -15,6 +15,7 @@
 		'id' => 'template-issue',
 		'description' => '',
 		'typeCode' => null,
+		'issues' => $issues,
 		'firstItem' => false,
 	)
 ) ?>

@@ -45,9 +45,12 @@ class NewReport extends BaseController
 			}
 		}
 
+		// Get the list of permitted issue types
+		$issues = $this->getIssueList();
+
 		echo $this->render(
 			'new-report',
-			array('report' => $report, 'errors' => $errors, )
+			array('report' => $report, 'issues' => $issues, 'errors' => $errors, )
 		);
 	}
 
@@ -147,6 +150,21 @@ class NewReport extends BaseController
 		$statement->execute(array(':username' => $this->getSignedInUsername()));
 
 		return $statement->fetchColumn();
+	}
+
+	protected function getIssueList()
+	{
+		$sql = "SELECT code FROM issue ORDER BY description";
+		$statement = $this->getDriver()->prepare($sql);
+		$statement->execute();
+		$issues = $statement->fetchAll(\PDO::FETCH_ASSOC);
+		$out = array();
+		foreach ($issues as $issue)
+		{
+			$out[] = $issue['code'];
+		}
+
+		return $out;
 	}
 
 	public function getMenuSlug()

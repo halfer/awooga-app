@@ -1,6 +1,7 @@
 <?php
 /*
  * @var array $report A report to edit
+ * @var array $issues The list of permitted issue codes
  * @var array $errors A list of errors to report, as a result of a failed validation/save
  */
 ?>
@@ -78,6 +79,7 @@
 				'id' => false,
 				'description' => $issue['description'],
 				'typeCode' => $issue['issue_cat_code'],
+				'issues' => $issues,
 				'firstItem' => $ord === 0,
 			)
 		) ?>
@@ -105,7 +107,7 @@
 </form>
 
 <?php // Move this outside of the form, so elements aren't detected inside it ?>
-<?php $this->insert('partials/new-report/templates') ?>
+<?php $this->insert('partials/new-report/templates', array('issues' => $issues, )) ?>
 
 
 <script type="text/javascript">

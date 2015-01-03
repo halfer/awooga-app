@@ -5,6 +5,7 @@
  * @var string $description The description string being edited
  * @var string $typeCode Code chosen from the drop-down
  * @var string $id The id for the overall div, if required
+ * @var array $issues List of issue codes to choose from
  * @var boolean $firstItem True for first item, false otherwise
  */
 ?>
@@ -25,7 +26,6 @@
 	>Issue(s):</label>
 	<div class="col-sm-10">
 		<div class="input-group">
-			code{<?php echo $typeCode ?>}
 			<select
 				name="issue-type-code[]"
 				<?php if ($firstItem): ?>
@@ -33,12 +33,11 @@
 				<?php endif ?>
 				class="form-control"
 			>
-				<option
-					value="sql-injection"
-					>SQL injection</option>
-				<option
-					value="xss"
-					>XSS</option>
+				<?php foreach ($issues as $issue): ?>
+					<option
+						<?php if ($issue == $typeCode): ?>selected="selected"<?php endif ?>
+						><?php echo $this->escape($issue) ?></option>
+				<?php endforeach ?>
 			</select>
 			<span class="input-group-btn">
 				<button
