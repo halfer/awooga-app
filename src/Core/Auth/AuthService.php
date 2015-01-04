@@ -2,9 +2,16 @@
 
 namespace Awooga\Core\Auth;
 
+use OAuth\Common\Http\Uri\UriFactory;
+
 abstract class AuthService
 {
+	use \Awooga\Traits\AuthSession;
+
 	protected $config;
+	protected $redirect;
+	protected $error;
+	protected $authenticatedName;
 
 	/**
 	 * Set up the authorisation system with application config
@@ -16,9 +23,27 @@ abstract class AuthService
 		$this->config = $config;
 	}
 
-	abstract public function execute();
+	public function redirectTo()
+	{
+		return $this->redirect;
+	}
 
-	abstract public function getError();
+	public function getAuthenticatedName()
+	{
+		return $this->authenticatedName;
+	}
+
+	/**
+	 * If the login failed, the reason will be given here
+	 * 
+	 * @return string
+	 */
+	public function getError()
+	{
+		return $this->error;
+	}
+
+	abstract public function execute();
 
 	/**
 	 * Method to determine whether this system is available
@@ -30,5 +55,17 @@ abstract class AuthService
 	public function isConfigured()
 	{
 		return false;
+	}
+
+	/**
+	 * Creates a URI so we can build return addresses
+	 */
+	protected function createUri()
+	{
+		$uriFactory = new \OAuth\Common\Http\Uri\UriFactory();
+		$currentUri = $uriFactory->createFromSuperGlobalArray($_SERVER);
+		$currentUri->setQuery('');
+
+		return $currentUri;
 	}
 }

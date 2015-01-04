@@ -5,6 +5,7 @@ namespace Awooga\Core\Auth;
 use OAuth\Common\Storage\Session;
 use OAuth\Common\Consumer\Credentials;
 use OAuth\Common\Http\Uri\UriInterface;
+use OAuth\Common\Http\Exception\TokenResponseException;
 
 class Github extends AuthService
 {
@@ -15,31 +16,64 @@ class Github extends AuthService
 	 */
 	public function execute()
 	{
-		// @todo Do the auth here
-	}
+		$currentUri = $this->createUri();
+		$service = $this->getAuthService($currentUri);
+		$code = isset($_GET['code']) ? $_GET['code'] : null;
 
-	/**
-	 * If the login failed, the reason will be given here
-	 * 
-	 * @return array
-	 */
-	public function getError()
-	{
-		return array();
+		if ($code && $this->getProviderNameFromSession())
+		{
+			// This was a callback request from GitHub, get the token
+			try
+			{
+				$service->requestAccessToken($code);
+				$result = json_decode($service->request('user'), true);
+			}
+			catch (TokenResponseException $e)
+			{
+				// This seems safe to report to the user
+				$this->error = $e->getMessage();
+				return false;
+			}
+
+			// Clear intermediate session vars
+			$this->unsetProviderInSession();
+
+			// See if the security token matches, to ensure the request came from us
+			$suppliedState = isset($_GET['state']) ? $_GET['state'] : 1;
+			$savedState = isset($_SESSION['state']) ? $_SESSION['state'] : 2;
+			if ($suppliedState != $savedState)
+			{
+				$this->error = "The login attempt appears not to have come from GitHub";
+				return false;
+			}
+			if (isset($result['html_url']))
+			{
+				$this->authenticatedName = $result['html_url'];
+			}
+		}
+		elseif ($this->getProviderNameFromQueryString())
+		{
+			$url = $service->getAuthorizationUri();
+			$state = rand(1, 9999999);
+			$_SESSION['state'] = $state;
+			$this->setProviderInSession('github');
+			$url .= '&state=' . $state;
+			$this->redirect = $url;
+		}
+
+		return true;
 	}
 
 	/**
 	 * Creates the authorisation service using the OAuth library
 	 * 
-	 * @todo Change this back to protected when we can
-	 * 
 	 * @param UriInterface $uri
 	 * @return type
 	 */
-	public function getAuthService(UriInterface $uri)
+	protected function getAuthService(UriInterface $uri)
 	{
-		// Session storage
-		$storage = new Session();
+		// Session storage, don't start session though - that is already done
+		$storage = new Session(false);
 
 		// Setup the credentials for the requests
 		$credentials = new Credentials(

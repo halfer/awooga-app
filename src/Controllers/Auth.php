@@ -2,10 +2,10 @@
 
 namespace Awooga\Controllers;
 
-use OAuth\Common\Http\Exception\TokenResponseException;
-
 class Auth extends BaseController
 {
+	use \Awooga\Traits\AuthSession;
+
 	/**
 	 * Controller for authentication endpoint
 	 */
@@ -13,7 +13,16 @@ class Auth extends BaseController
 	{
 		if (!$this->isAuthenticated())
 		{
-			$this->loginProcess();
+			// Gets provider code from query string or session
+			$provider = $this->getProviderName();
+			if ($provider)
+			{
+				$this->loginProcess($provider);
+			}
+			else
+			{
+				$this->showLoginScreen();
+			}
 		}
 		else
 		{
@@ -21,63 +30,46 @@ class Auth extends BaseController
 		}
 	}
 
-	protected function loginProcess()
+	public function showLoginScreen()
 	{
-		// Supply a URI so we can build return addresses
-		$uriFactory = new \OAuth\Common\Http\Uri\UriFactory();
-		$currentUri = $uriFactory->createFromSuperGlobalArray($_SERVER);
-		$currentUri->setQuery('');
+		echo $this->render(
+			'login',
+			array(
+				'error' => false,
+				// Show the requires auth message (comes from a redirect)
+				'requiresAuth' => isset($_GET['require-auth']),
+			)
+		);
+	}
 
-		// Temporary fix to use the new class
-		$authConfig = $this->getEnvConfig('auth-service.github', false);
-		$serviceFactory = new \Awooga\Core\Auth\Github(is_array($authConfig) ? $authConfig : array());
-
+	protected function loginProcess($provider)
+	{
 		$error = null;
-		if ($this->getProviderName() == 'github')
+		$authService = $this->getServiceProvider($provider);
+		if (!$authService)
 		{
-			// Just using GitHub at the moment
-			$service = $serviceFactory->getAuthService($currentUri);
-			$code = isset($_GET['code']) ? $_GET['code'] : null;
+			$error = 'Cannot find the requested authentication service';
+		}
 
-			if ($code && $this->getProviderNameFromSession())
+		if (!$error)
+		{
+			// Here is the login sequence
+			$ok = $authService->execute();
+			if ($ok)
 			{
-				// This was a callback request from GitHub, get the token
-				try
+				if ($serviceUsername = $authService->getAuthenticatedName())
 				{
-					$service->requestAccessToken($code);
-					$result = json_decode($service->request('user'), true);
-				}
-				catch (TokenResponseException $e)
-				{
-					// This seems safe to report to the user
-					$error = $e->getMessage();
-					$result = array();
-				}
-
-				// Clear intermediate session vars
-				unset($_SESSION['provider']);
-
-				// See if the security token matches, to ensure the request came from us
-				$suppliedState = isset($_GET['state']) ? $_GET['state'] : 1;
-				$savedState = isset($_SESSION['state']) ? $_SESSION['state'] : 2;
-				if ($suppliedState != $savedState)
-				{
-					$error = "The login attempt appears not to have come from GitHub";
-				}
-				elseif (isset($result['html_url']))
-				{
-					$this->logon($result['html_url']);
+					$this->logon($serviceUsername, $provider);
 					$this->getSlim()->redirect('/');
 				}
+				elseif ($url = $authService->redirectTo())
+				{
+					$this->getSlim()->redirect($url);
+				}
 			}
-			elseif ($this->getProviderNameFromQueryString())
+			else
 			{
-				$url = $service->getAuthorizationUri();
-				$state = rand(1, 9999999);
-				$_SESSION['state'] = $state;
-				$_SESSION['provider'] = 'github';
-				$url .= '&state=' . $state;
-				$this->slim->redirect($url);
+				$error = $authService->getError();
 			}
 		}
 
@@ -92,25 +84,24 @@ class Auth extends BaseController
 		);
 	}
 
-	protected function getProviderName()
+	/**
+	 * Gets an Awooga auth service, if one exists
+	 * 
+	 * @param type $provider
+	 */
+	protected function getServiceProvider($provider)
 	{
-		$provider = $this->getProviderNameFromQueryString();
-		if (!$provider)
+		// An empty config is permitted, so no error need result from it not being set
+		$authConfig = $this->getEnvConfig('auth-service.' . $provider, false);
+
+		// Return null if the class does not exist
+		$className = '\\Awooga\\Core\\Auth\\' . ucfirst($provider);
+		if (!class_exists($className))
 		{
-			$provider = $this->getProviderNameFromSession();
+			return null;
 		}
 
-		return $provider;
-	}
-
-	protected function getProviderNameFromQueryString()
-	{
-		return isset($_GET['provider']) ? $_GET['provider'] : null;
-	}
-
-	protected function getProviderNameFromSession()
-	{
-		return isset($_SESSION['provider']) ? $_SESSION['provider'] : null;		
+		return new $className(is_array($authConfig) ? $authConfig : array());		
 	}
 
 	/**
@@ -118,14 +109,14 @@ class Auth extends BaseController
 	 * 
 	 * @param string $serviceUsername
 	 */
-	protected function logon($serviceUsername)
+	protected function logon($serviceUsername, $provider)
 	{
-		// @todo Remove hardwiring for provider name
-		$this->createAndFetchUserRecords($serviceUsername, 'github');
+		// Ensure the user's login records exist
+		$this->createAndFetchUserRecords($serviceUsername, $provider);
 
 		// Prevent session fixation
 		session_regenerate_id();
-
+		
 		// Store the username for cross-referencing with the database
 		$_SESSION[self::SESSION_KEY_USERNAME] = $serviceUsername;
 	}
