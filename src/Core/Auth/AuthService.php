@@ -18,7 +18,7 @@ abstract class AuthService
 
 	abstract public function execute();
 
-	abstract public function getErrors();
+	abstract public function getError();
 
 	/**
 	 * Method to determine whether this system is available

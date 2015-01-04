@@ -28,13 +28,13 @@ class Auth extends BaseController
 		$currentUri = $uriFactory->createFromSuperGlobalArray($_SERVER);
 		$currentUri->setQuery('');
 
+		// Temporary fix to use the new class
+		$authConfig = $this->getEnvConfig('auth-service.github', false);
+		$serviceFactory = new \Awooga\Core\Auth\Github(is_array($authConfig) ? $authConfig : array());
+
 		$error = null;
 		if ($this->getProviderName() == 'github')
 		{
-			// Temporary fix to use the new class
-			$authConfig = $this->getEnvConfig('auth-service.github', false);
-			$serviceFactory = new \Awooga\Core\Auth\Github(is_array($authConfig) ? $authConfig : array());
-
 			// Just using GitHub at the moment
 			$service = $serviceFactory->getAuthService($currentUri);
 			$code = isset($_GET['code']) ? $_GET['code'] : null;

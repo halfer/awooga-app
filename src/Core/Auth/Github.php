@@ -19,11 +19,11 @@ class Github extends AuthService
 	}
 
 	/**
-	 * If the login failed, the reason(s) will be given here
+	 * If the login failed, the reason will be given here
 	 * 
 	 * @return array
 	 */
-	public function getErrors()
+	public function getError()
 	{
 		return array();
 	}
