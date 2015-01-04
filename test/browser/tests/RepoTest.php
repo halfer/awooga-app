@@ -5,9 +5,18 @@ namespace Awooga\Testing\Browser;
 class RepoTest extends TestCase
 {
 	/**
-	 * Ensure the count is correct for this repo
+	 * Check page title
 	 * 
-	 * @todo Need a page title test
+	 * @driver simple
+	 */
+	public function testTitle()
+	{
+		$page = $this->visit(self::DOMAIN . '/repos');
+		$this->assertEquals('Source repositories — Awooga', $page->find('title')->text());
+	}
+
+	/**
+	 * Ensure the count is correct for this repo
 	 * 
 	 * @driver phantomjs
 	 */

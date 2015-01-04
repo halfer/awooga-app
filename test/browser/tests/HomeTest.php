@@ -5,9 +5,18 @@ namespace Awooga\Testing\Browser;
 class HomeTest extends TestCase
 {
 	/**
-	 * Ensure the menus and footers look OK
+	 * Check page title
 	 * 
-	 * @todo Need a page title test
+	 * @driver simple
+	 */
+	public function testTitle()
+	{
+		$page = $this->visit(self::DOMAIN);
+		$this->assertEquals('Awooga', $page->find('title')->text());
+	}
+
+	/**
+	 * Ensure the menus and footers look OK
 	 * 
 	 * @driver phantomjs
 	 */

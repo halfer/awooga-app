@@ -5,6 +5,17 @@ namespace Awooga\Testing\Browser;
 class IssueTest extends TestCase
 {
 	/**
+	 * Check page title
+	 * 
+	 * @driver simple
+	 */
+	public function testTitle()
+	{
+		$page = $this->visit(self::DOMAIN . '/issues');
+		$this->assertEquals('Issue types — Awooga', $page->find('title')->text());
+	}
+
+	/**
 	 * Check the issues table works
 	 * 
 	 * @todo Need a page title test

@@ -5,9 +5,20 @@ namespace Awooga\Testing\Browser;
 class BrowseTest extends TestCase
 {
 	/**
-	 * General table browsing
+	 * Check page title
 	 * 
-	 * @todo Need a page title test
+	 * @todo Works with simple driver but not phantomjs, report bug
+	 * 
+	 * @driver simple
+	 */
+	public function testTitle()
+	{
+		$page = $this->visit(self::DOMAIN . '/browse');
+		$this->assertEquals('Browse reports — Awooga', $page->find('title')->text());
+	}
+
+	/**
+	 * General table browsing
 	 * 
 	 * @driver phantomjs
 	 */
