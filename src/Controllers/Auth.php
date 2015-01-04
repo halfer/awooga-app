@@ -2,9 +2,6 @@
 
 namespace Awooga\Controllers;
 
-use OAuth\Common\Storage\Session;
-use OAuth\Common\Consumer\Credentials;
-use OAuth\Common\Http\Uri\UriInterface;
 use OAuth\Common\Http\Exception\TokenResponseException;
 
 class Auth extends BaseController
@@ -34,8 +31,12 @@ class Auth extends BaseController
 		$error = null;
 		if ($this->getProviderName() == 'github')
 		{
+			// Temporary fix to use the new class
+			$authConfig = $this->getEnvConfig('auth-service.github', false);
+			$serviceFactory = new \Awooga\Core\Auth\Github(is_array($authConfig) ? $authConfig : array());
+
 			// Just using GitHub at the moment
-			$service = $this->getAuthService($currentUri);
+			$service = $serviceFactory->getAuthService($currentUri);
 			$code = isset($_GET['code']) ? $_GET['code'] : null;
 
 			if ($code && $this->getProviderNameFromSession())
@@ -89,81 +90,6 @@ class Auth extends BaseController
 				'requiresAuth' => isset($_GET['require-auth']),
 			)
 		);
-	}
-
-	protected function getAuthService(UriInterface $uri)
-	{
-		// Session storage
-		$storage = new Session();
-
-		// Setup the credentials for the requests
-		$credentials = new Credentials(
-			$this->getKey(),
-			$this->getSecret(),
-			$uri->getAbsoluteUri()
-		);
-
-		// Currently I am using a child service class that improves error handling
-		$serviceFactory = new \OAuth\ServiceFactory();
-		$serviceFactory->registerService('GitHubAuthService', '\\Awooga\\Core\\GitHubAuthService');
-		$service = $serviceFactory->createService(
-			'GitHubAuthService',
-			$credentials,
-			$storage,
-			array('user:email', )
-		);
-
-		return $service;
-	}
-
-	/**
-	 * Get the key for the chosen auth provider
-	 * 
-	 * This can come from server variables or from file config
-	 * 
-	 * @todo Don't show the login button if this is not set
-	 * 
-	 * @return string
-	 */
-	protected function getKey()
-	{
-		if ($authConfig = $this->getEnvConfig('auth-service.github', false))
-		{
-			return $authConfig['client-id'];
-		}
-
-		$clientId = getenv('GITHUB_CLIENT_ID');
-		if (!$clientId)
-		{
-			throw new \Exception("Cannot find auth provider client ID in server or file config");
-		}
-
-		return $clientId;
-	}
-
-	/**
-	 * Get the secret for the chosen auth provider
-	 * 
-	 * This can come from server variables or from file config
-	 * 
-	 * @todo Don't show the login button if this is not set
-	 * 
-	 * @return string
-	 */
-	protected function getSecret()
-	{
-		if ($authConfig = $this->getEnvConfig('auth-service.github', false))
-		{
-			return $authConfig['client-secret'];
-		}
-
-		$clientSecret = getenv('GITHUB_CLIENT_SECRET');
-		if (!$clientSecret)
-		{
-			throw new \Exception("Cannot find auth provider client secret in server or file config");
-		}
-
-		return $clientSecret;
 	}
 
 	protected function getProviderName()

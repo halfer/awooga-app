@@ -1,5 +1,6 @@
 <?php
 
+// @todo Maybe move this to Awooga\Core\Auth?
 namespace Awooga\Core;
 
 use OAuth\OAuth2\Service\GitHub;
@@ -24,5 +25,4 @@ class GitHubAuthService extends GitHub
 
 		return parent::parseAccessTokenResponse($responseBody);
 	}
-
 }
