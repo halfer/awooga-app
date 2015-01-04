@@ -9,6 +9,7 @@ abstract class AuthService
 	use \Awooga\Traits\AuthSession;
 
 	protected $config;
+	protected $environment;
 	protected $redirect;
 	protected $error;
 	protected $authenticatedName;
@@ -18,9 +19,10 @@ abstract class AuthService
 	 * 
 	 * @param array $config
 	 */
-	public function __construct(array $config)
+	public function __construct(array $config, $environment)
 	{
 		$this->config = $config;
+		$this->environment = $environment;
 	}
 
 	public function redirectTo()

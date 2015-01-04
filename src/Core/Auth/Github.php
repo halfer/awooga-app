@@ -64,6 +64,12 @@ class Github extends AuthService
 		return true;
 	}
 
+	// @todo Make use of this
+	public function isConfigured()
+	{
+		return $this->getKey() && $this->getSecret();
+	}
+
 	/**
 	 * Creates the authorisation service using the OAuth library
 	 * 
@@ -100,8 +106,6 @@ class Github extends AuthService
 	 * 
 	 * This can come from server variables or from file config
 	 * 
-	 * @todo Don't show the login button if this is not set
-	 * 
 	 * @return string
 	 */
 	protected function getKey()
@@ -124,8 +128,6 @@ class Github extends AuthService
 	 * Get the secret for the chosen auth provider
 	 * 
 	 * This can come from server variables or from file config
-	 * 
-	 * @todo Don't show the login button if this is not set
 	 * 
 	 * @return string
 	 */

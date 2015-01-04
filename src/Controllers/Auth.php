@@ -100,7 +100,10 @@ class Auth extends BaseController
 			return null;
 		}
 
-		return new $className(is_array($authConfig) ? $authConfig : array());		
+		return new $className(
+			is_array($authConfig) ? $authConfig : array(),
+			$this->getSlim()->mode
+		);
 	}
 
 	/**

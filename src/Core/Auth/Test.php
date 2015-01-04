@@ -2,8 +2,22 @@
 
 namespace Awooga\Core\Auth;
 
-class Test
+class Test extends AuthService
 {
-	// Only allows the 'test' user to do things
-	// Only in the test environment
+	/**
+	 * A simple login system for the test environment
+	 * 
+	 * @return boolean
+	 */
+	public function execute()
+	{
+		if ($this->environment == 'test')
+		{
+			$this->authenticatedName = 'testuser';
+			return true;
+		}
+
+		$this->error = "This authorisation provider is not enabled";
+		return false;
+	}
 }
