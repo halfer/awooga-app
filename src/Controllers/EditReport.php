@@ -12,6 +12,7 @@ class EditReport extends NewReport
 	// @todo Apply a numeric regex to edit/view routing params
 	// - Add test to show that has worked
 	// @todo Email database backup
+	// @todo Github URLs in browse/view should remove 'https://'
 
 	/**
 	 * When editing an old report, the initial state is retrieved from disk
@@ -62,7 +63,7 @@ class EditReport extends NewReport
 	/**
 	 * Identifies which ID we're editing
 	 * 
-	 * @return boolean
+	 * @return integer
 	 */
 	protected function getEditId()
 	{

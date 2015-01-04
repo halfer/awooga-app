@@ -246,10 +246,10 @@ class NewReport extends BaseController
 	/**
 	 * Allows reports to be created
 	 * 
-	 * @param integer $userId Report owner (may be null)
+	 * @param integer $userId Report owner (will be null when creating reports)
 	 * @return boolean
 	 */
-	protected function editPermitted()
+	protected function editPermitted($userId)
 	{
 		return true;
 	}

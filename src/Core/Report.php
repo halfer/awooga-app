@@ -271,6 +271,7 @@ class Report
 	 * needs to rely on them.
 	 * 
 	 * @param integer $reportId Supply this to overwrite a particular row
+	 * @return integer
 	 */
 	public function save($reportId = null)
 	{
@@ -421,8 +422,8 @@ class Report
 	/**
 	 * Internal save command to do an insert
 	 *
-	 * @return string
 	 * @throws TrivialException
+	 * @return integer
 	 */
 	protected function insert()
 	{
