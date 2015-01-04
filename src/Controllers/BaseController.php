@@ -149,6 +149,20 @@ abstract class BaseController
 	}
 
 	/**
+	 * Reads the username from the session and retrieves a user ID
+	 * 
+	 * @return integer
+	 */
+	protected function getSignedInUserId()
+	{
+		$sql = "SELECT id FROM user WHERE username = :username";
+		$statement = $this->getDriver()->prepare($sql);
+		$statement->execute(array(':username' => $this->getSignedInUsername()));
+
+		return $statement->fetchColumn();
+	}
+
+	/**
 	 * Turns off debug mode for production env
 	 */
 	protected function configureDebugging()

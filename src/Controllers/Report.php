@@ -33,7 +33,13 @@ class Report extends BaseController
 			'Report "' . $report['title'] . '" containing ' . count($report['issues']) . ' issues'
 		);
 
-		echo $this->render('report', array('report' => $report, ));
+		echo $this->render(
+			'report',
+			array(
+				'report' => $report,
+				'isOwner' => $report['user_id'] == $this->getSignedInUserId(),
+			)
+		);
 	}
 
 	public function getMenuSlug()
@@ -57,6 +63,6 @@ class Report extends BaseController
 
 	public function setReportId($reportId)
 	{
-		$this->reportId = $reportId;
+		$this->reportId = (int) $reportId;
 	}
 }

@@ -147,6 +147,7 @@ trait Pagination
 				return $maxPage;
 			}
 
+			// @todo I think this can be stripped out, page numbers are verified in the router now
 			if ($realPage !== $this->page)
 			{
 				// Redirect to cleaned version (001 -> 1, 1hello -> 1)

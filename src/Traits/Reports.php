@@ -46,6 +46,7 @@ trait Reports
 				r.report_id,
 				i.code,
 				r.description_html,
+				r.description,
 				r.resolved_at
 			FROM report_issue r
 			INNER JOIN issue i ON (i.id = r.issue_id)
@@ -55,6 +56,20 @@ trait Reports
 		";
 
 		return $this->fetchAll($sql);
+	}
+
+	protected function getReportForId($id)
+	{
+		$sql = $this->getSqlToReadReports() . " AND report.id = :report_id";
+		$statement = $this->getDriver()->prepare($sql);
+		$ok = $statement->execute(array(':report_id' => $id, ));
+
+		if (!$ok)
+		{
+			throw new \Exception('Could not fetch report');
+		}
+
+		return $statement->fetch(\PDO::FETCH_ASSOC);
 	}
 
 	/**

@@ -269,13 +269,21 @@ class Report
 	 * Currently I'm deleting issues and URLs and then recreating them, for simplicity. This
 	 * will change their PKs, but that's OK since I don't (currently) plan on having anything that
 	 * needs to rely on them.
+	 * 
+	 * @param integer $reportId Supply this to overwrite a particular row
 	 */
-	public function save()
+	public function save($reportId = null)
 	{
 		$this->validateBeforeSave();
 
-		// See if we are editing a report or creating a new one
-		if ($reportId = $this->getCurrentReport())
+		// See if we need to overwrite
+		if ($reportId === null)
+		{
+			$reportId = $this->getCurrentReport();
+		}
+
+		// See if we need to overwrite a report
+		if ($reportId)
 		{
 			// These can be zapped and recreated
 			$this->deleteIssues($reportId);

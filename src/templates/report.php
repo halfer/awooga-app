@@ -4,13 +4,20 @@
 ) ?>
 
 <p>
-	This is information about a single report in the Awooga system.</p>
+	This is information about a single report in the Awooga system.
+</p>
 
 <div class="alert alert-info">
 	If you are the author of the referenced work, please note that it appears here because it has
 	been judged to contain serious errors, usually of a security nature. Please read the
 	introductory notes on the <a href="/">home page</a>.
 </div>
+
+<?php if ($isOwner): ?>
+	<p class="pull-right">
+		<a href="/report/<?php echo $report['id'] ?>/edit">Edit report</a>
+	</p>
+<?php endif ?>
 
 <h1><?php echo $this->escape($report['title']) ?></h1>
 

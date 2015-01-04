@@ -3,6 +3,7 @@
  * @var array $report A report to edit
  * @var array $issues The list of permitted issue codes
  * @var array $errors A list of errors to report, as a result of a failed validation/save
+ * @var integer $editId If applicable the ID we are editing
  */
 ?>
 
@@ -10,6 +11,12 @@
 	'layout',
 	array('selectedMenu' => $selectedMenu, 'countData' => $countData, 'username' => $username, )
 ) ?>
+
+<?php if ($editId): ?>
+	<p class="pull-right">
+		<a href="/report/<?php echo $editId ?>">View report</a>
+	</p>
+<?php endif ?>
 
 <p>
 	A page to create new reports.
@@ -32,7 +39,12 @@
 	</div>
 <?php endif ?>
 
-<form id="edit-report" method="post" class="form-horizontal">
+<form
+	id="edit-report"
+	method="post"
+	class="form-horizontal"
+	action="<?php echo $editId ? "/report/$editId/edit" : '/report/new' ?>"
+>
 
 	<?php foreach ($report['urls'] as $ord => $url): ?>
 		<?php $this->insert(
@@ -106,9 +118,8 @@
 
 </form>
 
-<?php // Move this outside of the form, so elements aren't detected inside it ?>
+<?php // This is outside of the form, so elements aren't detected inside it ?>
 <?php $this->insert('partials/new-report/templates', array('issues' => $issues, )) ?>
-
 
 <script type="text/javascript">
 	$(document).ready(function() {

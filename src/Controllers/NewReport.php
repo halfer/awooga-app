@@ -3,9 +3,13 @@
 namespace Awooga\Controllers;
 
 use Awooga\Core\Report;
+use Awooga\Exceptions\TrivialException;
 
 class NewReport extends BaseController
 {
+	/**
+	 * Runs the new report controller
+	 */
 	public function execute()
 	{
 		// Redirect if not signed in
@@ -15,17 +19,14 @@ class NewReport extends BaseController
 		}
 
 		// Create a report in an array to edit
-		$report = array(
-			'urls' => array(''),
-			'title' => '',
-			'description' => '',
-			'issues' => array(
-				array(
-					'issue_cat_code' => '',
-					'description' => '',
-				),
-			),
-		);
+		$report = $this->getInitialReport();
+
+		// Redirect if we are not permitted to edit (create is always fine, edit isn't)
+		if (!$this->editPermitted($report['user_id']))
+		{
+			// @todo Set a flash notice?
+			$this->getSlim()->redirect('/report/' . $this->getEditId());
+		}
 
 		// Let's try the save operation
 		$errors = array();
@@ -36,7 +37,7 @@ class NewReport extends BaseController
 			if (is_int($result))
 			{
 				// If the result is an int, it was successful
-				$this->getSlim()->redirect('/report/' . $result);
+				$this->getSlim()->redirect('/report/' . $result . '/edit');
 			}
 			else
 			{
@@ -49,8 +50,34 @@ class NewReport extends BaseController
 		$issues = $this->getIssueList();
 
 		echo $this->render(
-			'new-report',
-			array('report' => $report, 'issues' => $issues, 'errors' => $errors, )
+			'edit-report',
+			array(
+				'report' => $report,
+				'issues' => $issues,
+				'errors' => $errors,
+				'editId' => $this->getEditId(),
+			)
+		);
+	}
+
+	/**
+	 * When creating a new report, the initial state is a blank report
+	 * 
+	 * @return array
+	 */
+	protected function getInitialReport()
+	{
+		return array(
+			'urls' => array(''),
+			'title' => '',
+			'description' => '',
+			'user_id' => null,
+			'issues' => array(
+				array(
+					'issue_cat_code' => '',
+					'description' => '',
+				),
+			),
 		);
 	}
 
@@ -110,7 +137,7 @@ class NewReport extends BaseController
 	protected function handleSave(array $reportInput)
 	{
 		// Create/update the report attached to this user
-		$report = new Report(null, $this->getUserId());
+		$report = new Report(null, $this->getSignedInUserId());
 		$report->setDriver($this->getDriver());
 
 		// These can blow up, so we wrap in catch block
@@ -118,6 +145,7 @@ class NewReport extends BaseController
 		try
 		{
 			$report->setUrl($reportInput['urls']);
+			$this->checkUrlConflict($reportInput['urls']);
 			$report->setTitle($reportInput['title']);
 			$report->setDescription($reportInput['description']);
 			$report->setIssues($reportInput['issues']);
@@ -132,7 +160,7 @@ class NewReport extends BaseController
 		{
 			try
 			{
-				$reportId = $report->save();
+				$reportId = $report->save($this->getEditId());
 			}
 			catch (\Exception $e)
 			{
@@ -143,18 +171,56 @@ class NewReport extends BaseController
 		return $errors ? $errors : $reportId;
 	}
 
-	protected function getUserId()
+	protected function checkUrlConflict(array $urls)
 	{
-		$sql = "SELECT id FROM user WHERE username = :username";
-		$statement = $this->getDriver()->prepare($sql);
-		$statement->execute(array(':username' => $this->getSignedInUsername()));
+		// We need to do escaping manually for an IN query
+		$pdo = $this->getDriver();
+		$escaped = array();
+		foreach ($urls as $url)
+		{
+			$escaped[] = $pdo->quote($url, \PDO::PARAM_STR);
+		}
+		$inList = implode(',', $escaped);
 
-		return $statement->fetchColumn();
+		// See if any URLs are already known, for this user only
+		$sql = "
+			SELECT 1
+			FROM resource_url u
+			INNER JOIN report r ON (u.report_id = r.id)
+			WHERE
+				u.url IN ($inList)
+				AND r.user_id = :user_id
+		";
+		$params = array(':user_id' => $this->getSignedInUserId(), );
+
+		// If we are editing, allow an exception for the current report
+		if ($reportId = $this->getEditId())
+		{
+			$sql .= " AND r.id != :report_id";
+			$params[':report_id'] = $reportId;
+		}
+
+		$statement = $pdo->prepare($sql);
+		$statement->execute($params);
+
+		// If we have rows then we have a conflict
+		if ($statement->rowCount())
+		{
+			// @todo Add singular/plural messages here
+			throw new TrivialException(
+				"One of these URLs is already contained within another of your reports"
+			);
+		}
 	}
 
+	/**
+	 * Returns an array containing the issue codes
+	 * 
+	 * @return array
+	 */
 	protected function getIssueList()
 	{
-		$sql = "SELECT code FROM issue ORDER BY description";
+		$sql = "SELECT code FROM issue ORDER BY code";
 		$statement = $this->getDriver()->prepare($sql);
 		$statement->execute();
 		$issues = $statement->fetchAll(\PDO::FETCH_ASSOC);
@@ -165,6 +231,27 @@ class NewReport extends BaseController
 		}
 
 		return $out;
+	}
+
+	/**
+	 * Identifies which ID we're editing
+	 * 
+	 * @return boolean
+	 */
+	protected function getEditId()
+	{
+		return false;
+	}
+
+	/**
+	 * Allows reports to be created
+	 * 
+	 * @param integer $userId Report owner (may be null)
+	 * @return boolean
+	 */
+	protected function editPermitted()
+	{
+		return true;
 	}
 
 	public function getMenuSlug()
