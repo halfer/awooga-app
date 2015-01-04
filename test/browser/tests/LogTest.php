@@ -23,7 +23,5 @@ class LogTest extends TestCase
 	public function testLogs()
 	{
 		// @todo Improve fixture data first, too much cruft at the mo
-		// @todo Need a page title test
-
 	}
 }

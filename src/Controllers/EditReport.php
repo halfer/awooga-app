@@ -9,8 +9,7 @@ class EditReport extends NewReport
 	protected $reportId;
 
 	// @todo Write browser tests to check new/edit form
-	// @todo Apply a numeric regex to edit/view routing params
-	// - Add test to show that has worked
+	// @todo Add test to show routing conditions work correctly
 	// @todo Email database backup
 	// @todo Github URLs in browse/view should remove 'https://'
 

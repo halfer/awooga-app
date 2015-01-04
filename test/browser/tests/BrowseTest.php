@@ -7,7 +7,8 @@ class BrowseTest extends TestCase
 	/**
 	 * Check page title
 	 * 
-	 * @todo Works with simple driver but not phantomjs, report bug
+	 * @todo Works with simple driver but not phantomjs, reported here:
+	 * https://github.com/OpenBuildings/spiderling/issues/7
 	 * 
 	 * @driver simple
 	 */
