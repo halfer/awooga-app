@@ -78,8 +78,7 @@ class Auth extends BaseController
 			'login',
 			array(
 				'error' => $error,
-				// Show the requires auth message (comes from a redirect)
-				'requiresAuth' => isset($_GET['require-auth']),
+				'requiresAuth' => false,
 			)
 		);
 	}
