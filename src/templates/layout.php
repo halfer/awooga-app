@@ -52,8 +52,10 @@
 					<div class="nav navbar-nav navbar-right">
 						<ul class="nav navbar-nav">
 							<?php if ($username): ?>
-								<li>
-									<a href="/logout">Logout <?php echo $this->escape($username) ?></a>
+								<li id="auth-logout">
+									<a href="/logout">
+										Logout <span class="auth-username"><?php echo $this->escape($username) ?></span>
+									</a>
 								</li>
 							<?php else: ?>
 								<li class="<?php echo $selectedMenu == 'auth' ? 'active' : '' ?>">

@@ -6,6 +6,8 @@ class Auth extends BaseController
 {
 	use \Awooga\Traits\AuthSession;
 
+	protected $pageTitle = 'Login';
+
 	/**
 	 * Controller for authentication endpoint
 	 */
