@@ -51,7 +51,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `repository_log` WRITE;
 /*!40000 ALTER TABLE `repository_log` DISABLE KEYS */;
-INSERT INTO `repository_log` VALUES (668,1,270,'fetch',NULL,'2014-12-13 00:10:01','success'),(669,1,270,'move',NULL,'2014-12-13 00:10:01','success'),(670,1,270,'scan',NULL,'2014-12-13 00:10:02','success'),(671,1,270,'resched',NULL,'2014-12-13 00:10:02','success'),(672,1,274,'fetch',NULL,'2014-12-13 23:40:01','success'),(673,1,274,'move',NULL,'2014-12-13 23:40:01','success'),(674,1,274,'scan',NULL,'2014-12-13 23:40:02','success'),(675,1,274,'resched',NULL,'2014-12-13 23:40:02','success');
+INSERT INTO `repository_log` (`id`, `repository_id`, `run_id`, `log_type`, `message`, `created_at`, `log_level`) VALUES (668,1,270,'fetch',NULL,'2014-12-13 00:10:01','success'),(669,1,270,'move',NULL,'2014-12-13 00:10:01','success'),(670,1,270,'scan',NULL,'2014-12-13 00:10:02','success'),(671,1,270,'resched',NULL,'2014-12-13 00:10:02','success'),(672,1,274,'fetch',NULL,'2014-12-13 23:40:01','success'),(673,1,274,'move',NULL,'2014-12-13 23:40:01','success'),(674,1,274,'scan',NULL,'2014-12-13 23:40:02','success'),(675,1,274,'resched',NULL,'2014-12-13 23:40:02','success');
 /*!40000 ALTER TABLE `repository_log` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -71,7 +71,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `run` WRITE;
 /*!40000 ALTER TABLE `run` DISABLE KEYS */;
-INSERT INTO `run` VALUES (270,'2014-12-13 00:10:01'),(274,'2014-12-13 23:40:01');
+INSERT INTO `run` (`id`, `created_at`) VALUES (270,'2014-12-13 00:10:01'),(274,'2014-12-13 23:40:01');
 /*!40000 ALTER TABLE `run` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
