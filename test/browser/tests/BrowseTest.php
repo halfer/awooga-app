@@ -36,6 +36,23 @@ class BrowseTest extends TestCase
 	}
 
 	/**
+	 * Test the owner strings of the top two reports
+	 * 
+	 * @driver phantomjs
+	 */
+	public function testSourceStrings()
+	{
+		$page = $this->visit(self::DOMAIN . '/browse');
+
+		// Check the report link goes to /report/x
+		$firstSource = $page->find('table#reports tbody tr:first-child td:last-child')->text();
+		$this->assertEquals('User: https://github.com/halfer', $firstSource);
+
+		$secondSource = $page->find('table#reports tbody tr:nth-child(2) td:last-child')->text();
+		$this->assertEquals('Repo: 1', $secondSource);
+	}
+
+	/**
 	 * Check that domains can be searched for
 	 * 
 	 * @driver phantomjs
