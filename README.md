@@ -1,6 +1,8 @@
 Project Awooga
 ==============
 
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/halfer/awooga-app/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/halfer/awooga-app/?branch=master) [![Code Coverage](https://scrutinizer-ci.com/g/halfer/awooga-app/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/halfer/awooga-app/?branch=master) [![Build Status](https://scrutinizer-ci.com/g/halfer/awooga-app/badges/build.png?b=master)](https://scrutinizer-ci.com/g/halfer/awooga-app/build-status/master)
+
 Introduction
 ------
 
