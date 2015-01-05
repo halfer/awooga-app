@@ -134,11 +134,4 @@ class ReportTest extends TestCase
 			$this->assertNotContains('Edit report', $reportHeader);
 		}		
 	}
-
-	protected function loginTestUser()
-	{
-		// Logon and then check that it worked
-		$this->visit(self::DOMAIN . '/auth?provider=test');
-		$this->assertEquals('Logout testuser', $this->find('#auth-status')->text());
-	}
 }

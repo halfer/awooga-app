@@ -139,4 +139,14 @@ abstract class TestCase extends \Openbuildings\PHPUnitSpiderling\Testcase_Spider
 
 		return $statement->fetchAll(\PDO::FETCH_ASSOC);
 	}
+
+	/**
+	 * Logs in the test user
+	 */
+	protected function loginTestUser()
+	{
+		// Logon and then check that it worked
+		$this->visit(self::DOMAIN . '/auth?provider=test');
+		$this->assertEquals('Logout testuser', $this->find('#auth-status')->text());
+	}
 }
