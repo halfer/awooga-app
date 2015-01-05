@@ -24,7 +24,7 @@ class RepoTest extends TestCase
 	{
 		$this->
 			visit(self::DOMAIN . '/repos')->
-			assertHasCss('table tbody tr:first-child td:nth-child(2):contains("25")')
+			assertHasCss('table tbody tr:first-child td:nth-child(2):contains("24")')
 		;
 	}
 }

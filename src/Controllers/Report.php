@@ -33,11 +33,15 @@ class Report extends BaseController
 			'Report "' . $report['title'] . '" containing ' . count($report['issues']) . ' issues'
 		);
 
+		// Decide if this report is being viewed by its owner
+		$isOwner =
+			$report['user_id'] &&
+			$report['user_id'] == $this->getSignedInUserId();
+
 		echo $this->render(
 			'report',
 			array(
-				'report' => $report,
-				'isOwner' => $report['user_id'] == $this->getSignedInUserId(),
+				'report' => $report, 'isOwner' => $isOwner,
 			)
 		);
 	}

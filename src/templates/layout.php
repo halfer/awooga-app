@@ -50,7 +50,7 @@
 						<?php endif ?>
 					</ul>
 					<div class="nav navbar-nav navbar-right">
-						<ul class="nav navbar-nav">
+						<ul id="auth-status" class="nav navbar-nav">
 							<?php if ($username): ?>
 								<li id="auth-logout">
 									<a href="/logout">
