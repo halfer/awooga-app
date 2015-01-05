@@ -128,8 +128,7 @@
 			$('#template-' + type).
 				clone().
 				removeAttr('id').
-				insertAfter(lastGroup).
-				css('display', 'block');			
+				insertAfter(lastGroup);
 		}
 
 		$('#edit-report').on('click', '.url-add', function() {
