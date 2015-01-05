@@ -1,7 +1,7 @@
 Installation instructions
 =========================
 
-General
+Getting started
 -------
 
 To install, you'll need Composer and Bower to get the project's dependencies:
@@ -22,6 +22,13 @@ To set up web app configuration:
 
 (And then edit the new file with your database settings)
 
+To identify your Awooga environment, add this into your Apache vhost:
+
+    SetEnv SLIM_MODE production
+
+The usual environments are `local`, `staging`, `test` and `production`. Do not make a test site
+available on the public internet, as it permits anonymous login.
+
 To install cron/reboot tasks:
 
 	sudo ./build/cron/install.sh
@@ -36,7 +43,8 @@ To delete the database and start again:
 General
 -------
 
-To run an update, do the following. Note that the cron will do it for you, so this is only if you want to run it by hand.
+To run an update, do the following. Note that the cron will do it for you, so this is only if you
+want to run it by hand.
 
     sudo console/create-mount-fs.sh && sudo -u awooga php console/update-repos.php
 
