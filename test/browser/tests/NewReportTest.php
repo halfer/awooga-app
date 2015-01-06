@@ -71,9 +71,7 @@ class NewReportTest extends TestCase
 		// No URL
 		$this->
 			visit($pageUrl)->
-			find_button('Save')->
-				click()->
-			end();
+			click_button('Save');
 		$this->checkError("The 'url' field is required");
 
 		// Bad URL
@@ -82,9 +80,7 @@ class NewReportTest extends TestCase
 			find('#edit-report input[name="urls[]"]')->
 				set('nonsense')->
 			end()->
-			find_button('Save')->
-				click()->
-			end();
+			click_button('Save');
 		$this->checkError('The URL "nonsense" does not have a recognised protocol');
 
 		// Insert a URL, add a new URL, insert an identical URL
@@ -99,8 +95,7 @@ class NewReportTest extends TestCase
 			find('#edit-report div.url-group:nth-child(2) input[name="urls[]"]')->
 				set('http://urlone.com/')->
 			end()->
-			find_button('Save')->
-				click();
+			click_button('Save');
 		$this->checkError("URL arrays may not contain duplicates");
 
 		// The URL duplicates a URL in a report belonging to the same user
@@ -109,9 +104,7 @@ class NewReportTest extends TestCase
 			find('#edit-report input[name="urls[]"]')->
 				set('http://www.smarttutorials.net/responsive-quiz-application-using-php-mysql-jquery-ajax-and-twitter-bootstrap/')->
 			end()->
-			find_button('Save')->
-				click()->
-			end();
+			click_button('Save');
 		$this->checkError('One of these URLs is already contained within another of your reports');
 				
 		// Missing title
@@ -120,9 +113,7 @@ class NewReportTest extends TestCase
 			find('#edit-report input[name="urls[]"]')->
 				set('http://urlone.com/')->
 			end()->
-			find_button('Save')->
-				click()->
-			end();
+			click_button('Save');
 		$this->checkError("The 'title' field is required");
 
 		// Missing description
@@ -134,9 +125,7 @@ class NewReportTest extends TestCase
 			find('#edit-report input[name="title"]')->
 				set('Demo title')->
 			end()->
-			find_button('Save')->
-				click()->
-			end();
+			click_button('Save');
 		$this->checkError("The 'description' field is required");
 	}
 
