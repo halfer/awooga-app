@@ -36,7 +36,7 @@ class NewReportTest extends TestCase
 	public function testNewReportRequiresLogin()
 	{
 		$this->visit($this->pageUrl());
-		// @todo Check that we are redirected to login
+		$this->assertEquals('/auth?require-auth=1', $this->current_path());
 	}
 
 	/**
@@ -127,10 +127,7 @@ class NewReportTest extends TestCase
 		$this->checkError("The 'url' field cannot be longer than 256 characters");
 
 		// Excessively long title
-		$this->setPageData(
-			'http://urlone.com/',
-			str_repeat('Demo title', 50)
-		)->
+		$this->setPageData('http://urlone.com/', str_repeat('Demo title', 50))->
 			click_button('Save');
 		$this->checkError("The 'title' field cannot be longer than 256 characters");
 
