@@ -117,7 +117,7 @@ abstract class BaseController
 		$pdo = new \PDO($dsn, $config['username'], $config['password']);
 
 		// Add debugging facility if appropriate
-		if (!$this->isProduction())
+		if ($this->useDebugBar())
 		{
 			$traceablePDO = new \DebugBar\DataCollector\PDO\TraceablePDO($pdo);
 			$this->getDebugBar()->addCollector(
@@ -178,7 +178,7 @@ abstract class BaseController
 	{
 		// Set up the debug bar, but not in production
 		$jsRenderer = null;
-		if (!$this->isProduction())
+		if ($this->useDebugBar())
 		{
 			$debugbar = new StandardDebugBar();
 			$jsRenderer = $debugbar->getJavascriptRenderer('/assets/debugbar');
@@ -207,9 +207,19 @@ abstract class BaseController
 		$this->getDebugBar()['messages']->addMessage($message);
 	}
 
+	protected function useDebugBar()
+	{
+		return !$this->isProduction() && !$this->isTest();
+	}
+
 	protected function isProduction()
 	{
 		return $this->slim->mode == 'production';
+	}
+
+	protected function isTest()
+	{
+		return $this->slim->mode == 'test';		
 	}
 
 	/**
