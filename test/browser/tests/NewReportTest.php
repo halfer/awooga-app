@@ -180,10 +180,49 @@ class NewReportTest extends TestCase
 
 	/**
 	 * Check that we can actually save an item!
+	 * 
+	 * @driver phantomjs
 	 */
 	public function testSuccessfulSave()
 	{
-		// @todo
+		$this->setPageData(
+			'http://urlone.com/',
+			'Demo title',
+			'Demo description'
+		)->
+			find('#edit-report textarea[name="issue-description[]"]')->
+				set('This is a demo issue description')->
+			end()->
+			find('#edit-report textarea[name="issue-type-code[]"]')->
+				select_option('sql-injection')->
+			click_button('Save');
+
+		// @todo Check we redirect back to the edit page
+		echo $this->current_path() . "\n";
+
+		// @todo Check there is no error message
+	}
+
+	/**
+	 * Check that the JavaScript device to remove a URL works
+	 * 
+	 * @driver phantomjs
+	 */
+	public function testRemoveUrlWidget()
+	{
+		// @todo Check that with two URLs, the last one can be removed
+		// @todo Check that with three URLs, the first one can be removed
+	}
+
+	/**
+	 * Check that the JavaScript device to remove an issue group works
+	 * 
+	 * @driver phantomjs
+	 */
+	public function testRemoveIssueWidget()
+	{
+		// @todo Check that with two issues, the last one can be removed
+		// @todo Check that with three issues, the first one can be removed
 	}
 
 	/**
