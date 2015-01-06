@@ -7,6 +7,10 @@ use \Awooga\Exceptions\SeriousException;
 
 class Report
 {
+	const LENGTH_TITLE = 256;
+	const LENGTH_DESCRIPTION = 1024;
+	const LENGTH_URL = 256;
+
 	protected $repoId;
 	protected $userId;
 	protected $id;
@@ -41,6 +45,7 @@ class Report
 	{
 		$this->isRequired($title, 'title');
 		$this->isString($title);
+		$this->validateLength($title, 'title', self::LENGTH_TITLE);
 
 		$this->title = $title;
 	}
@@ -66,6 +71,7 @@ class Report
 			foreach ($url as $urlItem)
 			{
 				$this->isRequired($urlItem, 'url');
+				$this->validateLength($urlItem, 'url', self::LENGTH_URL);
 				if (!is_string($urlItem))
 				{
 					$formatFail = true;
@@ -113,6 +119,7 @@ class Report
 	{
 		$this->isRequired($description, 'description');
 		$this->isString($description);
+		$this->validateLength($description, 'description', self::LENGTH_DESCRIPTION);
 
 		$this->description = $description;
 	}
@@ -198,6 +205,7 @@ class Report
 			{
 				throw new TrivialException('Descriptions must be strings');
 			}
+			$this->validateLength($issue['description'], 'issue-description', self::LENGTH_DESCRIPTION);
 		}
 
 		if (isset($issue['resolved_at']))
@@ -658,5 +666,13 @@ class Report
 		{
 			throw new TrivialException("The '{$name}' field is required");
 		}		
+	}
+
+	protected function validateLength($data, $name, $length)
+	{
+		if (strlen($data) > $length)
+		{
+			throw new TrivialException("The '{$name}' field cannot be longer than {$length} characters");			
+		}
 	}
 }

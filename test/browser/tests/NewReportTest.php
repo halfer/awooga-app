@@ -35,7 +35,7 @@ class NewReportTest extends TestCase
 	 */
 	public function testNewReportRequiresLogin()
 	{
-		$this->visit(self::DOMAIN . '/report/new');
+		$this->visit($this->pageUrl());
 		// @todo Check that we are redirected to login
 	}
 
@@ -49,7 +49,7 @@ class NewReportTest extends TestCase
 		// We need to be signed in for this
 		$this->loginTestUser();
 
-		$tableText = $this->visit(self::DOMAIN . '/report/new')->find('form#edit-report')->text();
+		$tableText = $this->visit($this->pageUrl())->find('form#edit-report')->text();
 		$labels = array('URL(s)', 'Title', 'Description', 'Issue(s)', 'Author notified date', );
 		foreach ($labels as $label)
 		{
@@ -66,17 +66,16 @@ class NewReportTest extends TestCase
 	{
 		// We need to be signed in for this
 		$this->loginTestUser();
-		$pageUrl = self::DOMAIN . '/report/new';
 
 		// No URL
 		$this->
-			visit($pageUrl)->
+			visit($this->pageUrl())->
 			click_button('Save');
 		$this->checkError("The 'url' field is required");
 
 		// Bad URL
 		$this->
-			visit($pageUrl)->
+			visit($this->pageUrl())->
 			find('#edit-report input[name="urls[]"]')->
 				set('nonsense')->
 			end()->
@@ -85,7 +84,7 @@ class NewReportTest extends TestCase
 
 		// Insert a URL, add a new URL, insert an identical URL
 		$this->
-			visit($pageUrl)->
+			visit($this->pageUrl())->
 			find('#edit-report input[name="urls[]"]')->
 				set('http://urlone.com/')->
 			end()->
@@ -100,7 +99,7 @@ class NewReportTest extends TestCase
 
 		// The URL duplicates a URL in a report belonging to the same user
 		$this->
-			visit($pageUrl)->
+			visit($this->pageUrl())->
 			find('#edit-report input[name="urls[]"]')->
 				set('http://www.smarttutorials.net/responsive-quiz-application-using-php-mysql-jquery-ajax-and-twitter-bootstrap/')->
 			end()->
@@ -109,7 +108,7 @@ class NewReportTest extends TestCase
 				
 		// Missing title
 		$this->
-			visit($pageUrl)->
+			visit($this->pageUrl())->
 			find('#edit-report input[name="urls[]"]')->
 				set('http://urlone.com/')->
 			end()->
@@ -118,7 +117,7 @@ class NewReportTest extends TestCase
 
 		// Missing description
 		$this->
-			visit($pageUrl)->
+			visit($this->pageUrl())->
 			find('#edit-report input[name="urls[]"]')->
 				set('http://urlone.com/')->
 			end()->
@@ -153,10 +152,58 @@ class NewReportTest extends TestCase
 		$this->loginTestUser();
 
 		// Excessively long URL
+		$this->
+			visit($this->pageUrl())->
+			find('#edit-report input[name="urls[]"]')->
+				set('http://' . str_repeat('nonsense', 50))->
+			end()->
+			click_button('Save');
+		$this->checkError("The 'url' field cannot be longer than 256 characters");
+
 		// Excessively long title
+		$this->
+			visit($this->pageUrl())->
+			find('#edit-report input[name="urls[]"]')->
+				set('http://urlone.com/')->
+			end()->
+			find('#edit-report input[name="title"]')->
+				set(str_repeat('Demo title', 50))->
+			end()->
+			click_button('Save');
+		$this->checkError("The 'title' field cannot be longer than 256 characters");
+
 		// Excessively long description
-		// Excessively long issue code
-		// Excessively long issue code		
+		$this->
+			visit($this->pageUrl())->
+			find('#edit-report input[name="urls[]"]')->
+				set('http://urlone.com/')->
+			end()->
+			find('#edit-report input[name="title"]')->
+				set('Demo title')->
+			end()->
+			find('#edit-report textarea[name="description"]')->
+				set(str_repeat('Demo description', 100))->
+			end()->
+			click_button('Save');
+		$this->checkError("The 'description' field cannot be longer than 1024 characters");
+
+		// Excessively long issue description
+		$this->
+			visit($this->pageUrl())->
+			find('#edit-report input[name="urls[]"]')->
+				set('http://urlone.com/')->
+			end()->
+			find('#edit-report input[name="title"]')->
+				set('Demo title')->
+			end()->
+			find('#edit-report textarea[name="description"]')->
+				set('Demo description')->
+			end()->
+			find('#edit-report textarea[name="issue-description[]"]')->
+				set(str_repeat('Demo description', 100))->
+			end()->
+			click_button('Save');			
+		$this->checkError("The 'issue-description' field cannot be longer than 1024 characters");
 	}
 
 	/**
@@ -172,5 +219,11 @@ class NewReportTest extends TestCase
 		// No URLs
 		// No issues
 		// Invalid issue code
+		// Excessively long issue code
+	}
+
+	protected function pageUrl()
+	{
+		return self::DOMAIN . '/report/new';
 	}
 }
