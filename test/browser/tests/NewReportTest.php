@@ -154,10 +154,30 @@ class NewReportTest extends TestCase
 
 	/**
 	 * Checks that two issues of the same code result in a validation error
+	 * 
+	 * @driver phantomjs
 	 */
 	public function testDuplicateIssueCode()
 	{
-		// @todo
+		// We need to be signed in for this
+		$this->loginTestUser();
+
+		$this->setPageData(
+			'http://urlone.com/',
+			'Demo title',
+			'Demo description'
+		);
+		$this->addAnotherIssue();
+
+		// Grab the selects and set them to the same value
+		$selects = $this->all('#edit-report div.issue-group select');
+		foreach ($selects as $select)
+		{
+			$select->select_option('sql-injection')->end();
+		}
+
+		$this->click_button('Save');
+		$this->checkError("Issue codes may not be duplicated in a report");
 	}
 
 	/**
@@ -306,6 +326,19 @@ class NewReportTest extends TestCase
 			find('#edit-report .url-group')->
 				click_button('+')->
 			end();
+	}
+
+	/**
+	 * Clicks the + issue button
+	 * 
+	 * @return Node
+	 */
+	protected function addAnotherIssue()
+	{
+		return $this->
+			find('#edit-report .issue-group')->
+				click_button('+')->
+			end();		
 	}
 
 	/**
