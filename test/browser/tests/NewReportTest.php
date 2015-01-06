@@ -75,19 +75,13 @@ class NewReportTest extends TestCase
 
 		// Bad URL
 		$this->
-			visit($this->pageUrl())->
-			find('#edit-report input[name="urls[]"]')->
-				set('nonsense')->
-			end()->
+			setPageData('nonsense')->
 			click_button('Save');
 		$this->checkError('The URL "nonsense" does not have a recognised protocol');
 
 		// Insert a URL, add a new URL, insert an identical URL
 		$this->
-			visit($this->pageUrl())->
-			find('#edit-report input[name="urls[]"]')->
-				set('http://urlone.com/')->
-			end()->
+			setPageData('http://urlone.com/')->
 			find('#edit-report .url-group')->
 				click_button('+')->
 			end()->
@@ -99,33 +93,83 @@ class NewReportTest extends TestCase
 
 		// The URL duplicates a URL in a report belonging to the same user
 		$this->
-			visit($this->pageUrl())->
-			find('#edit-report input[name="urls[]"]')->
-				set('http://www.smarttutorials.net/responsive-quiz-application-using-php-mysql-jquery-ajax-and-twitter-bootstrap/')->
-			end()->
+			setPageData('http://www.smarttutorials.net/responsive-quiz-application-using-php-mysql-jquery-ajax-and-twitter-bootstrap/')->
 			click_button('Save');
 		$this->checkError('One of these URLs is already contained within another of your reports');
 				
 		// Missing title
 		$this->
-			visit($this->pageUrl())->
-			find('#edit-report input[name="urls[]"]')->
-				set('http://urlone.com/')->
-			end()->
+			setPageData('http://urlone.com/')->
 			click_button('Save');
 		$this->checkError("The 'title' field is required");
 
 		// Missing description
 		$this->
-			visit($this->pageUrl())->
-			find('#edit-report input[name="urls[]"]')->
-				set('http://urlone.com/')->
-			end()->
-			find('#edit-report input[name="title"]')->
-				set('Demo title')->
-			end()->
+			setPageData('http://urlone.com/', 'Demo title')->
 			click_button('Save');
 		$this->checkError("The 'description' field is required");
+	}
+
+	/**
+	 * Check that some simple length validation works for this page
+	 * 
+	 * @driver phantomjs
+	 */
+	public function testBasicLengthValidation()
+	{
+		// We need to be signed in for this
+		$this->loginTestUser();
+
+		// Excessively long URL
+		$this->
+			setPageData('http://' . str_repeat('nonsense', 50))->
+			click_button('Save');
+		$this->checkError("The 'url' field cannot be longer than 256 characters");
+
+		// Excessively long title
+		$this->setPageData(
+			'http://urlone.com/',
+			str_repeat('Demo title', 50)
+		)->
+			click_button('Save');
+		$this->checkError("The 'title' field cannot be longer than 256 characters");
+
+		// Excessively long description
+		$this->setPageData(
+			'http://urlone.com/',
+			'Demo title',
+			str_repeat('Demo description', 100)
+		)->
+			click_button('Save');
+		$this->checkError("The 'description' field cannot be longer than 1024 characters");
+
+		// Excessively long issue description
+		$this->setPageData(
+			'http://urlone.com/',
+			'Demo title',
+			'Demo description'
+		)->
+			find('#edit-report textarea[name="issue-description[]"]')->
+				set(str_repeat('Demo description', 100))->
+			end()->
+			click_button('Save');
+		$this->checkError("The 'issue-description' field cannot be longer than 1024 characters");
+	}
+
+	/**
+	 * Checks that two issues of the same code result in a validation error
+	 */
+	public function testDuplicateIssueCode()
+	{
+		// @todo
+	}
+
+	/**
+	 * Check that we can actually save an item!
+	 */
+	public function testSuccessfulSave()
+	{
+		// @todo
 	}
 
 	/**
@@ -142,68 +186,25 @@ class NewReportTest extends TestCase
 	}
 
 	/**
-	 * Check that some simple length validation works for this page
+	 * Shortcut method to fill in some of the form's fields
 	 * 
-	 * @driver phantomjs
+	 * @param string $url
+	 * @param string $title
+	 * @param string $description
 	 */
-	public function testBasicLengthValidation()
+	protected function setPageData($url = '', $title = '', $description = '')
 	{
-		// We need to be signed in for this
-		$this->loginTestUser();
-
-		// Excessively long URL
-		$this->
+		return $this->
 			visit($this->pageUrl())->
 			find('#edit-report input[name="urls[]"]')->
-				set('http://' . str_repeat('nonsense', 50))->
-			end()->
-			click_button('Save');
-		$this->checkError("The 'url' field cannot be longer than 256 characters");
-
-		// Excessively long title
-		$this->
-			visit($this->pageUrl())->
-			find('#edit-report input[name="urls[]"]')->
-				set('http://urlone.com/')->
+				set($url)->
 			end()->
 			find('#edit-report input[name="title"]')->
-				set(str_repeat('Demo title', 50))->
-			end()->
-			click_button('Save');
-		$this->checkError("The 'title' field cannot be longer than 256 characters");
-
-		// Excessively long description
-		$this->
-			visit($this->pageUrl())->
-			find('#edit-report input[name="urls[]"]')->
-				set('http://urlone.com/')->
-			end()->
-			find('#edit-report input[name="title"]')->
-				set('Demo title')->
+				set($title)->
 			end()->
 			find('#edit-report textarea[name="description"]')->
-				set(str_repeat('Demo description', 100))->
-			end()->
-			click_button('Save');
-		$this->checkError("The 'description' field cannot be longer than 1024 characters");
-
-		// Excessively long issue description
-		$this->
-			visit($this->pageUrl())->
-			find('#edit-report input[name="urls[]"]')->
-				set('http://urlone.com/')->
-			end()->
-			find('#edit-report input[name="title"]')->
-				set('Demo title')->
-			end()->
-			find('#edit-report textarea[name="description"]')->
-				set('Demo description')->
-			end()->
-			find('#edit-report textarea[name="issue-description[]"]')->
-				set(str_repeat('Demo description', 100))->
-			end()->
-			click_button('Save');			
-		$this->checkError("The 'issue-description' field cannot be longer than 1024 characters");
+				set($description)->
+			end();
 	}
 
 	/**
