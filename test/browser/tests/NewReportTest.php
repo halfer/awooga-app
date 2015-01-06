@@ -162,6 +162,23 @@ class NewReportTest extends TestCase
 	}
 
 	/**
+	 * Validation tests that require page hacking
+	 * 
+	 * @driver phantomjs
+	 */
+	public function testAdvancedValidation()
+	{
+		// We need to be signed in for this
+		$this->loginTestUser();
+
+		// @todo
+		// No URLs
+		// No issues
+		// Invalid issue code
+		// Excessively long issue code
+	}
+
+	/**
 	 * Check that we can actually save an item!
 	 */
 	public function testSuccessfulSave()
@@ -202,22 +219,6 @@ class NewReportTest extends TestCase
 			find('#edit-report textarea[name="description"]')->
 				set($description)->
 			end();
-	}
-
-	/**
-	 * Validation tests that require page hacking
-	 * 
-	 * @driver phantomjs
-	 */
-	public function testAdvancedValidation()
-	{
-		// We need to be signed in for this
-		$this->loginTestUser();
-
-		// No URLs
-		// No issues
-		// Invalid issue code
-		// Excessively long issue code
 	}
 
 	protected function pageUrl()
