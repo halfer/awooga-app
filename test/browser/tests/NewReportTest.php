@@ -103,9 +103,41 @@ class NewReportTest extends TestCase
 				click();
 		$this->checkError("URL arrays may not contain duplicates");
 
-		// One URL duplicating an existing URL
+		// The URL duplicates a URL in a report belonging to the same user
+		$this->
+			visit($pageUrl)->
+			find('#edit-report input[name="urls[]"]')->
+				set('http://www.smarttutorials.net/responsive-quiz-application-using-php-mysql-jquery-ajax-and-twitter-bootstrap/')->
+			end()->
+			find_button('Save')->
+				click()->
+			end();
+		$this->checkError('One of these URLs is already contained within another of your reports');
+				
 		// Missing title
+		$this->
+			visit($pageUrl)->
+			find('#edit-report input[name="urls[]"]')->
+				set('http://urlone.com/')->
+			end()->
+			find_button('Save')->
+				click()->
+			end();
+		$this->checkError("The 'title' field is required");
+
 		// Missing description
+		$this->
+			visit($pageUrl)->
+			find('#edit-report input[name="urls[]"]')->
+				set('http://urlone.com/')->
+			end()->
+			find('#edit-report input[name="title"]')->
+				set('Demo title')->
+			end()->
+			find_button('Save')->
+				click()->
+			end();
+		$this->checkError("The 'description' field is required");
 	}
 
 	/**
