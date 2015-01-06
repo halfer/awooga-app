@@ -81,10 +81,9 @@ class NewReportTest extends TestCase
 
 		// Insert a URL, add a new URL, insert an identical URL
 		$this->
-			setPageData('http://urlone.com/')->
-			find('#edit-report .url-group')->
-				click_button('+')->
-			end()->
+			setPageData('http://urlone.com/');
+		$this->
+			addAnotherUrl()->
 			find('#edit-report div.url-group:nth-child(2) input[name="urls[]"]')->
 				set('http://urlone.com/')->
 			end()->
@@ -185,6 +184,9 @@ class NewReportTest extends TestCase
 	 */
 	public function testSuccessfulSave()
 	{
+		// We need to be signed in for this
+		$this->loginTestUser();
+
 		$this->setPageData(
 			'http://urlone.com/',
 			'Demo title',
@@ -193,14 +195,17 @@ class NewReportTest extends TestCase
 			find('#edit-report textarea[name="issue-description[]"]')->
 				set('This is a demo issue description')->
 			end()->
-			find('#edit-report textarea[name="issue-type-code[]"]')->
+			find('#edit-report select[name="issue-type-code[]"]')->
 				select_option('sql-injection')->
+			end()->
 			click_button('Save');
 
-		// @todo Check we redirect back to the edit page
-		echo $this->current_path() . "\n";
+		// Wait for the redirect
+		$redirected = $this->waitUntilRedirected($this->pageUrl());
+		$this->assertTrue($redirected, "Ensure page redirects to different URL");
 
-		// @todo Check there is no error message
+		// Check there is no error message
+		$this->not_present('.alert-warning');
 	}
 
 	/**
@@ -210,8 +215,39 @@ class NewReportTest extends TestCase
 	 */
 	public function testRemoveUrlWidget()
 	{
-		// @todo Check that with two URLs, the last one can be removed
-		// @todo Check that with three URLs, the first one can be removed
+		// We need to be signed in for this
+		$this->loginTestUser();
+
+		$this->visit($this->pageUrl());
+		$this->addAnotherUrl();
+		$this->addAnotherUrl();
+		$this->addAnotherUrl();
+
+		// Add some data
+		for($i = 1; $i <= 4; $i++)
+		{
+			$this->setSpecificUrl($i, 'http://example.com/' . $i);
+		}
+
+		// Remove the first one and the last one, check the middle two are still OK
+		$this->
+			find('#edit-report div.url-group:nth-child(1)')->
+				click_button('-')->
+			end()->
+			// The 4th one becomes the 3rd after the above call!
+			find('#edit-report div.url-group:nth-child(3)')->
+				click_button('-')->
+			end();
+		$this->not_present('#edit-report div.url-group input:contains("http://example.com/1")');
+		$this->not_present('#edit-report div.url-group input:contains("http://example.com/4")');
+		$this->assertEquals(
+			'http://example.com/2',
+			$this->find('#edit-report div.url-group:nth-child(1) input')->value()
+		);
+		$this->assertEquals(
+			'http://example.com/3',
+			$this->find('#edit-report div.url-group:nth-child(2) input')->value()
+		);
 	}
 
 	/**
@@ -247,17 +283,58 @@ class NewReportTest extends TestCase
 	 */
 	protected function setPageData($url = '', $title = '', $description = '')
 	{
+		$this->visit($this->pageUrl());
+
 		return $this->
-			visit($this->pageUrl())->
-			find('#edit-report input[name="urls[]"]')->
-				set($url)->
-			end()->
+			setSpecificUrl(1, $url)->
 			find('#edit-report input[name="title"]')->
 				set($title)->
 			end()->
 			find('#edit-report textarea[name="description"]')->
 				set($description)->
 			end();
+	}
+
+	/**
+	 * Clicks the + URL button
+	 * 
+	 * @return Node
+	 */
+	protected function addAnotherUrl()
+	{
+		return $this->
+			find('#edit-report .url-group')->
+				click_button('+')->
+			end();
+	}
+
+	/**
+	 * Sets the first/second/etc URL input
+	 * 
+	 * @param integer $ord
+	 * @param string $url
+	 * @return string
+	 */
+	protected function setSpecificUrl($ord, $url)
+	{
+		return $this->
+			find("#edit-report div.url-group:nth-child($ord) input[name='urls[]']")->
+				set($url)->
+			end();
+	}
+
+	protected function waitUntilRedirected($originalUrl)
+	{
+		$retry = 0;
+		do {
+			$hasRedirected = $originalUrl != $this->current_url();
+			if (!$hasRedirected)
+			{
+				sleep(0.5);
+			}
+		} while (!$hasRedirected && $retry++ < 20);
+
+		return $hasRedirected;
 	}
 
 	protected function pageUrl()
