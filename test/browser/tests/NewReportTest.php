@@ -349,7 +349,7 @@ class NewReportTest extends TestCase
 		// Let's see how long we needed to wait
 		$time = microtime(true);
 		$ok = $this->waitForSelectorCount($selector, $oldCount + 1);
-		$elapsedTime = round(time() - $time, 2);
+		$elapsedTime = round(microtime(true) - $time, 2);
 		$this->assertTrue(
 			$ok, 
 			"Wait $elapsedTime seconds for another $type to be added"
