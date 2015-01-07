@@ -86,8 +86,11 @@ class NewReportTest extends TestCase
 		$this->
 			setPageData('http://urlone.com/');
 		sleep(3);
+		$this->encodedScreenshot('Before URL is added');
 		$this->
-			addAnotherUrl()->
+			addAnotherUrl();
+		$this->encodedScreenshot('After URL is added');
+		$this->
 			find('#edit-report div.url-group:nth-child(2) input[name="urls[]"]')->
 				set('http://urlone.com/')->
 			end()->
@@ -404,6 +407,30 @@ class NewReportTest extends TestCase
 		} while (!$isReached && $retry++ < 20);
 
 		return $isReached;
+	}
+
+	protected function encodedScreenshot($title)
+	{
+		$file = '/tmp/awooga-screenshot.png';
+		$this->screenshot($file);
+		$this->base64out($file, $title);
+		unlink($file);
+	}
+
+	protected function base64out($filename, $title)
+	{
+		if (!file_exists($filename))
+		{
+			throw new \Exception("File '$filename' not found");
+		}
+
+		$data = 
+			"-----\n" .
+			$title . "\n" .
+			"-----\n" .
+			chunk_split(base64_encode(file_get_contents($filename))) .
+			"-----\n\n";
+		file_put_contents('/tmp/awooga-screenshot-data.log', $data, FILE_APPEND);
 	}
 
 	protected function pageUrl()
