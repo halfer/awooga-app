@@ -79,9 +79,13 @@ class NewReportTest extends TestCase
 			click_button('Save');
 		$this->checkError('The URL "nonsense" does not have a recognised protocol');
 
+		// Travis is not responding to clicks, does it need settling down time to get the DOM
+		// ready? I'll try adding some sleeps in first.
+
 		// Insert a URL, add a new URL, insert an identical URL
 		$this->
 			setPageData('http://urlone.com/');
+		sleep(3);
 		$this->
 			addAnotherUrl()->
 			find('#edit-report div.url-group:nth-child(2) input[name="urls[]"]')->
