@@ -4,6 +4,9 @@ namespace Awooga\Testing\Browser;
 
 class NewReportTest extends TestCase
 {
+	/**
+	 * Handy to check critical web assets are available, which would cause JS not to work
+	 */
 	public function testWebAssetsAvailable()
 	{
 		$assets = array(
@@ -96,18 +99,11 @@ class NewReportTest extends TestCase
 			click_button('Save');
 		$this->checkError('The URL "nonsense" does not have a recognised protocol');
 
-		// Travis is not responding to clicks, does it need settling down time to get the DOM
-		// ready? I'll try adding some sleeps in first.
-
 		// Insert a URL, add a new URL, insert an identical URL
 		$this->
 			setPageData('http://urlone.com/');
-		sleep(3);
-		$this->encodedScreenshot('Before URL is added');
 		$this->
-			addAnotherUrl();
-		$this->encodedScreenshot('After URL is added');
-		$this->
+			addAnotherUrl()->
 			find('#edit-report div.url-group:nth-child(2) input[name="urls[]"]')->
 				set('http://urlone.com/')->
 			end()->
@@ -397,6 +393,14 @@ class NewReportTest extends TestCase
 			end();
 	}
 
+	/**
+	 * Waits until a redirect or a timeout occurs
+	 * 
+	 * @todo Move this to the parent
+	 * 
+	 * @param string $originalUrl
+	 * @return boolean Success
+	 */
 	protected function waitUntilRedirected($originalUrl)
 	{
 		$retry = 0;
@@ -411,6 +415,15 @@ class NewReportTest extends TestCase
 		return $hasRedirected;
 	}
 
+	/**
+	 * Wait until the count of a selector agrees with the expected count, or a timeout occurs
+	 * 
+	 * @todo Move this to the parent
+	 * 
+	 * @param type $selector
+	 * @param type $expectedCount
+	 * @return type
+	 */
 	protected function waitForSelectorCount($selector, $expectedCount)
 	{
 		$retry = 0;
@@ -426,6 +439,13 @@ class NewReportTest extends TestCase
 		return $isReached;
 	}
 
+	/**
+	 * Takes a screenshot and appends it to a base64 log file, handy for Travis
+	 * 
+	 * @todo Move this to the parent
+	 * 
+	 * @param string $title
+	 */
 	protected function encodedScreenshot($title)
 	{
 		$file = '/tmp/awooga-screenshot.png';
@@ -434,6 +454,15 @@ class NewReportTest extends TestCase
 		unlink($file);
 	}
 
+	/**
+	 * Base 64 encoding helper
+	 * 
+	 * @todo Move this to the parent
+	 * 
+	 * @param string $filename
+	 * @param string $title
+	 * @throws \Exception
+	 */
 	protected function base64out($filename, $title)
 	{
 		if (!file_exists($filename))
