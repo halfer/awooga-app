@@ -345,9 +345,14 @@ class NewReportTest extends TestCase
 			find($selector)->
 				click_button('+')->
 			end();
+
+		// Let's see how long we needed to wait
+		$time = microtime(true);
+		$ok = $this->waitForSelectorCount($selector, $oldCount + 1);
+		$elapsedTime = round(time() - $time, 2);
 		$this->assertTrue(
-			$this->waitForSelectorCount($selector, $oldCount + 1),
-			"Wait for another $type to be added"
+			$ok, 
+			"Wait $elapsedTime seconds for another $type to be added"
 		);
 
 		return $fluid;		
