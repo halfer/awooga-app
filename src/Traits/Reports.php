@@ -20,7 +20,7 @@ trait Reports
 			FROM report
 			LEFT JOIN user ON (report.user_id = user.id)
 			WHERE
-				is_enabled = 1
+				report.is_enabled = 1
 		";
 	}
 

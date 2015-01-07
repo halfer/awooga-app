@@ -115,15 +115,15 @@ class Browse extends BaseController
 			// @todo Need to take the right page slice out of here
 			$where = implode(',', $this->searchKeys);
 			$sql = $this->getSqlToReadReports() . "
-				AND id IN ($where)
-				ORDER BY id DESC
+				AND report.id IN ($where)
+				ORDER BY report.id DESC
 			";			
 		}
 		else
 		{
 			$limitClause = $this->getLimitClause($pageSize);
 			$sql = $this->getSqlToReadReports() . "
-				ORDER BY id DESC
+				ORDER BY report.id DESC
 				{$limitClause}
 			";
 		}
