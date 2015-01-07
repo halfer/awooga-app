@@ -2,9 +2,10 @@
 /*
  * Variables:
  * 
- * $maxPage
- * $currentPage
+ * $maxPage integer
+ * $currentPage integer
  * $urlPrefix string Prefix for all links, e.g. /logs/
+ * $searchString string Optional
  */
 ?>
 
@@ -16,7 +17,13 @@
 			<?php else: ?>
 				<span>
 					<a
-						href="<?php echo $this->escape($urlPrefix) ?>/<?php echo $pageNo ?>"
+						href="<?php
+							echo $this->escape($urlPrefix)
+						?>/<?php
+							echo $pageNo
+						?><?php
+							echo isset($searchString) && $searchString ? '?search=' . $this->escape($searchString) : ''
+						?>"
 					><?php echo $pageNo ?></a>
 				</span>
 			<?php endif ?>

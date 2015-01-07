@@ -100,6 +100,17 @@ class BrowseTest extends TestCase
 	public function testIssueSearch()
 	{
 		$this->checkSearch('sql-injection', 23, true);
+
+		// Make sure paginator works on searches
+		$originalUrl = $this->current_url();
+		$this->
+			find('#paginator')->
+			click_link('2');
+		$this->assertTrue(
+			$this->waitUntilRedirected($originalUrl),
+			"Ensure the search moves to the second page"
+		);
+		$this->checkTableRowCount(3);
 	}
 
 	/**
@@ -120,11 +131,16 @@ class BrowseTest extends TestCase
 		;
 
 		// Count table entries too, in case the query has borked, or there are too many entries
+		$this->checkTableRowCount($expectedResults);
+	}
+
+	protected function checkTableRowCount($expectedResults)
+	{
 		$rows = $this->all('#reports tbody tr');
 		$this->assertEquals(
 			$expectedResults > 20 ? 20 : $expectedResults,
 			count($rows),
 			"Check the correct number of results have been rendered on the (first) results page"
-		);
+		);		
 	}
 }

@@ -16,6 +16,7 @@ class Browse extends BaseController
 	public function execute()
 	{
 		// See if we are in search mode
+		$searchString = null;
 		if ($this->isSearchMode())
 		{
 			// Get correct search index path
@@ -25,7 +26,8 @@ class Browse extends BaseController
 			$root = realpath(__DIR__ . '/../..') . $path;
 			$searcher = new \Awooga\Core\Searcher();
 			$searcher->connect($root);
-			$results = $searcher->search($_GET['search']);
+			$searchString = $_GET['search'];
+			$results = $searcher->search($searchString);
 			$this->searchKeys = array();
 			foreach ($results as $row)
 			{
@@ -46,6 +48,7 @@ class Browse extends BaseController
 				'isSearch' => $this->isSearchMode(),
 				'currentPage' => $this->getPage(),
 				'maxPage' => $this->getMaxPage($rowCount, $pageSize),
+				'searchString' => $searchString,
 			)
 		);
 	}

@@ -41,5 +41,8 @@
 
 <?php $this->insert(
 	'partials/paginator',
-	['maxPage' => $maxPage, 'currentPage' => $currentPage, 'urlPrefix' => '/browse', ]
+	array(
+		'maxPage' => $maxPage, 'currentPage' => $currentPage,
+		'urlPrefix' => '/browse', 'searchString' => $searchString,
+	)
 ) ?>
