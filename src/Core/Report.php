@@ -44,11 +44,33 @@ class Report
 	 */
 	public function setTitle($title)
 	{
-		$this->isRequired($title, 'title');
-		$this->isString($title);
-		$this->validateLength($title, 'title', self::LENGTH_TITLE);
+		$this->setRequiredString('title', $title, self::LENGTH_TITLE);
+	}
 
-		$this->title = $title;
+	/**
+	 * Sets a string description
+	 * 
+	 * @param string $description
+	 */
+	public function setDescription($description)
+	{
+		$this->setRequiredString('description', $description, self::LENGTH_DESCRIPTION);
+	}
+
+	/**
+	 * Sets a string description
+	 * 
+	 * @param string $name
+	 * @param string $value
+	 * @param integer $maxLength
+	 */
+	protected function setRequiredString($name, $value, $maxLength)
+	{
+		$this->isRequired($value, $name);
+		$this->isString($value);
+		$this->validateLength($value, $name, $maxLength);
+
+		$this->$name = $value;
 	}
 
 	/**
@@ -109,20 +131,6 @@ class Report
 		}
 
 		$this->urls = $url;
-	}
-
-	/**
-	 * Sets a string description
-	 * 
-	 * @param string $description
-	 */
-	public function setDescription($description)
-	{
-		$this->isRequired($description, 'description');
-		$this->isString($description);
-		$this->validateLength($description, 'description', self::LENGTH_DESCRIPTION);
-
-		$this->description = $description;
 	}
 
 	/**
