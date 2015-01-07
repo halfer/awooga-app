@@ -325,31 +325,32 @@ class NewReportTest extends TestCase
 	 */
 	protected function addAnotherUrl()
 	{
-		$oldCount = count($this->all($selector = '#edit-report .url-group'));
-		$fluid = $this->
-			find($selector)->
-				click_button('+')->
-			end();
-		$this->waitForSelectorCount($selector, $oldCount + 1);
-
-		return $fluid;
+		return $this->addAnotherBlock('url');
 	}
 
 	/**
-	 * Clicks the + issue button
+	 * Clicks the + issue button and waits for the screen to update
 	 * 
 	 * @return Node
 	 */
 	protected function addAnotherIssue()
 	{
-		$oldCount = count($this->all($selector = '#edit-report .issue-group'));
+		return $this->addAnotherBlock('issue');
+	}
+
+	protected function addAnotherBlock($type)
+	{
+		$oldCount = count($this->all($selector = "#edit-report .{$type}-group"));
 		$fluid = $this->
 			find($selector)->
 				click_button('+')->
 			end();
-		$this->waitForSelectorCount($selector, $oldCount + 1);
+		$this->assertTrue(
+			$this->waitForSelectorCount($selector, $oldCount + 1),
+			"Wait for another $type to be added"
+		);
 
-		return $fluid;
+		return $fluid;		
 	}
 
 	/**
