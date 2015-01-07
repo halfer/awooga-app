@@ -74,7 +74,7 @@ class Github extends AuthService
 	 * Creates the authorisation service using the OAuth library
 	 * 
 	 * @param UriInterface $uri
-	 * @return type
+	 * @return \Awooga\Core\GitHubAuthService
 	 */
 	protected function getAuthService(UriInterface $uri)
 	{

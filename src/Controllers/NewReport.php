@@ -236,7 +236,7 @@ class NewReport extends BaseController
 	/**
 	 * Identifies which ID we're editing
 	 * 
-	 * @return boolean
+	 * @return boolean|integer
 	 */
 	protected function getEditId()
 	{
