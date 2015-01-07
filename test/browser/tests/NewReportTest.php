@@ -375,7 +375,7 @@ class NewReportTest extends TestCase
 			$hasRedirected = $originalUrl != $this->current_url();
 			if (!$hasRedirected)
 			{
-				sleep(0.5);
+				usleep(500000);
 			}
 		} while (!$hasRedirected && $retry++ < 20);
 
@@ -390,7 +390,7 @@ class NewReportTest extends TestCase
 			$isReached = $count == $expectedCount;
 			if (!$isReached)
 			{
-				sleep(0.5);
+				usleep(500000);
 			}
 		} while (!$isReached && $retry++ < 20);
 
