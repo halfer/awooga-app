@@ -2,6 +2,9 @@
 
 namespace Awooga\Traits;
 
+/**
+ * Shall we merge this into the Database trait? Is there much need to split them?
+ */
 trait Runner
 {
 	/**

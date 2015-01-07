@@ -15,6 +15,7 @@ abstract class BaseController
 	protected $pageTitle;
 
 	use \Awooga\Traits\Database;
+	use \Awooga\Traits\Runner;
 	use \Awooga\Traits\Config;
 
 	public function __construct(Slim $slim, Engine $engine)
@@ -155,11 +156,11 @@ abstract class BaseController
 	 */
 	protected function getSignedInUserId()
 	{
-		$sql = "SELECT id FROM user WHERE username = :username";
-		$statement = $this->getDriver()->prepare($sql);
-		$statement->execute(array(':username' => $this->getSignedInUsername()));
-
-		return $statement->fetchColumn();
+		return $this->fetchColumn(
+			$this->getDriver(),
+			"SELECT id FROM user WHERE username = :username",
+			array(':username' => $this->getSignedInUsername())
+		);
 	}
 
 	/**

@@ -521,18 +521,16 @@ class Report
 	/**
 	 * Converts an issue code into an ID
 	 * 
-	 * @todo Rewrite using Runner->fetchColumn
-	 * 
 	 * @param string $code
 	 * @return string
 	 */
 	protected function getIssueIdForCode($code)
 	{
-		$sql = "SELECT id FROM issue WHERE code = :code";
-		$statement = $this->getDriver()->prepare($sql);
-		$statement->execute(array(':code' => $code, ));
-
-		return $statement->fetchColumn();
+		return $this->fetchColumn(
+			$this->getDriver(),
+			"SELECT id FROM issue WHERE code = :code",
+			array(':code' => $code, )
+		);
 	}
 
 	/**
