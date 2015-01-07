@@ -12,6 +12,9 @@ namespace Awooga\Testing\Browser;
  * @method string current_path() Return the current browser url without the domain
  * @method string current_url() Return the current url
  * @method \Openbuildings\Spiderling\Functest_Node assertHasCss($selector, array $filters = array(), $message = NULL)
+ * @method \Openbuildings\Spiderling\Node find($selector) Returns a single matching Node
+ * @method array all($selector) Returns all matching elements as Nodes
+ * @method void screenshot($filename) Takes a screenshot at this point in time
  */
 abstract class TestCase extends \Openbuildings\PHPUnitSpiderling\Testcase_Spiderling
 {
