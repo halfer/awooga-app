@@ -8,6 +8,7 @@ notifications:
 before_script:
   - composer self-update
   - COMPOSER=composer.travis.json composer install
+  - npm install bower
   - bower install
   - mysql -u root < test/build/create-user.sql
   - export PATH=`pwd`/bin:$PATH
