@@ -19,6 +19,9 @@ abstract class TestCase extends \Openbuildings\PHPUnitSpiderling\Testcase_Spider
 
 	const DOMAIN = 'http://localhost:8090';
 
+	// Change this to turn logging back on
+	const LOG_ACTIONS = false;
+
 	/**
 	 * Common library loading for all test classes
 	 */
@@ -36,7 +39,7 @@ abstract class TestCase extends \Openbuildings\PHPUnitSpiderling\Testcase_Spider
 		// We can supply a log location here (or omit to use /dev/null)
 		$logFile = '/tmp/phantom-awooga.log';
 		$connection = new \Openbuildings\Spiderling\Driver_Phantomjs_Connection();
-		$connection->start(null, $logFile);
+		$connection->start(null, self::LOG_ACTIONS ? $logFile : '/dev/null');
 
 		$driver = new \Openbuildings\Spiderling\Driver_Phantomjs();
 		$driver->connection($connection);

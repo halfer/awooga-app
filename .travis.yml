@@ -11,6 +11,7 @@ before_script:
   - mysql -u root < test/build/create-user.sql
   - export PATH=`pwd`/bin:$PATH
   - cp config/env-config.php.example config/env-config.php
+  - touch /tmp/phantom-awooga.log
 script:
   - phpunit --coverage-clover=coverage.clover
   - wget https://scrutinizer-ci.com/ocular.phar
