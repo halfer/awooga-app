@@ -8,6 +8,21 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	use \Awooga\Traits\Runner;
 
 	/**
+	 * Helper method for report classes
+	 * 
+	 * @return ReportTestHarness
+	 */
+	protected function buildDatabaseAndGetReport()
+	{
+		$pdo = $this->getDriver();
+		$repoId = $this->buildDatabase($pdo);
+		$report = new ReportTestHarness($repoId);
+		$report->setDriver($pdo);
+
+		return $report;
+	}
+
+	/**
 	 * Creates the test database
 	 * 
 	 * @param \PDO $pdo
