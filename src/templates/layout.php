@@ -9,10 +9,10 @@
 		<?php else: ?>
 			<title>Awooga</title>
 		<?php endif ?>
-		<link rel="stylesheet" href="/assets/main.css">
-		<script src="/assets/jquery.min.js"></script>
-		<link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
-		<script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+		<link type="text/css" rel="stylesheet" href="/assets/main.css">
+		<script type="text/javascript" src="/assets/jquery.min.js"></script>
+		<link type="text/css" rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+		<script type="text/javascript" src="/assets/bootstrap/js/bootstrap.min.js"></script>
 		<?php if ($debugbarRenderer): ?>
 			<?php echo $debugbarRenderer->renderHead() ?>
 		<?php endif ?>
