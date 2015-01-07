@@ -250,14 +250,16 @@ class NewReportTest extends TestCase
 		}
 
 		// Remove the first one and the last one, check the middle two are still OK
+		$prefix = '#edit-report div.url-group';
 		$this->
-			find('#edit-report div.url-group:nth-child(1)')->
+			find($prefix . ':nth-child(1)')->
 				click_button('-')->
 			end()->
 			// The 4th one becomes the 3rd after the above call!
-			find('#edit-report div.url-group:nth-child(3)')->
+			find($prefix . ':nth-child(3)')->
 				click_button('-')->
 			end();
+		$this->waitForSelectorCount($prefix, 2);
 		$this->not_present('#edit-report div.url-group input:contains("http://example.com/1")');
 		$this->not_present('#edit-report div.url-group input:contains("http://example.com/4")');
 		$this->assertEquals(
@@ -288,9 +290,10 @@ class NewReportTest extends TestCase
 	 */
 	protected function checkError($errorMessage)
 	{
+		$this->waitForSelectorCount($selector = '.alert-warning', 1);
 		$this->assertContains(
 			$errorMessage,
-			$this->find('.alert-warning')->text()
+			$this->find($selector)->text()
 		);		
 	}
 
@@ -316,16 +319,20 @@ class NewReportTest extends TestCase
 	}
 
 	/**
-	 * Clicks the + URL button
+	 * Clicks the + URL button and waits for the screen to update
 	 * 
 	 * @return Node
 	 */
 	protected function addAnotherUrl()
 	{
-		return $this->
-			find('#edit-report .url-group')->
+		$oldCount = count($this->all($selector = '#edit-report .url-group'));
+		$fluid = $this->
+			find($selector)->
 				click_button('+')->
 			end();
+		$this->waitForSelectorCount($selector, $oldCount + 1);
+
+		return $fluid;
 	}
 
 	/**
@@ -335,10 +342,14 @@ class NewReportTest extends TestCase
 	 */
 	protected function addAnotherIssue()
 	{
-		return $this->
-			find('#edit-report .issue-group')->
+		$oldCount = count($this->all($selector = '#edit-report .issue-group'));
+		$fluid = $this->
+			find($selector)->
 				click_button('+')->
-			end();		
+			end();
+		$this->waitForSelectorCount($selector, $oldCount + 1);
+
+		return $fluid;
 	}
 
 	/**
@@ -368,6 +379,21 @@ class NewReportTest extends TestCase
 		} while (!$hasRedirected && $retry++ < 20);
 
 		return $hasRedirected;
+	}
+
+	protected function waitForSelectorCount($selector, $expectedCount)
+	{
+		$retry = 0;
+		do {
+			$count = count($this->all($selector));
+			$isReached = $count == $expectedCount;
+			if (!$isReached)
+			{
+				sleep(0.5);
+			}
+		} while (!$isReached && $retry++ < 20);
+
+		return $isReached;
 	}
 
 	protected function pageUrl()
