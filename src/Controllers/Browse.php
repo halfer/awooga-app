@@ -112,8 +112,9 @@ class Browse extends BaseController
 	{
 		if ($this->isSearchMode())
 		{
-			// @todo Need to take the right page slice out of here
-			$where = implode(',', $this->searchKeys);
+			// Take a page slice out of the results array
+			$slice = array_slice($this->searchKeys, ($this->getPage() - 1) * $pageSize, $pageSize);
+			$where = implode(',', $slice);
 			$sql = $this->getSqlToReadReports() . "
 				AND report.id IN ($where)
 				ORDER BY report.id DESC

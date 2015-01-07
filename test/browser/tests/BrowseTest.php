@@ -118,5 +118,13 @@ class BrowseTest extends TestCase
 			assertHasCss("h3:contains('$expectedResults results')")->
 			$assertHasPaginator('#paginator')
 		;
+
+		// Count table entries too, in case the query has borked, or there are too many entries
+		$rows = $this->all('#reports tbody tr');
+		$this->assertEquals(
+			$expectedResults > 20 ? 20 : $expectedResults,
+			count($rows),
+			"Check the correct number of results have been rendered on the (first) results page"
+		);
 	}
 }
