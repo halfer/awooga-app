@@ -15,15 +15,6 @@ file_put_contents($root . '/.server.pid', getmypid());
 
 if (preg_match('#^/assets/#', $_SERVER["REQUEST_URI"]))
 {
-	// Special rules for certain file types
-	$path = pathinfo($_SERVER["SCRIPT_FILENAME"]);
-	if ($path["extension"] == "css")
-	{
-		header('Content-Type: text/css');
-		echo file_get_contents($_SERVER["SCRIPT_FILENAME"]);
-		exit();
-	}
-
 	// Let static assets fall through to the default server
 	return false;
 }
