@@ -407,7 +407,7 @@ class ReportWriteTest extends TestCase
 	/**
 	 * Helper method to fill in dummy data
 	 * 
-	 * @param \Awooga\Testing\Unit\Report $report
+	 * @param Report $report
 	 */
 	protected function setDummyReportData(Report $report)
 	{
