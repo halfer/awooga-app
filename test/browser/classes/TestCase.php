@@ -152,4 +152,86 @@ abstract class TestCase extends \Openbuildings\PHPUnitSpiderling\Testcase_Spider
 		$this->visit(self::DOMAIN . '/auth?provider=test');
 		$this->assertEquals('Logout testuser', $this->find('#auth-status')->text());
 	}
+
+	/**
+	 * Waits until a redirect or a timeout occurs
+	 * 
+	 * @param string $originalUrl
+	 * @return boolean Success
+	 */
+	protected function waitUntilRedirected($originalUrl)
+	{
+		$retry = 0;
+		do {
+			$hasRedirected = $originalUrl != $this->current_url();
+			if (!$hasRedirected)
+			{
+				usleep(500000);
+			}
+		} while (!$hasRedirected && $retry++ < 20);
+
+		return $hasRedirected;
+	}
+
+	/**
+	 * Wait until the count of a selector agrees with the expected count, or a timeout occurs
+	 * 
+	 * @param string $selector
+	 * @param integer $expectedCount
+	 * @return boolean Success
+	 */
+	protected function waitForSelectorCount($selector, $expectedCount)
+	{
+		$retry = 0;
+		do {
+			$count = count($this->all($selector));
+			$isReached = $count == $expectedCount;
+			if (!$isReached)
+			{
+				usleep(500000);
+			}
+		} while (!$isReached && $retry++ < 20);
+
+		return $isReached;
+	}
+
+	/**
+	 * Takes a screenshot and appends it to a base64 log file
+	 * 
+	 * This is really handy for Travis, where exporting build artefacts like screenshots is
+	 * not all that easy to do. We just cat the log file to the screen after the build, paste
+	 * it into a file, and decode it locally.
+	 * 
+	 * @param string $title
+	 */
+	protected function encodedScreenshot($title)
+	{
+		$file = '/tmp/awooga-screenshot.png';
+		$this->screenshot($file);
+		$this->base64out($file, $title);
+		unlink($file);
+	}
+
+	/**
+	 * Base 64 encoding helper
+	 * 
+	 * @param string $filename
+	 * @param string $title
+	 * @throws \Exception
+	 */
+	protected function base64out($filename, $title)
+	{
+		if (!file_exists($filename))
+		{
+			throw new \Exception("File '$filename' not found");
+		}
+
+		$data = 
+			"-----\n" .
+			$title . "\n" .
+			"-----\n" .
+			chunk_split(base64_encode(file_get_contents($filename))) .
+			"-----\n\n";
+		file_put_contents('/tmp/awooga-screenshot-data.log', $data, FILE_APPEND);
+	}
 }
