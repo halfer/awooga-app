@@ -7,6 +7,22 @@ use Awooga\Exceptions\TrivialException;
 trait Validation
 {
 	/**
+	 * Sets a required string
+	 * 
+	 * @param string $name
+	 * @param string $value
+	 * @param integer $maxLength
+	 */
+	protected function setRequiredString($name, $value, $maxLength)
+	{
+		$this->isRequired($value, $name);
+		$this->isString($value);
+		$this->validateLength($value, $name, $maxLength);
+
+		$this->$name = $value;
+	}
+
+	/**
 	 * Checks to see if the parameter is a string, raises a TrivialException if not
 	 * 
 	 * @param mixed $string

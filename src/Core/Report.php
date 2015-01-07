@@ -58,22 +58,6 @@ class Report
 	}
 
 	/**
-	 * Sets a string description
-	 * 
-	 * @param string $name
-	 * @param string $value
-	 * @param integer $maxLength
-	 */
-	protected function setRequiredString($name, $value, $maxLength)
-	{
-		$this->isRequired($value, $name);
-		$this->isString($value);
-		$this->validateLength($value, $name, $maxLength);
-
-		$this->$name = $value;
-	}
-
-	/**
 	 * Sets a URL or an array of URLs
 	 * 
 	 * @param string|array $url
