@@ -4,6 +4,23 @@ namespace Awooga\Testing\Browser;
 
 class NewReportTest extends TestCase
 {
+	public function testWebAssetsAvailable()
+	{
+		$assets = array(
+			array(self::DOMAIN . '/assets/main.css', 700, 1000),
+			array(self::DOMAIN . '/assets/jquery.min.js', 80000, 90000)
+		);
+		foreach ($assets as $asset)
+		{
+			$data = file_get_contents($asset[0]);
+			$size = strlen($data);
+			$this->assertTrue(
+				$size >= $asset[1] && $size <= $asset[2],
+				"Check to see filesize of $size bytes is within expected bounds"
+			);
+		}
+	}
+
 	/**
 	 * Checks the menu link only appears when logged in
 	 * 
