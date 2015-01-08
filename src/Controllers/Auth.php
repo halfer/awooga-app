@@ -128,22 +128,11 @@ class Auth extends BaseController
 	protected function createAndFetchUserRecords($serviceUsername, $provider)
 	{
 		// See if the username exists
-		$sql = "
-			SELECT
-				ua.id user_auth_id,
-				u.id user_id
-			FROM user_auth ua
-			INNER JOIN user u ON (ua.user_id = u.id)
-			WHERE
-				ua.username = :username
-		";
-		$statement = $this->getDriver()->prepare($sql);
-		$statement->execute(array(':username' => $serviceUsername, ));
-
-		if ($statement->rowCount() === 1)
+		$ids = $this->getUserIdsFromUsername($this->getDriver(), $serviceUsername);
+		if (is_array($ids))
 		{
 			// Update login time for both user records
-			$this->resetLoginTime($serviceUsername, $provider);
+			$this->resetLoginTime($ids);
 		}
 		else
 		{
@@ -168,22 +157,22 @@ class Auth extends BaseController
 	{
 		// We use the service username (e.g. https://github.com/fred) but this will be
 		// renamable in the future
-		$sqlAuth = "
+		$sqlUser = "
 			INSERT INTO user
 				(username, last_login_at)
 				VALUES (:username, NOW())
 		";
 		$pdo = $this->getDriver();
-		$statement = $pdo->prepare($sqlAuth);
+		$statement = $pdo->prepare($sqlUser);
 		$statement->execute(array(':username' => $serviceUsername, ));
 		$userId = $pdo->lastInsertId();
 
-		$sqlService = "
+		$sqlAuth = "
 			INSERT INTO user_auth
 				(user_id, username, provider, last_login_at)
 				VALUES (:user_id, :username, :provider, NOW())
 		";
-		$statementAuth = $pdo->prepare($sqlService);
+		$statementAuth = $pdo->prepare($sqlAuth);
 		$statementAuth->execute(
 			array(
 				':user_id' => $userId,
@@ -196,12 +185,28 @@ class Auth extends BaseController
 	/**
 	 * Reset the user and user service login times
 	 * 
-	 * @param string $serviceUsername
-	 * @param string $provider
+	 * @param array $ids Associative array of auth and user tables to update
 	 */
-	protected function resetLoginTime($serviceUsername, $provider)
+	protected function resetLoginTime(array $ids)
 	{
-		// @todo Add the body of this method
+		$sqlUser = "
+			UPDATE user
+				SET last_login_at = NOW()
+			WHERE
+				id = :user_id
+		";
+		$pdo = $this->getDriver();
+		$statement = $pdo->prepare($sqlUser);
+		$statement->execute(array(':user_id' => $ids['user_id']));
+
+		$sqlAuth = "
+			UPDATE user_auth
+				SET last_login_at = NOW()
+			WHERE
+				id = :user_auth_id
+		";
+		$statementAuth = $pdo->prepare($sqlAuth);
+		$statementAuth->execute(array(':user_auth_id' => $ids['user_auth_id']));
 	}
 
 	public function getMenuSlug()
