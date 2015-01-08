@@ -30,12 +30,11 @@
 	</div>
 	<div class="col-md-4">
 		<h3>
-			Are there alternatives to maintaining a repository?
+			How can I contribute via a repo?
 		</h3>
 		<p>
-			I chose public Git repositories because they're a login that most developers already
-			have. However, if you don't want to maintain your own report set, you could instead
-			fork an existing one, and send a pull request to the owner.
+			Copy or fork an <a href="/repos">existing repository</a> and let me take a look. If I
+			agree with your initial commits, I'll set your repo to auto-publish.
 		</p>
 	</div>
 </div>
@@ -43,10 +42,11 @@
 <div class="row">
 	<div class="col-md-4">
 		<h3>
-			Can we add and edit resources online?
+			Can I contribute to an existing repository?
 		</h3>
 		<p>
-			A couple of people have requested that already, so I'll be looking at that next.
+			If you would rather not maintain your own repo or edit reports online, you can instead
+			fork an existing repository on GitHub, and send a pull request to the owner.
 		</p>
 	</div>
 </div>

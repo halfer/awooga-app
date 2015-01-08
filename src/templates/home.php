@@ -61,10 +61,9 @@
 		</h3>
 
 		<p>
-			If you are an experienced programmer, I'd love to have your help. Please create a
-			public Git repository similar to an
-			<a href="https://github.com/halfer/awooga-reports">existing repository</a> and let me
-			take a look. If I agree with your initial commits, I'll add your repo to auto-publish.
+			If you are an experienced programmer, I'd love to have your help. You can contribute
+			either via a public Git repository or by <a href="/auth">logging in</a> via GitHub. To
+			contribute via a repository, read more on the <a href="/about">About page</a>.
 		</p>
 	</div>
 	<div class="col-md-4">
@@ -103,10 +102,12 @@
 	</div>
 	<div class="col-md-4">
 		<h3>
-			Can we comment on resources via the Awooga website?
+			Awooga needs feature X!
 		</h3>
 		<p>
-			Not yet, but it's a good idea! If there's demand I'll add that to the to-list.
+			I should be very glad to consider feature requests: please create an issue at GitHub
+			and we'll discuss it. I recommend also opening an issue prior to sending pull requests;
+			as with all projects, not all feature/code changes will be considered suitable.
 		</p>
 	</div>
 </div>
