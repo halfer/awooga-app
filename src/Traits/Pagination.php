@@ -165,8 +165,8 @@ trait Pagination
 	 */
 	protected function baseSetRowCount($table)
 	{
-		$escaped = $this->getDriver()->quote($table);
-		$sql = "SELECT COUNT(*) FROM $escaped";
+		$escaped = preg_replace('/[^A-Za-z0-9_]+/', '', $table);
+		$sql = "SELECT COUNT(*) FROM `{$escaped}`";
 		$statement = $this->getDriver()->prepare($sql);
 		$statement->execute();
 
