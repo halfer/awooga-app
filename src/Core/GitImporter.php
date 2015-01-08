@@ -279,7 +279,7 @@ class GitImporter extends BaseGitImporter
 
 		// Write debug to screen if required
 		$this->writeDebug("System command: $command");
-		$this->writeDebug($return ? 'Call successful.' : 'Call failed.');
+		$this->writeDebug($return === 0 ? 'Call successful.' : 'Call failed.');
 		if ($output)
 		{
 			$this->writeDebug("Output: " . implode("\n", $output));
