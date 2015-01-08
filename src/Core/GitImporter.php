@@ -69,10 +69,11 @@ class GitImporter extends BaseGitImporter
 		}
 		catch (\Exception $e)
 		{
+			// SeriousExceptions are safe enough to put into the public log system
 			$this->repoLog(
 				$repoId,
 				self::LOG_TYPE_FETCH,
-				'Fetch failed',
+				$e instanceof SeriousException ? $e->getMessage() : 'Fetch failed',
 				self::LOG_LEVEL_ERROR_SERIOUS
 			);
 
@@ -233,13 +234,24 @@ class GitImporter extends BaseGitImporter
 		// Create new checkout path
 		$target = $this->getCheckoutPath($url);
 
+		// Let's do an explicit check for permissions, so we can report it properly
+		$writeable = @mkdir($target) && @rmdir($target);
+		if (!$writeable)
+		{
+			$relativePath = str_replace($this->repoRoot, '', $target);
+			$this->writeDebug(
+				$error = "A new repo directory '{$relativePath}' could not be created, permission error?"
+			);
+			throw new SeriousException($error);
+		}
+
 		// Turn relative target into fully qualified path
 		$fqTarget = $this->repoRoot . '/' . $target;
 		$ok = $this->runGitCommand($url, $fqTarget);
 
 		if (!$ok)
 		{
-			throw new SeriousException("Problem when cloning");
+			throw new SeriousException("Problem when cloning from Git repository");
 		}
 
 		return $target;
