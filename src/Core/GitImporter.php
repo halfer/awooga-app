@@ -282,7 +282,7 @@ class GitImporter extends BaseGitImporter
 		$this->writeDebug($return ? 'Call successful.' : 'Call failed.');
 		if ($output)
 		{
-			$this->writeDebug("Output: " . $output);
+			$this->writeDebug("Output: " . implode("\n", $output));
 		}
 
 		return $return === 0;
