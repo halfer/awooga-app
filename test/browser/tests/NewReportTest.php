@@ -224,38 +224,35 @@ class NewReportTest extends TestCase
 	 */
 	public function testSave()
 	{
-		$this->
-			doBasicDataEntry()->
-			select('issue-type-code[]', array('text' => 'sql-injection'))->
-			click_button('Save');
-		$this->checkSaved();
-		$this->switchFromEditToView();
+		$this->doSimpleSave('sql-injection');
 
-		// @todo Check the URL, title, description and issue description
-
-		// Check the category
-		$this->find('td.issues:contains(sql-injection)');
+		// @todo Also check the URL, title, description and issue description
 	}
 
 	/**
 	 * Check that save works with one uncategorised issue
 	 * 
-	 * Uncategorised issues tend to work slightly different to ordinary ones, so I am testing
+	 * Uncategorised issues are treated slightly different to ordinary ones, so I am testing
 	 * them separately.
 	 * 
 	 * @driver phantomjs
 	 */
 	public function testSaveWithOneUncategorisedIssue()
 	{
+		$this->doSimpleSave('uncategorised');
+	}
+
+	protected function doSimpleSave($issueCode)
+	{
 		$this->
 			doBasicDataEntry()->
-			select('issue-type-code[]', array('text' => 'uncategorised'))->
+			select('issue-type-code[]', array('text' => $issueCode))->
 			click_button('Save');
 		$this->checkSaved();
 		$this->switchFromEditToView();
 
 		// Check the category
-		$this->find('td.issues:contains(uncategorised)');
+		$this->find("td.issues:contains({$issueCode})");
 	}
 
 	/**
