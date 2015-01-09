@@ -158,7 +158,7 @@ class Report
 		}
 
 		// Check for duplicates, these are not allowed
-		if (array_unique($issueCodes) != $issueCodes)
+		if ($this->containsDuplicateCodes($issueCodes))
 		{
 			throw new TrivialException(
 				"Issue codes may not be duplicated in a report"
@@ -166,6 +166,13 @@ class Report
 		}
 
 		$this->issues = $issuesOut;
+	}
+
+	protected function containsDuplicateCodes(array $issueCodes)
+	{
+		$withoutNulls = array_filter($issueCodes, function($value) { return !is_null($value); });
+
+		return array_unique($withoutNulls) != $withoutNulls;
 	}
 
 	/**

@@ -137,11 +137,18 @@ class NewReport extends BaseController
 	protected function handleSave(array $reportInput)
 	{
 		// Create/update the report attached to this user
-		$report = new Report(null, $this->getSignedInUserId());
+		$userId = $this->getSignedInUserId();
+		$report = new Report(null, $userId);
 		$report->setDriver($this->getDriver());
 
-		// These can blow up, so we wrap in catch block
+		// Make sure this is found first
 		$errors = array();
+		if (!$userId)
+		{
+			$errors[] = "Cannot find user account";
+		}
+
+		// These can blow up, so we wrap in catch block
 		try
 		{
 			$report->setUrl($reportInput['urls']);
