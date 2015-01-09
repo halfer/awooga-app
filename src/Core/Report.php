@@ -170,9 +170,12 @@ class Report
 
 	protected function containsDuplicateCodes(array $issueCodes)
 	{
-		$withoutNulls = array_filter($issueCodes, function($value) { return !is_null($value); });
+		$withoutUncat = array_filter(
+			$issueCodes,
+			function($value) { return $value != 'uncategorised'; }
+		);
 
-		return array_unique($withoutNulls) != $withoutNulls;
+		return array_unique($withoutUncat) != $withoutUncat;
 	}
 
 	/**
