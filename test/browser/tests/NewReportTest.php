@@ -402,7 +402,7 @@ class NewReportTest extends TestCase
 	/**
 	 * Clicks the + URL button and waits for the screen to update
 	 * 
-	 * @return Node
+	 * @return \Openbuildings\Spiderling\Node
 	 */
 	protected function addAnotherUrl()
 	{
@@ -412,13 +412,19 @@ class NewReportTest extends TestCase
 	/**
 	 * Clicks the + issue button and waits for the screen to update
 	 * 
-	 * @return Node
+	 * @return \Openbuildings\Spiderling\Node
 	 */
 	protected function addAnotherIssue()
 	{
 		return $this->addAnotherBlock('issue');
 	}
 
+	/**
+	 * Generic helper to add a URL or issue block via a '+' button
+	 * 
+	 * @param string $type
+	 * @return \Openbuildings\Spiderling\Node
+	 */
 	protected function addAnotherBlock($type)
 	{
 		$oldCount = count($this->all($selector = "#edit-report .{$type}-group"));
