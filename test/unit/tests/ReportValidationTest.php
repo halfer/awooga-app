@@ -196,19 +196,13 @@ class ReportValidationTest extends TestCase
 	}
 
 	/**
-	 * Make sure duplicate issues are rejected
+	 * Make sure categorised duplicate issues are rejected
 	 * 
 	 * @expectedException \Awooga\Exceptions\TrivialException
 	 */
 	public function testSetArrayContainingDuplicateIssues()
 	{
-		// We need the database to access the issue codes
-		$this->buildDatabaseAndGetReport()->setIssues(
-			array(
-				array('issue_cat_code' => 'xss', 'description' => 'Description goes here', ),
-				array('issue_cat_code' => 'xss', 'description' => 'Different description does not matter', ),
-			)
-		);
+		$this->checkMultipleIssueCodes('xss');
 	}
 
 	/**
@@ -216,13 +210,17 @@ class ReportValidationTest extends TestCase
 	 */
 	public function testSetArrayContainingMultipleUncategorisedIssues()
 	{
-		// We need the database to access the issue codes
+		$this->checkMultipleIssueCodes('uncategorised');
+	}
+
+	protected function checkMultipleIssueCodes($code)
+	{
 		$this->buildDatabaseAndGetReport()->setIssues(
 			array(
-				array('issue_cat_code' => 'uncategorised', 'description' => 'Description goes here', ),
-				array('issue_cat_code' => 'uncategorised', 'description' => 'Different description does not matter', ),
+				array('issue_cat_code' => $code, 'description' => 'Description goes here', ),
+				array('issue_cat_code' => $code, 'description' => 'Different description does not matter', ),
 			)
-		);
+		);		
 	}
 
 	/**
