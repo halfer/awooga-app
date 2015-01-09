@@ -23,4 +23,17 @@ class Logs extends PaginatedController
 			$pageSize
 		);
 	}
+
+	/**
+	 * A custom row count function that limits logs to the last few hundred
+	 * 
+	 * @return integer
+	 */
+	protected function getRowCount()
+	{
+		$rowCount = parent::getRowCount();
+		$limit = 20 * 20;
+
+		return $rowCount > $limit ? $limit : $rowCount;
+	}
 }
