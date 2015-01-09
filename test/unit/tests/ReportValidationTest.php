@@ -212,6 +212,20 @@ class ReportValidationTest extends TestCase
 	}
 
 	/**
+	 * Make sure multiple uncategorised issues are accepted
+	 */
+	public function testSetArrayContainingMultipleUncategorisedIssues()
+	{
+		// We need the database to access the issue codes
+		$this->buildDatabaseAndGetReport()->setIssues(
+			array(
+				array('issue_cat_code' => 'uncategorised', 'description' => 'Description goes here', ),
+				array('issue_cat_code' => 'uncategorised', 'description' => 'Different description does not matter', ),
+			)
+		);
+	}
+
+	/**
 	 * Check that all these issue codes are regarded as valid
 	 */
 	public function testValidIssueCatCodes()

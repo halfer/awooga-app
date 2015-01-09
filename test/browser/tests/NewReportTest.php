@@ -222,24 +222,88 @@ class NewReportTest extends TestCase
 	 * 
 	 * @driver phantomjs
 	 */
-	public function testSuccessfulSave()
+	public function testSave()
+	{
+		$this->
+			doBasicDataEntry()->
+			select('issue-type-code[]', array('text' => 'sql-injection'))->
+			click_button('Save');
+		$this->checkSaved();
+		$this->switchFromEditToView();
+
+		// @todo Check the URL, title, description and issue description
+
+		// Check the category
+		$this->find('td.issues:contains(sql-injection)');
+	}
+
+	/**
+	 * Check that save works with one uncategorised issue
+	 * 
+	 * Uncategorised issues tend to work slightly different to ordinary ones, so I am testing
+	 * them separately.
+	 * 
+	 * @driver phantomjs
+	 */
+	public function testSaveWithOneUncategorisedIssue()
+	{
+		$this->
+			doBasicDataEntry()->
+			select('issue-type-code[]', array('text' => 'uncategorised'))->
+			click_button('Save');
+		$this->checkSaved();
+		$this->switchFromEditToView();
+
+		// Check the category
+		$this->find('td.issues:contains(uncategorised)');
+	}
+
+	/**
+	 * Check that save works with an uncategorised item
+	 * 
+	 * @driver phantomjs
+	 */
+	public function testSaveWithMultipleUncategorisedIssues()
+	{
+		$this->doBasicDataEntry();
+		$this->addAnotherIssue();
+
+		// Odd, div.issue-group:nth-child(2) doesn't seem to work, so using all() instead
+		$issueGroups = $this->all('#edit-report div.issue-group');
+		$issueGroups[0]->
+			select('issue-type-code[]', array('text' => 'uncategorised'));
+		$issueGroups[1]->
+			select('issue-type-code[]', array('text' => 'uncategorised'));
+		$this->click_button('Save');
+
+		$this->checkSaved();
+	}
+
+	protected function doBasicDataEntry()
 	{
 		// We need to be signed in for this
 		$this->loginTestUser();
 
-		$this->setPageData(
+		return $this->setPageData(
 			'http://urlone.com/',
 			'Demo title',
 			'Demo description'
 		)->
 			find('#edit-report textarea[name="issue-description[]"]')->
 				set('This is a demo issue description')->
-			end()->
-			find('#edit-report select[name="issue-type-code[]"]')->
-				select_option('sql-injection')->
-			end()->
-			click_button('Save');
+			end();
+	}
 
+	protected function switchFromEditToView()
+	{
+		$editUrl = $this->current_url();
+		$this->
+			click_link('View report');
+		$this->waitUntilRedirected($editUrl);
+	}
+
+	protected function checkSaved()
+	{
 		// Wait for the redirect
 		$redirected = $this->waitUntilRedirected($this->pageUrl());
 		$this->assertTrue($redirected, "Ensure page redirects to different URL");
