@@ -161,7 +161,7 @@ class Report
 		if ($this->containsDuplicateCodes($issueCodes))
 		{
 			throw new TrivialException(
-				"Issue codes may not be duplicated in a report"
+				"Issue codes (other than 'uncategorised') may only appear once in a report"
 			);			
 		}
 
