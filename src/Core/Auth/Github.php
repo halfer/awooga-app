@@ -6,6 +6,7 @@ use OAuth\Common\Storage\Session;
 use OAuth\Common\Consumer\Credentials;
 use OAuth\Common\Http\Uri\UriInterface;
 use OAuth\Common\Http\Exception\TokenResponseException;
+use Awooga\Core\GitHubAuthService;
 
 class Github extends AuthService
 {
@@ -22,43 +23,55 @@ class Github extends AuthService
 
 		if ($code && $this->getProviderNameFromSession())
 		{
-			// This was a callback request from GitHub, get the token
-			try
-			{
-				$service->requestAccessToken($code);
-				$result = json_decode($service->request('user'), true);
-			}
-			catch (TokenResponseException $e)
-			{
-				// This seems safe to report to the user
-				$this->error = $e->getMessage();
-				return false;
-			}
-
-			// Clear intermediate session vars
-			$this->unsetProviderInSession();
-
-			// See if the security token matches, to ensure the request came from us
-			$suppliedState = isset($_GET['state']) ? $_GET['state'] : 1;
-			$savedState = isset($_SESSION['state']) ? $_SESSION['state'] : 2;
-			if ($suppliedState != $savedState)
-			{
-				$this->error = "The login attempt appears not to have come from GitHub";
-				return false;
-			}
-			if (isset($result['html_url']))
-			{
-				$this->authenticatedName = $result['html_url'];
-			}
+			return $this->handleProviderCallback($service, $code);
 		}
 		elseif ($this->getProviderNameFromQueryString())
 		{
-			$url = $service->getAuthorizationUri();
-			$state = rand(1, 9999999);
-			$_SESSION['state'] = $state;
-			$this->setProviderInSession('github');
-			$url .= '&state=' . $state;
-			$this->redirect = $url;
+			return $this->callProvider($service);
+		}
+	}
+
+	protected function callProvider(GitHubAuthService $service)
+	{
+		$url = $service->getAuthorizationUri();
+		$state = rand(1, 9999999);
+		$_SESSION['state'] = $state;
+		$this->setProviderInSession('github');
+		$url .= '&state=' . $state;
+		$this->redirect = $url;
+
+		return true;
+	}
+
+	protected function handleProviderCallback(GitHubAuthService $service, $code)
+	{
+		// This was a callback request from GitHub, get the token
+		try
+		{
+			$service->requestAccessToken($code);
+			$result = json_decode($service->request('user'), true);
+		}
+		catch (TokenResponseException $e)
+		{
+			// This seems safe to report to the user
+			$this->error = $e->getMessage();
+			return false;
+		}
+
+		// Clear intermediate session vars
+		$this->unsetProviderInSession();
+
+		// See if the security token matches, to ensure the request came from us
+		$suppliedState = isset($_GET['state']) ? $_GET['state'] : 1;
+		$savedState = isset($_SESSION['state']) ? $_SESSION['state'] : 2;
+		if ($suppliedState != $savedState)
+		{
+			$this->error = "The login attempt appears not to have come from GitHub";
+			return false;
+		}
+		if (isset($result['html_url']))
+		{
+			$this->authenticatedName = $result['html_url'];
 		}
 
 		return true;
