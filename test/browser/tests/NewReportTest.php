@@ -197,7 +197,7 @@ class NewReportTest extends TestCase
 		}
 
 		$this->click_button('Save');
-		$this->checkError("Issue codes may not be duplicated in a report");
+		$this->checkError("Issue codes (other than 'uncategorised') may only appear once in a report");
 	}
 
 	/**
