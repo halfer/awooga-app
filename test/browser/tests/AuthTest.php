@@ -46,6 +46,8 @@ class AuthTest extends TestCase
 	/**
 	 * Checks that the login times are updated for users and service provider records
 	 * 
+	 * @todo This needs finishing, do with #15
+	 * 
 	 * @driver phantomjs
 	 */
 	public function testLoginTimesUpdated()
@@ -56,7 +58,7 @@ class AuthTest extends TestCase
 
 		// Get the login time for the user record
 		$timesBefore = $this->getLoginTimes();
-		print_r($timesBefore);
+		//print_r($timesBefore);
 
 		// When we logon, let's check we now have a service record
 		$loginUrl = self::DOMAIN . '/auth?provider=test';
@@ -67,7 +69,7 @@ class AuthTest extends TestCase
 
 		// @todo Check the login time is changed for the user record
 		$timesAfterFirstLogin = $this->getLoginTimes();
-		print_r($timesAfterFirstLogin);
+		//print_r($timesAfterFirstLogin);
 
 		// Log out and log back in again
 		$redirectUrl = $this->current_url();
@@ -80,7 +82,7 @@ class AuthTest extends TestCase
 
 		// @todo Check the login time is changed for the user record
 		$timesAfterSecondLogin = $this->getLoginTimes();
-		print_r($timesAfterSecondLogin);
+		//print_r($timesAfterSecondLogin);
 	}
 
 	protected function getLoginTimes()
