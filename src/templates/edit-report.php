@@ -104,13 +104,14 @@
 	<?php endforeach ?>
 
 	<div class="form-group">
-		<label for="input-date" class="col-sm-2 control-label">Author notified date:</label>
+		<label for="input-notified-date" class="col-sm-2 control-label">Author notified date:</label>
 		<div class="col-sm-10">
 			<input
 				type="date"
-				id="input-date"
+				id="input-notified-date"
 				class="form-control"
 				name="author-notified-date"
+				value="<?php echo $this->escape($report['author_notified_at']) ?>"
 				placeholder="The date the author was notified, in the format yyyy-mm-dd (optional)"
 			/>
 		</div>

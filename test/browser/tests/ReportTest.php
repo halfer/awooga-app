@@ -61,6 +61,12 @@ class ReportTest extends TestCase
 
 		// Check repo owner
 		$this->checkReportSource($page, 'Repo: 1');
+
+		// Check notified date
+		$this->assertContains(
+			'Yes, on 2014-10-21',
+			$page->find('#report tr:last-child td:last-child')->text()
+		);
 	}
 
 	/**
@@ -88,7 +94,7 @@ class ReportTest extends TestCase
 	{
 		$this->assertEquals(
 			$expectedText,
-			$page->find('table#report tbody tr:last-child td:last-child')->text()
+			$page->find('table#report tbody tr td#report-source')->text()
 		);
 	}
 

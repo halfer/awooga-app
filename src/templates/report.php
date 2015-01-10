@@ -24,6 +24,7 @@
 </div>
 
 <table class="table table-bordered" id="report">
+	<col width="180px;" />
 	<tbody>
 		<tr>
 			<th
@@ -88,8 +89,18 @@
 		</tr>
 		<tr>
 			<th>Source</th>
-			<td colspan="3">
+			<td colspan="3" id="report-source">
 				<?php $this->insert('partials/source', ['report' => $report, ]) ?>
+			</td>
+		</tr>
+		<tr>
+			<th>Author notified?</th>
+			<td colspan="3">
+				<?php if ($report['author_notified_at']): ?>
+					Yes, on <?php echo $this->escape($report['author_notified_at']) ?>
+				<?php else: ?>
+					No
+				<?php endif ?>
 			</td>
 		</tr>
 	</tbody>

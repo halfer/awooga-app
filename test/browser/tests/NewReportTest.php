@@ -104,7 +104,7 @@ class NewReportTest extends TestCase
 			setPageData('http://urlone.com/');
 		$this->
 			addAnotherUrl()->
-			find('#edit-report div.url-group:nth-child(2) input[name="urls[]"]')->
+			find('#edit-report .url-group:nth-child(2) input[name="urls[]"]')->
 				set('http://urlone.com/')->
 			end()->
 			click_button('Save');
@@ -127,6 +127,15 @@ class NewReportTest extends TestCase
 			setPageData('http://urlone.com/', 'Demo title')->
 			click_button('Save');
 		$this->checkError("The 'description' field is required");
+
+		// Set an invalid author notified date
+		$this->
+			setPageData('http://urlone.com', 'Demo title', 'Demo description')->
+			find('#edit-report input[name="author-notified-date"]')->
+				set('invalid')->
+			end()->
+			click_button('Save');
+		$this->checkError("Invalid author notification date passed");
 	}
 
 	/**
@@ -220,13 +229,36 @@ class NewReportTest extends TestCase
 	/**
 	 * Check that we can actually save an item!
 	 * 
+	 * @todo Maybe centralise these strings as constants, so they are not duplicated here?
+	 * 
 	 * @driver phantomjs
 	 */
 	public function testSave()
 	{
-		$this->doSimpleSave('sql-injection');
+		$this->doSimpleSave($issue = 'sql-injection');
 
-		// @todo Also check the URL, title, description and issue description
+		// We are in view mode, and need to check some elements
+		$this->screenshot('');
+		$this->
+			find('#report')->
+				find('tr:first-child td:last-child:contains("http://urlone.com/")')->end()->
+				find('tr:nth-child(2)')->
+					find("td:nth-child(2):contains('$issue')")->end()->
+					find("td:nth-child(4):contains('This is a demo issue description')")->end()->
+				end()->
+				find('tr:nth-child(3) td:last-child:contains("Demo description")')->end()->
+				find('tr:nth-child(4) td:last-child:contains("testuser")')->end()->
+				// No author notified
+				find('tr:nth-child(5) td:last-child:contains("No")')->end()->
+			end();
+	}
+
+	/**
+	 * @todo Write this test
+	 */
+	public function testSaveWithAuthorNotificationDate()
+	{
+		
 	}
 
 	/**
