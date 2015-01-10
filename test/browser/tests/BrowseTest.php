@@ -46,7 +46,7 @@ class BrowseTest extends TestCase
 
 		// Check the report link goes to /report/x
 		$firstSource = $page->find('table#reports tbody tr:first-child td:last-child')->text();
-		$this->assertEquals('User: https://github.com/halfer', $firstSource);
+		$this->assertEquals('User: github.com/halfer', $firstSource);
 
 		$secondSource = $page->find('table#reports tbody tr:nth-child(2) td:last-child')->text();
 		$this->assertEquals('Repo: 1', $secondSource);

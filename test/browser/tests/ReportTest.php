@@ -75,7 +75,7 @@ class ReportTest extends TestCase
 		$page = $this->visit(self::DOMAIN . '/report/26');
 
 		// Check user owner
-		$this->checkReportSource($page, 'User: https://github.com/halfer');
+		$this->checkReportSource($page, 'User: github.com/halfer');
 	}
 
 	/**

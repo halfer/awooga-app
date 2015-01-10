@@ -54,7 +54,7 @@
 							<?php if ($username): ?>
 								<li id="auth-logout">
 									<a href="/logout">
-										Logout <span class="auth-username"><?php echo $this->escape($username) ?></span>
+										Logout <span class="auth-username"><?php echo $this->escape($username, 'trim_username') ?></span>
 									</a>
 								</li>
 							<?php else: ?>

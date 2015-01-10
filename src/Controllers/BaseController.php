@@ -57,6 +57,18 @@ abstract class BaseController
 		return $statement->fetchColumn();
 	}
 
+	protected function configureTemplateEngine()
+	{
+		// Register a function to format URL-style usernames, from SSO systems
+		$this->getEngine()->registerFunction(
+			'trim_username',
+			function ($username)
+			{
+				return preg_replace('#^https?://#', '', $username);
+			}
+		);
+	}
+
 	/**
 	 * Shortcut rendering method that sets up a few template values
 	 * 
@@ -68,7 +80,7 @@ abstract class BaseController
 		$values['countData'] = $this->getCounts();
 
 		// Remove any protocol from the username
-		$values['username'] = preg_replace('#^https?://#', '', $this->getSignedInUsername());
+		$values['username'] = $this->getSignedInUsername();
 
 		// Inject static title if one is set
 		if ($this->pageTitle)
@@ -91,6 +103,7 @@ abstract class BaseController
 
 	final public function initAndExecute()
 	{
+		$this->configureTemplateEngine();
 		$this->configureDebugging();
 		$this->initDebugBar();
 		$this->setDriver($this->initDriver());
