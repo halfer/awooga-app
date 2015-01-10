@@ -16,9 +16,8 @@
 	<?php endif ?>
 	class="form-group issue-group"
 >
-	<?php // @todo The invisible label isn't very elegant, is there a better way to do this? ?>
 	<label
-		for="issueType"
+		for="input-issue"
 		class="col-sm-2 control-label"
 		<?php if (!$firstItem): ?>
 			style="visibility: hidden;"
@@ -29,7 +28,7 @@
 			<select
 				name="issue-type-code[]"
 				<?php if ($firstItem): ?>
-					id="issueType"
+					id="input-issue"
 				<?php endif ?>
 				class="form-control"
 			>

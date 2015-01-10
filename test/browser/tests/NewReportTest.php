@@ -334,9 +334,15 @@ class NewReportTest extends TestCase
 		$prefix = '#edit-report div.url-group';
 		$this->
 			find($prefix . ':nth-child(1)')->
+				// Check the ID is present in the first row
+				find('#input-url')->end()->
+				// Then click the delete button
 				click_button('-')->
 			end()->
-			// The 4th one becomes the 3rd after the above call!
+			// Check we still have an id in the first URL to link the label to
+			find('#input-url')->
+			end()->
+			// The 4th one becomes the 3rd after the above deletion!
 			find($prefix . ':nth-child(3)')->
 				click_button('-')->
 			end();
@@ -362,6 +368,7 @@ class NewReportTest extends TestCase
 	{
 		// @todo Check that with two issues, the last one can be removed
 		// @todo Check that with three issues, the first one can be removed
+		// @todo Check that we have an id even after the first one is removed
 	}
 
 	/**
@@ -460,6 +467,11 @@ class NewReportTest extends TestCase
 			end();
 	}
 
+	/**
+	 * Gets the usual start URL for tests in this class
+	 * 
+	 * @return string
+	 */
 	protected function pageUrl()
 	{
 		return self::DOMAIN . '/report/new';

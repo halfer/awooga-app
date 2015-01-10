@@ -157,6 +157,15 @@
 			}
 
 			clicked.parents('.form-group').remove();
+
+			// If we no longer have an id on the first element, add it again
+			if ($('#input-' + type).length === 0)
+			{
+				$('#edit-report div.' + type + '-group').
+					first().
+					find('input,select').
+					attr('id', 'input-' + type);
+			}
 		}
 
 		$('#edit-report').on('click', '.url-remove', function() {
