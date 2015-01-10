@@ -88,15 +88,23 @@ abstract class BaseController
 			$this->setPageTitle($this->pageTitle);
 		}
 
+		$this->addMemoryInfoToDebugBar();
+
+		return $this->getEngine()->render($name, $values);
+	}
+
+	/**
+	 * If the debug bar is enabled, add some simple RAM info to it
+	 */
+	protected function addMemoryInfoToDebugBar()
+	{
 		// Let's report the memory usage here, since it is the last thing we do
 		if ($this->useDebugBar())
 		{
 			$usage = 'Peak memory usage: ' . (memory_get_peak_usage(true) / 1024) . "K";
 			$alloc = 'Process size: ' . ini_get('memory_limit');
 			$this->debugMessage($usage . ', ' . $alloc);
-		}
-
-		return $this->getEngine()->render($name, $values);
+		}		
 	}
 
 	abstract protected function getMenuSlug();
