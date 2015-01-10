@@ -64,13 +64,13 @@
 	<?php endforeach ?>
 	
 	<div class="form-group">
-		<label for="inputTitle" class="col-sm-2 control-label">Title:</label>
+		<label for="input-title" class="col-sm-2 control-label">Title:</label>
 		<div class="col-sm-10">
 			<input
 				type="text"
 				name="title"
 				value="<?php echo $this->escape($report['title']) ?>"
-				id="inputTitle"
+				id="input-title"
 				class="form-control"
 				placeholder="The title of the resource (you can just copy and paste this from the resource)"
 			/>
@@ -78,11 +78,11 @@
 	</div>
 
 	<div class="form-group">
-		<label for="reportDescription" class="col-sm-2 control-label">Description:</label>
+		<label for="report-description" class="col-sm-2 control-label">Description:</label>
 		<div class="col-sm-10">
 			<textarea
 				name="description"
-				id="reportDescription"
+				id="input-report-description"
 				class="form-control"
 				rows="3"
 				placeholder="An English description of the problem(s) should go here (Markdown is supported)"
@@ -104,11 +104,11 @@
 	<?php endforeach ?>
 
 	<div class="form-group">
-		<label for="inputDate" class="col-sm-2 control-label">Author notified date:</label>
+		<label for="input-date" class="col-sm-2 control-label">Author notified date:</label>
 		<div class="col-sm-10">
 			<input
 				type="date"
-				id="inputDate"
+				id="input-date"
 				class="form-control"
 				name="author-notified-date"
 				placeholder="The date the author was notified, in the format yyyy-mm-dd (optional)"
