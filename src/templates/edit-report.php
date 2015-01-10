@@ -27,6 +27,7 @@
 	<div class="alert alert-warning">
 		<?php echo $this->escape(current($errors)) ?>
 	</div>
+<?php // Multiple errors go here ?>
 <?php elseif (count($errors) > 1): ?>
 	<div class="alert alert-warning">
 		<ul>
@@ -36,6 +37,11 @@
 				</li>
 			<?php endforeach ?>
 		</ul>
+	</div>
+<?php // Save success message goes here ?>
+<?php elseif ($saveMessage): ?>
+	<div class="alert alert-success">
+		<?php echo $this->escape($saveMessage) ?>
 	</div>
 <?php endif ?>
 

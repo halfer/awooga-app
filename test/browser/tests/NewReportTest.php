@@ -305,7 +305,8 @@ class NewReportTest extends TestCase
 		$redirected = $this->waitUntilRedirected($this->pageUrl());
 		$this->assertTrue($redirected, "Ensure page redirects to different URL");
 
-		// Check there is no error message
+		// Check there is a success and no error message
+		$this->find('.alert-success');
 		$this->not_present('.alert-warning');
 	}
 

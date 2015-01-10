@@ -37,6 +37,7 @@ class NewReport extends BaseController
 			if (is_int($result))
 			{
 				// If the result is an int, it was successful
+				$this->getSlim()->flash('saveMessage', "Report successfully saved");
 				$this->getSlim()->redirect('/report/' . $result . '/edit');
 			}
 			else
@@ -52,6 +53,7 @@ class NewReport extends BaseController
 		echo $this->render(
 			'edit-report',
 			array(
+				'saveMessage' => $this->getSlim()->view()->getData('flash')['saveMessage'],
 				'report' => $report,
 				'issues' => $issues,
 				'errors' => $errors,
