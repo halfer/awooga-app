@@ -8,11 +8,6 @@ class EditReport extends NewReport
 
 	protected $reportId;
 
-	// @todo Write browser tests to check new/edit form
-	// @todo Add test to show routing conditions work correctly
-	// @todo Email database backup
-	// @todo Github URLs in browse/view should remove 'https://'
-
 	/**
 	 * When editing an old report, the initial state is retrieved from disk
 	 * 
