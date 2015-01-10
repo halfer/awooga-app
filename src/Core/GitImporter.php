@@ -233,20 +233,19 @@ class GitImporter extends BaseGitImporter
 	{
 		// Create new checkout path
 		$target = $this->getCheckoutPath($url);
+		$fqTarget = $this->repoRoot . '/' . $target;
 
 		// Let's do an explicit check for permissions, so we can report it properly
-		$writeable = @mkdir($target) && @rmdir($target);
+		$writeable = @mkdir($fqTarget) && @rmdir($fqTarget);
 		if (!$writeable)
 		{
-			$relativePath = str_replace($this->repoRoot, '', $target);
+			$relativePath = str_replace($this->repoRoot, '', $fqTarget);
 			$this->writeDebug(
 				$error = "A new repo directory '{$relativePath}' could not be created, permission error?"
 			);
 			throw new SeriousException($error);
 		}
 
-		// Turn relative target into fully qualified path
-		$fqTarget = $this->repoRoot . '/' . $target;
 		$ok = $this->runGitCommand($url, $fqTarget);
 
 		if (!$ok)
