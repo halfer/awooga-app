@@ -150,7 +150,7 @@ class Report
 			{
 				$issueOut['description'] = $issue['description'];
 			}
-			if (isset($issue['resolved_at']))
+			if (isset($issue['resolved_at']) && $issue['resolved_at'])
 			{
 				$issueOut['resolved_at'] = $issue['resolved_at'];
 			}
@@ -211,7 +211,7 @@ class Report
 			$this->validateLength($issue['description'], 'issue-description', self::LENGTH_DESCRIPTION);
 		}
 
-		if (isset($issue['resolved_at']))
+		if (isset($issue['resolved_at']) && $issue['resolved_at'])
 		{
 			$date = \DateTime::createFromFormat('Y-m-d', $issue['resolved_at']);
 			if ($date === false || $this->getLastDateParseFailCount())

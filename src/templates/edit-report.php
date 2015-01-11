@@ -97,6 +97,7 @@
 				'id' => false,
 				'description' => $issue['description'],
 				'typeCode' => $issue['issue_cat_code'],
+				'resolvedAt' => $issue['resolved_at'],
 				'issues' => $issues,
 				'firstItem' => $ord === 0,
 			)

@@ -79,6 +79,7 @@ class NewReport extends BaseController
 				array(
 					'issue_cat_code' => '',
 					'description' => '',
+					'resolved_at' => '',
 				),
 			),
 		);
@@ -86,6 +87,8 @@ class NewReport extends BaseController
 
 	/**
 	 * Grab the report data from user input
+	 *
+	 * @todo This has a high cyclic complexity level at Scrutiziner - fix me with extra methods
 	 * 
 	 * @param array $report
 	 * @return type
@@ -112,13 +115,14 @@ class NewReport extends BaseController
 			$report['author_notified_at'] = $post['author-notified-at'];
 		}
 
-		// I add a blank description here in case there aren't enough descriptions to fill it
+		// I add a blank desc/date here in case there aren't enough to fill the issues
 		if (isset($post['issue-type-code']) && is_array($post['issue-type-code']))
 		{
 			foreach ($post['issue-type-code'] as $ord => $code)
 			{
 				$report['issues'][$ord]['issue_cat_code'] = $code;
 				$report['issues'][$ord]['description'] = '';
+				$report['issues'][$ord]['resolved_at'] = '';
 			}
 		}
 
@@ -133,6 +137,19 @@ class NewReport extends BaseController
 					$report['issues'][$ord]['issue_cat_code'] = null;
 				}
 			}
+		}
+
+		// I add a blank code here in case we have too many resolved dates
+		if (isset($post['issue-resolved-date']) && is_array($post['issue-resolved-date']))
+		{
+			foreach ($post['issue-resolved-date'] as $ord => $resolvedAt)
+			{
+				$report['issues'][$ord]['resolved_at'] = $resolvedAt;
+				if (!isset($report['issues'][$ord]['issue_cat_code']))
+				{
+					$report['issues'][$ord]['issue_cat_code'] = null;
+				}
+			}			
 		}
 
 		return $report;

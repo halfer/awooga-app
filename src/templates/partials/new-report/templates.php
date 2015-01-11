@@ -14,6 +14,7 @@
 	array(
 		'id' => 'template-issue',
 		'description' => '',
+		'resolvedAt' => '',
 		'typeCode' => null,
 		'issues' => $issues,
 		'firstItem' => false,

@@ -128,6 +128,15 @@ class NewReportTest extends TestCase
 			click_button('Save');
 		$this->checkError("The 'description' field is required");
 
+		// Set an invalid issue resolved date
+		$this->
+			setPageData('http://urlone.com', 'Demo title', 'Demo description')->
+			find('#edit-report input[name="issue-resolved-date[]"]')->
+				set('invalid')->
+			end()->
+			click_button('Save');
+		$this->checkError("A resolution date must be in the form yyyy-mm-dd");
+
 		// Set an invalid author notified date
 		$this->
 			setPageData('http://urlone.com', 'Demo title', 'Demo description')->
@@ -249,7 +258,6 @@ class NewReportTest extends TestCase
 		$this->doSimpleSave($issue = 'sql-injection');
 
 		// We are in view mode, and need to check some elements
-		$this->screenshot('');
 		$this->
 			find('#report')->
 				find('tr:first-child td:last-child:contains("http://urlone.com/")')->end()->

@@ -36,6 +36,7 @@ class EditReport extends NewReport
 			$report['issues'][] = array(
 				'issue_cat_code' => $issue['code'],
 				'description' => $issue['description'],
+				'resolved_at' => $issue['resolved_at'],
 			);
 		}
 

@@ -368,8 +368,6 @@ class ReportValidationTest extends TestCase
 		);
 	}
 
-
-
 	/**
 	 * Returns a report to test against
 	 * 

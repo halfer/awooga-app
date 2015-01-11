@@ -9,6 +9,8 @@ class ReportTest extends TestCase
 	/**
 	 * Tests everything in a repo report
 	 * 
+	 * @todo Add support for unresolved/resolved issues (tag contains 'fixed' when resolved)
+	 * 
 	 * @driver phantomjs
 	 */
 	public function testRepoReport()
