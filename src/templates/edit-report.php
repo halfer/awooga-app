@@ -110,7 +110,7 @@
 				type="date"
 				id="input-notified-date"
 				class="form-control"
-				name="author-notified-date"
+				name="author-notified-at"
 				value="<?php echo $this->escape($report['author_notified_at']) ?>"
 				placeholder="The date the author was notified, in the format yyyy-mm-dd (optional)"
 			/>

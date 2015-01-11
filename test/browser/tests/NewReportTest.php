@@ -131,7 +131,7 @@ class NewReportTest extends TestCase
 		// Set an invalid author notified date
 		$this->
 			setPageData('http://urlone.com', 'Demo title', 'Demo description')->
-			find('#edit-report input[name="author-notified-date"]')->
+			find('#edit-report input[name="author-notified-at"]')->
 				set('invalid')->
 			end()->
 			click_button('Save');
@@ -212,6 +212,8 @@ class NewReportTest extends TestCase
 	/**
 	 * Validation tests that require page hacking
 	 * 
+	 * @todo Write this test
+	 * 
 	 * @driver phantomjs
 	 */
 	public function testAdvancedValidation()
@@ -219,11 +221,20 @@ class NewReportTest extends TestCase
 		// We need to be signed in for this
 		$this->loginTestUser();
 
-		// @todo
 		// No URLs
 		// No issues
 		// Invalid issue code
 		// Excessively long issue code
+	}
+
+	/**
+	 * Ensure that when validation fails, user input remains in place
+	 * 
+	 * @todo Write this test
+	 */
+	public function testValidationFailurePreservesFormContents()
+	{
+		
 	}
 
 	/**
@@ -254,6 +265,8 @@ class NewReportTest extends TestCase
 	}
 
 	/**
+	 * Check that the author notification date works separately
+	 * 
 	 * @todo Write this test
 	 */
 	public function testSaveWithAuthorNotificationDate()

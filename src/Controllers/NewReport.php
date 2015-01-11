@@ -107,9 +107,9 @@ class NewReport extends BaseController
 		{
 			$report['description'] = $post['description'];
 		}
-		if (isset($post['author-notified-date']) && is_string($post['author-notified-date']))
+		if (isset($post['author-notified-at']) && is_string($post['author-notified-at']))
 		{
-			$report['notified-date'] = $post['author-notified-date'];
+			$report['author_notified_at'] = $post['author-notified-at'];
 		}
 
 		// I add a blank description here in case there aren't enough descriptions to fill it
@@ -163,7 +163,7 @@ class NewReport extends BaseController
 			$report->setTitle($reportInput['title']);
 			$report->setDescription($reportInput['description']);
 			$report->setIssues($reportInput['issues']);
-			$report->setAuthorNotifiedDate($reportInput['notified-date']);
+			$report->setAuthorNotifiedDate($reportInput['author_notified_at']);
 		}
 		catch (\Exception $e)
 		{
