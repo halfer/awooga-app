@@ -373,43 +373,60 @@ class NewReportTest extends TestCase
 		// We need to be signed in for this
 		$this->loginTestUser();
 
+		// Set up the additional URL blocks
 		$this->visit($this->pageUrl());
 		$this->addAnotherUrl();
 		$this->addAnotherUrl();
 		$this->addAnotherUrl();
 
-		// Add some data
+		// Type in some data
+		$urls = array();
 		for($i = 1; $i <= 4; $i++)
 		{
-			$this->setSpecificUrl($i, 'http://example.com/' . $i);
+			$urls[] = 'http://example.com/' . $i;
+			$this->setSpecificUrl($i, $urls[$i - 1]);
 		}
 
+		$this->checkRemoveButtonSection('url', $urls);
+	}
+
+	/**
+	 * General test harness to click the remove button and check the result
+	 * 
+	 * @param string $type
+	 * @param array $values
+	 */
+	protected function checkRemoveButtonSection($type, array $values)
+	{
+		$prefix = "#edit-report div.{$type}-group";
+		$input = '#input-' . $type;
+
 		// Remove the first one and the last one, check the middle two are still OK
-		$prefix = '#edit-report div.url-group';
 		$this->
 			find($prefix . ':nth-child(1)')->
 				// Check the ID is present in the first row
-				find('#input-url')->end()->
+				find($input)->
+				end()->
 				// Then click the delete button
 				click_button('-')->
 			end()->
 			// Check we still have an id in the first URL to link the label to
-			find('#input-url')->
+			find($input)->
 			end()->
 			// The 4th one becomes the 3rd after the above deletion!
 			find($prefix . ':nth-child(3)')->
 				click_button('-')->
 			end();
 		$this->waitForSelectorCount($prefix, 2);
-		$this->not_present('#edit-report div.url-group input:contains("http://example.com/1")');
-		$this->not_present('#edit-report div.url-group input:contains("http://example.com/4")');
+		$this->not_present($prefix . " input:contains('{$values[0]}')");
+		$this->not_present($prefix . " input:contains('{$values[3]}')");
 		$this->assertEquals(
-			'http://example.com/2',
-			$this->find('#edit-report div.url-group:nth-child(1) input')->value()
+			$values[1],
+			$this->find($prefix . ':nth-child(1) input')->value()
 		);
 		$this->assertEquals(
-			'http://example.com/3',
-			$this->find('#edit-report div.url-group:nth-child(2) input')->value()
+			$values[2],
+			$this->find($prefix . ':nth-child(2) input')->value()
 		);
 	}
 
