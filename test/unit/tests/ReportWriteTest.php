@@ -416,4 +416,15 @@ class ReportWriteTest extends TestCase
 		$report->setDescription('Description');
 		$report->setIssues(array(array('issue_cat_code' => 'xss', ),));
 	}
+
+	/**
+	 * Checks Markdown works and is reasonably safe
+	 * 
+	 * Only need to do basic checks - the tests for HTMLPurifier should be fine really
+	 * 
+	 * @todo Implement these tests
+	 */
+	public function checkMarkdownParser()
+	{
+	}
 }
