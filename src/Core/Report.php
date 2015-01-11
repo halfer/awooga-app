@@ -267,7 +267,7 @@ class Report
 			$notifiedDate = \DateTime::createFromFormat('Y-m-d', $notifiedDate);
 			if (!$notifiedDate || $this->getLastDateParseFailCount())
 			{
-				throw new TrivialException("Invalid author notification date passed");
+				throw new TrivialException("An author notified date must be in the form yyyy-mm-dd");
 			}
 		}
 

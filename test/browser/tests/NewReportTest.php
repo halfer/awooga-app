@@ -144,7 +144,7 @@ class NewReportTest extends TestCase
 				set('invalid')->
 			end()->
 			click_button('Save');
-		$this->checkError("Invalid author notification date passed");
+		$this->checkError("An author notified date must be in the form yyyy-mm-dd");
 	}
 
 	/**
