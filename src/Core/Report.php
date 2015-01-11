@@ -619,11 +619,37 @@ class Report
 	/**
 	 * Converts a Markdown string to HTML
 	 * 
+	 * The Markdown parser is still vulnerable to XSS, so we have to filter the output, see:
+	 * https://michelf.ca/blog/2010/markdown-and-xss/. The default mode seems to be to strip
+	 * rather than to encode, which is fine, since there are perfectly decent ways of encoding
+	 * legitimate code examples (backticks, block indent).
+	 * 
+	 * I've turned off caching as this by default wants to cache inside the vendor directory,
+	 * ouch! If any performance issues are seen, this can probably be repointed to a more suitable
+	 * location.
+	 * 
 	 * @param string $markdown
 	 * @return string|null
 	 */
 	protected function convertFromMarkdown($markdown)
 	{
-		return $markdown ? \Michelf\Markdown::defaultTransform($markdown) : null;
+		$html = $markdown ? \Michelf\Markdown::defaultTransform($markdown) : null;
+
+		if ($html)
+		{
+			$config = \HTMLPurifier_Config::createDefault();
+			$config->set('Cache.DefinitionImpl', null);
+			$purifier = new \HTMLPurifier($config);
+			try
+			{
+				$html = $purifier->purify($html);
+			}
+			catch (\Exception $e)
+			{
+				throw new TrivialException('Problem with parsing Markdown output');
+			}
+		}
+
+		return $html;
 	}
 }
