@@ -8,7 +8,7 @@ use HTMLPurifier_Config, HTMLPurifier;
 
 // @todo Can we get Composer to do this manual loading?
 
-require_once realpath(__DIR__ . '/../..') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.auto.php';
+require_once realpath(__DIR__ . '/../..') . '/modules/htmlpurifier/library/HTMLPurifier.auto.php';
 
 class Report
 {

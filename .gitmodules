@@ -1,0 +1,3 @@
+[submodule "modules/htmlpurifier"]
+	path = modules/htmlpurifier
+	url = https://github.com/ezyang/htmlpurifier.git

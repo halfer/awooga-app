@@ -8,6 +8,8 @@ notifications:
 before_script:
   - composer self-update
   - COMPOSER=composer.travis.json composer install
+  - git submodule init
+  - git submodule update
   - npm install bower
   - bower install
   - mysql -u root < test/build/create-user.sql

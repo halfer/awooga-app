@@ -1,6 +1,5 @@
 {
     "require": {
-        "ezyang/htmlpurifier": "dev-master",
         "slim/slim": "2.4.*",
         "league/plates": "3.1.*",
         "michelf/php-markdown": "1.4.*",
