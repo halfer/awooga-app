@@ -4,6 +4,7 @@ namespace Awooga\Core;
 
 use \Awooga\Exceptions\TrivialException;
 use \Awooga\Exceptions\SeriousException;
+use HTMLPurifier_Config, HTMLPurifier;
 
 class Report
 {
@@ -637,9 +638,9 @@ class Report
 
 		if ($html)
 		{
-			$config = \HTMLPurifier_Config::createDefault();
+			$config = HTMLPurifier_Config::createDefault();
 			$config->set('Cache.DefinitionImpl', null);
-			$purifier = new \HTMLPurifier($config);
+			$purifier = new HTMLPurifier($config);
 			try
 			{
 				$html = $purifier->purify($html);
