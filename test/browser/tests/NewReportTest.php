@@ -391,6 +391,33 @@ class NewReportTest extends TestCase
 	}
 
 	/**
+	 * Check that the JavaScript device to remove an issue group works
+	 * 
+	 * @driver phantomjs
+	 */
+	public function testRemoveIssueWidget()
+	{
+		// We need to be signed in for this
+		$this->loginTestUser();
+
+		// Set up the additional issue blocks
+		$this->visit($this->pageUrl());
+		$this->addAnotherIssue();
+		$this->addAnotherIssue();
+		$this->addAnotherIssue();
+
+		// Type in some data
+		$dates = array();
+		for($i = 0; $i <= 3; $i++)
+		{
+			$dates[] = '2015-01-0' . ($i + 1);
+			$this->setSpecificIssueResolvedDate($i, $dates[$i]);
+		}
+
+		$this->checkRemoveButtonSection('issue', $dates);
+	}
+
+	/**
 	 * General test harness to click the remove button and check the result
 	 * 
 	 * @param string $type
@@ -402,44 +429,38 @@ class NewReportTest extends TestCase
 		$input = '#input-' . $type;
 
 		// Remove the first one and the last one, check the middle two are still OK
-		$this->
-			find($prefix . ':nth-child(1)')->
-				// Check the ID is present in the first row
-				find($input)->
-				end()->
-				// Then click the delete button
-				click_button('-')->
-			end()->
-			// Check we still have an id in the first URL to link the label to
+		$blocks = $this->all($prefix);
+		$blocks[0]->
+			// Check the ID is present in the first row
 			find($input)->
 			end()->
-			// The 4th one becomes the 3rd after the above deletion!
-			find($prefix . ':nth-child(3)')->
-				click_button('-')->
+			click_button('-');
+
+		// Check we still have an id in the first thing to link the label to
+		$this->
+			find($prefix . ' ' . $input)->
 			end();
+
+		// Delete the last item, which remains at 3 even though 0 has been deleted
+		$blocks[3]->
+			click_button('-')->
+			end();
+
+		// Make sure deleted items have gone
 		$this->waitForSelectorCount($prefix, 2);
 		$this->not_present($prefix . " input:contains('{$values[0]}')");
 		$this->not_present($prefix . " input:contains('{$values[3]}')");
+
+		// Check remaining items are still there
+		$blocksAgain = $this->all($prefix);
 		$this->assertEquals(
 			$values[1],
-			$this->find($prefix . ':nth-child(1) input')->value()
+			$blocksAgain[0]->find('input')->value()
 		);
 		$this->assertEquals(
 			$values[2],
-			$this->find($prefix . ':nth-child(2) input')->value()
+			$blocksAgain[1]->find('input')->value()
 		);
-	}
-
-	/**
-	 * Check that the JavaScript device to remove an issue group works
-	 * 
-	 * @driver phantomjs
-	 */
-	public function testRemoveIssueWidget()
-	{
-		// @todo Check that with two issues, the last one can be removed
-		// @todo Check that with three issues, the first one can be removed
-		// @todo Check that we have an id even after the first one is removed
 	}
 
 	/**
@@ -466,9 +487,9 @@ class NewReportTest extends TestCase
 	protected function setPageData($url = '', $title = '', $description = '')
 	{
 		$this->visit($this->pageUrl());
+		$this->setSpecificUrl(1, $url);
 
 		return $this->
-			setSpecificUrl(1, $url)->
 			find('#edit-report input[name="title"]')->
 				set($title)->
 			end()->
@@ -524,18 +545,38 @@ class NewReportTest extends TestCase
 	}
 
 	/**
-	 * Sets the first/second/etc URL input
+	 * Sets the nth URL input (zero-based)
 	 * 
 	 * @param integer $ord
 	 * @param string $url
-	 * @return string
 	 */
 	protected function setSpecificUrl($ord, $url)
 	{
-		return $this->
-			find("#edit-report div.url-group:nth-child($ord) input[name='urls[]']")->
-				set($url)->
-			end();
+		$this->setSpecificBlockInputValue('url', $ord - 1, $url);
+	}
+
+	/**
+	 * Sets the nth issue resolved date (zero-based)
+	 * 
+	 * @param integer $ord
+	 * @param string $resolvedDate
+	 */
+	protected function setSpecificIssueResolvedDate($ord, $resolvedDate)
+	{
+		$this->setSpecificBlockInputValue('issue', $ord, $resolvedDate);
+	}
+
+	/**
+	 * Sets an input control
+	 * 
+	 * @param string $type
+	 * @param integer $ord
+	 * @param string $value
+	 */
+	protected function setSpecificBlockInputValue($type, $ord, $value)
+	{
+		$blocks = $this->all("#edit-report div.{$type}-group input");
+		$blocks[$ord]->set($value);
 	}
 
 	/**
