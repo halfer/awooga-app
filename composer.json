@@ -1,9 +1,9 @@
 {
     "require": {
+        "ezyang/htmlpurifier": "4.6.*",
         "slim/slim": "2.4.*",
         "league/plates": "3.1.*",
         "michelf/php-markdown": "1.4.*",
-        "ezyang/htmlpurifier": "4.6.*",
         "zendframework/zendsearch": "dev-master",
         "lusitanian/oauth": "~0.3"
     },
