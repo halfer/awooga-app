@@ -169,6 +169,10 @@ class ReportValidationTest extends TestCase
 			array(
 				'issue_cat_code' => 'sql-injection',
 				'description' => 'A valid description string',
+			),
+			array(
+				'issue_cat_code' => 'variable-injection',
+				'resolved_at' => '2015-01-11',
 			)
 		);
 		$report->setIssues($issues);
