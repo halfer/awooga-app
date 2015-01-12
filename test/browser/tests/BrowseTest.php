@@ -95,6 +95,10 @@ class BrowseTest extends TestCase
 	/**
 	 * Check that issue keywords can be searched for
 	 * 
+	 * This caused a false fail on 2015-01-14, and re-running in Travis fixed the issue. Maybe we
+	 * need to add in a conditional screenshot just before the checkTableRowCount call? Very odd,
+	 * keep an eye on this.
+	 * 
 	 * @driver phantomjs
 	 */
 	public function testIssueSearch()
