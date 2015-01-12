@@ -82,7 +82,8 @@ UNLOCK TABLES;
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'halfer','reporter','2014-12-29 20:30:58'),(2,'https://github.com/halfer','reporter','2014-12-30 18:47:21'),(4,'testuser','reporter','2015-01-04 23:38:19');
+INSERT INTO `user` (`id`, `username`, `access_level`) VALUES
+(1,'halfer','reporter'),(2,'https://github.com/halfer','reporter'),(4,'testuser','reporter');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
