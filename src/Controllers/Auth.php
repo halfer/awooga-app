@@ -131,8 +131,8 @@ class Auth extends BaseController
 		$ids = $this->getUserIdsFromUsername($this->getDriver(), $serviceUsername);
 		if (is_array($ids))
 		{
-			// Update login time for both user records
-			$this->resetLoginTime($ids);
+			// Update login time for service user record
+			$this->resetLoginTime($ids['user_auth_id']);
 		}
 		else
 		{
@@ -159,8 +159,8 @@ class Auth extends BaseController
 		// renamable in the future
 		$sqlUser = "
 			INSERT INTO user
-				(username, last_login_at)
-				VALUES (:username, NOW())
+				(username)
+				VALUES (:username)
 		";
 		$pdo = $this->getDriver();
 		$statement = $pdo->prepare($sqlUser);
@@ -183,30 +183,20 @@ class Auth extends BaseController
 	}
 
 	/**
-	 * Reset the user and user service login times
+	 * Reset the user service login times
 	 * 
-	 * @param array $ids Associative array of auth and user tables to update
+	 * @param integer $serviceId Associative array of auth and user tables to update
 	 */
-	protected function resetLoginTime(array $ids)
+	protected function resetLoginTime($serviceId)
 	{
-		$sqlUser = "
-			UPDATE user
-				SET last_login_at = NOW()
-			WHERE
-				id = :user_id
-		";
-		$pdo = $this->getDriver();
-		$statement = $pdo->prepare($sqlUser);
-		$statement->execute(array(':user_id' => $ids['user_id']));
-
 		$sqlAuth = "
 			UPDATE user_auth
 				SET last_login_at = NOW()
 			WHERE
 				id = :user_auth_id
 		";
-		$statementAuth = $pdo->prepare($sqlAuth);
-		$statementAuth->execute(array(':user_auth_id' => $ids['user_auth_id']));
+		$statementAuth = $this->getDriver()->prepare($sqlAuth);
+		$statementAuth->execute(array(':user_auth_id' => $serviceId));
 	}
 
 	public function getMenuSlug()
