@@ -437,14 +437,10 @@ class NewReportTest extends TestCase
 			click_button('-');
 
 		// Check we still have an id in the first thing to link the label to
-		$this->
-			find($prefix . ' ' . $input)->
-			end();
+		$this->find($prefix . ' ' . $input);
 
 		// Delete the last item, which remains at 3 even though 0 has been deleted
-		$blocks[3]->
-			click_button('-')->
-			end();
+		$blocks[3]->click_button('-');
 
 		// Make sure deleted items have gone
 		$this->waitForSelectorCount($prefix, 2);
