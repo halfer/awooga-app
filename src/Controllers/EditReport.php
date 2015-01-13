@@ -20,7 +20,7 @@ class EditReport extends NewReport
 
 	protected function getReportAndRelatedData($id)
 	{
-		$report = $this->getReportForId($id);
+		$report = $this->getReportForId($this->getDriver(), $id);
 
 		// We need to unwrap URL table to a string array
 		$report['url'] = array();

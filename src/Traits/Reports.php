@@ -58,10 +58,10 @@ trait Reports
 		return $this->fetchAll($sql);
 	}
 
-	protected function getReportForId($id)
+	protected function getReportForId(\PDO $pdo, $id)
 	{
 		$sql = $this->getSqlToReadReports() . " AND report.id = :report_id";
-		$statement = $this->getDriver()->prepare($sql);
+		$statement = $pdo->prepare($sql);
 		$ok = $statement->execute(array(':report_id' => $id, ));
 
 		if (!$ok)
@@ -71,13 +71,6 @@ trait Reports
 
 		return $statement->fetch(\PDO::FETCH_ASSOC);
 	}
-
-	/**
-	 * The database driver must be provided by the trait client
-	 * 
-	 * @return \PDO
-	 */
-	abstract protected function getDriver();
 
 	/**
 	 * This fetch method must be provided by the trait client

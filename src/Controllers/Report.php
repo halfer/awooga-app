@@ -14,7 +14,7 @@ class Report extends BaseController
 	public function execute()
 	{
 		// Redirect if the report does not exist
-		$report = $this->getReportForId($this->reportId);
+		$report = $this->getReportForId($this->getDriver(), $this->reportId);
 		if (!$report)
 		{
 			// @todo Add a flash var here to offer the user a helpful error
