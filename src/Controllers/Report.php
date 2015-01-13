@@ -14,7 +14,7 @@ class Report extends BaseController
 	public function execute()
 	{
 		// Redirect if the report does not exist
-		$report = $this->getReport();
+		$report = $this->getReportForId($this->reportId);
 		if (!$report)
 		{
 			// @todo Add a flash var here to offer the user a helpful error
@@ -49,20 +49,6 @@ class Report extends BaseController
 	public function getMenuSlug()
 	{
 		return 'report';
-	}
-
-	protected function getReport()
-	{
-		$sql = $this->getSqlToReadReports() . " AND report.id = :report_id";
-		$statement = $this->getDriver()->prepare($sql);
-		$ok = $statement->execute(array(':report_id' => $this->reportId, ));
-
-		if (!$ok)
-		{
-			throw new \Exception('Could not fetch report');
-		}
-
-		return $statement->fetch(\PDO::FETCH_ASSOC);
 	}
 
 	public function setReportId($reportId)
