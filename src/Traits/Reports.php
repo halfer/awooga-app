@@ -72,6 +72,31 @@ trait Reports
 		return $statement->fetch(\PDO::FETCH_ASSOC);
 	}
 
+	protected function getReportAndRelatedData(\PDO $pdo, $id)
+	{
+		$report = $this->getReportForId($pdo, $id);
+
+		// We need to unwrap URL table to a string array
+		$report['url'] = array();
+		foreach ($this->getRelatedUrls(array($id)) as $url)
+		{
+			$report['urls'][] = $url['url'];
+		}
+
+		// Convert issues table to simple array
+		$report['issues'] = array();
+		foreach ($this->getRelatedIssues(array($id)) as $issue)
+		{
+			$report['issues'][] = array(
+				'issue_cat_code' => $issue['code'],
+				'description' => $issue['description'],
+				'resolved_at' => $issue['resolved_at'],
+			);
+		}
+
+		return $report;
+	}
+
 	/**
 	 * This fetch method must be provided by the trait client
 	 * 
