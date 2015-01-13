@@ -6,6 +6,13 @@ use \Awooga\Core\Report;
 
 class ReportWriteTest extends TestCase
 {
+	// Don't overwrite the test getter, as we need that. We can simplify this by moving fetchAll
+	// to the Runner trait
+	use \Awooga\Traits\Database, \Awooga\Testing\BaseTestCase {
+		\Awooga\Testing\BaseTestCase::getDriver insteadof \Awooga\Traits\Database;
+	}
+	use \Awooga\Traits\Reports;
+
 	/**
 	 * Saves a report
 	 * 
@@ -76,6 +83,57 @@ class ReportWriteTest extends TestCase
 			$this->assertEquals(current($urls), $urlData['url']);
 			next($urls);
 		}
+
+		// Check we have a created_at and no updated_at
+		$this->assertNotNull($this->getCreatedAt($reportId), "Check we have a created date");
+		$this->assertNull($this->getUpdatedAt($reportId), "Check we don't have an updated date");
+	}
+
+	protected function getCreatedAt($reportId)
+	{
+		return $this->getReportColumn('created_at', $reportId);
+	}
+
+	protected function getUpdatedAt($reportId)
+	{
+		return $this->getReportColumn('updated_at', $reportId);
+	}
+
+	protected function getReportColumn($column, $reportId)
+	{
+		return $this->fetchColumn(
+			$this->getDriver(),
+			"SELECT $column FROM report WHERE id = :report_id",
+			array(':report_id' => $reportId, )
+		);
+	}
+
+	/**
+	 * Checks that re-saving a record results in a changed updated datetime
+	 * 
+	 * @todo Move the browser fixtures into /test/build/fixtures.sql? If we are using this file
+	 * here then it is clearly not exclusively for browser tests.
+	 */
+	public function testUpdatedAt()
+	{
+		$pdo = $this->getDriver();
+		$this->buildDatabase($pdo);
+		$this->runSqlFile($pdo, $this->getProjectRoot() . '/test/browser/fixtures/data.sql');
+
+		$report = $this->getReportAndRelatedData($this->getDriver(), $reportId = 24);
+		$updatedAt = $this->getUpdatedAt($reportId);
+
+		// Copy the report data into a new one
+		$reportObj = new Report(1);
+		$reportObj->setDriver($this->getDriver());
+		$reportObj->setDescription($report['description']);
+		$reportObj->setTitle($report['title']);
+		$reportObj->setAuthorNotifiedDate($report['author_notified_at']);
+		$reportObj->setUrl($report['urls']);
+		$reportObj->setIssues($report['issues']);
+		$reportObj->save($reportId);
+
+		$this->assertNotEquals($updatedAt, $this->getUpdatedAt($reportId), "");
 	}
 
 	/**

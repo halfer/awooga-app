@@ -427,7 +427,8 @@ class Report
 				title = :title,
 				description = :description,
 				description_html = :description_html,
-				author_notified_at = :notified_at
+				author_notified_at = :notified_at,
+				updated_at = NOW()
 			WHERE
 				id = :report_id
 		";
@@ -445,8 +446,8 @@ class Report
 	{
 		$sql = "
 			INSERT INTO report
-			(repository_id, user_id, title, description, description_html, author_notified_at)
-			VALUES (:repo_id, :user_id, :title, :description, :description_html, :notified_at)
+			(repository_id, user_id, title, description, description_html, author_notified_at, created_at)
+			VALUES (:repo_id, :user_id, :title, :description, :description_html, :notified_at, NOW())
 		";
 
 		$this->runSaveCommand($sql);

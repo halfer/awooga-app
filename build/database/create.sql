@@ -52,6 +52,8 @@ CREATE TABLE report (
 	/* Only day and not time is important here */
 	author_notified_at DATE,
 	is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+	created_at DATETIME,
+	updated_at DATETIME,
 
 	CONSTRAINT report_repo_fk FOREIGN KEY (repository_id) REFERENCES repository (id),
 	CONSTRAINT report_user_fk FOREIGN KEY (user_id) REFERENCES `user` (id)

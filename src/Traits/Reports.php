@@ -77,7 +77,7 @@ trait Reports
 		$report = $this->getReportForId($pdo, $id);
 
 		// We need to unwrap URL table to a string array
-		$report['url'] = array();
+		$report['urls'] = array();
 		foreach ($this->getRelatedUrls(array($id)) as $url)
 		{
 			$report['urls'][] = $url['url'];
