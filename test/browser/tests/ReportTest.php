@@ -140,6 +140,27 @@ class ReportTest extends TestCase
 				visit(self::DOMAIN . '/report/' . $reportId)->
 				find('#report-header')->text();
 			$this->assertNotContains('Edit report', $reportHeader);
-		}		
+		}
+	}
+
+	/**
+	 * Check that reports have expected create/update dates
+	 * 
+	 * @todo Use regexps to check date format too?
+	 * 
+	 * @driver phantomjs
+	 */
+	public function testCreateAndUpdateDates()
+	{
+		$this->
+			visit(self::DOMAIN . '/report/25')->
+			find('#write-dates')->
+				find('small:contains("Created at")')->end()->
+			end()->
+			visit(self::DOMAIN . '/report/26')->
+			find('#write-dates')->
+				find('small:contains("Created at")')->end()->
+				find('small:contains("Last updated at")')->end()->
+			end();
 	}
 }

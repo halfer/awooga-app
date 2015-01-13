@@ -105,3 +105,21 @@
 		</tr>
 	</tbody>
 </table>
+
+<?php // Show created_at and updated_at datetime values ?>
+<?php if ($report['created_at'] || $report['updated_at']): ?>
+	<div class="pull-right" id="write-dates">
+		<small>
+			<?php // @todo This can be made mandatory after created_at becomes NOT NULL ?>
+			<?php if ($report['created_at']): ?>
+				Created at: <?php echo $report['created_at'] ?>
+			<?php endif ?>
+			<?php if ($report['created_at'] && $report['updated_at']): ?>
+				&bull;
+			<?php endif ?>
+			<?php if ($report['updated_at']): ?>
+				Last updated at: <?php echo $report['updated_at'] ?>
+			<?php endif ?>
+		</small>
+	</div>
+<?php endif ?>
