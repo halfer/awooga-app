@@ -30,5 +30,12 @@
 </p>
 
 <p>
+	Contributed material will be added to a database for publishing here, and for redistribution via
+	an API to any third parties that would like to consume them, for the purpose of improving the
+	quality of online teaching materials. Thus, reports here become copyleft when they are added
+	(they will probably be relicensed as Creative Commons).
+</p>
+
+<p>
 	If anyone is interested in support for other SSO providers e.g. Twitter, do get in touch.
 </p>
