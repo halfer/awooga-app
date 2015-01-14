@@ -48,6 +48,17 @@ abstract class TestCase extends \Openbuildings\PHPUnitSpiderling\Testcase_Spider
 		$driver = new \Openbuildings\Spiderling\Driver_Phantomjs();
 		$driver->connection($connection);
 
+		// Try waiting to see if Travis can be made more robust
+		$i = 0;
+		while (!$connection->is_running() || !$connection->is_running())
+		{
+			usleep(200000);
+			if ($i++ > 10)
+			{
+				break;
+			}
+		}
+
 		return $driver;
 	}
 
