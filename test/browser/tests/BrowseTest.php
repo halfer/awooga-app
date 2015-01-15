@@ -99,6 +99,8 @@ class BrowseTest extends TestCase
 	 * need to add in a conditional screenshot just before the checkTableRowCount call? Very odd,
 	 * keep an eye on this.
 	 * 
+	 * @todo Another one for PHP 5.5 on 2015-01-15. Add screenshot to see what's going on?
+	 * 
 	 * @driver phantomjs
 	 */
 	public function testIssueSearch()
