@@ -11,7 +11,8 @@
 # Set up some constants
 IMAGE=filesystem/image.img
 MOUNT_POINT=filesystem/mount
-SEARCH_INDEX=$MOUNT_POINT/search-index
+ROOT_SEARCH_INDEX=$MOUNT_POINT/search-index
+ROOT_REPOS=$MOUNT_POINT/repos
 SIZE=20
 USER=awooga
 
@@ -60,11 +61,16 @@ chown $USER $MOUNT_POINT
 # The following is for the search index. I wonder if this would be better with its own
 # private filing system?
 
-# Set up search index folder
-mkdir --parents $SEARCH_INDEX
-chown $USER $SEARCH_INDEX
-chgrp www-data $SEARCH_INDEX
-chmod g+w $SEARCH_INDEX
+# Set up repo folder (only need rwx access for Awooga user)
+mkdir --parents $ROOT_REPOS
+chown -R $USER $ROOT_REPOS
+chmod -R 700 $ROOT_REPOS
+
+# Set up search index folder (needs write to Awooga and Apache users)
+mkdir --parents $ROOT_SEARCH_INDEX
+chown -R $USER $ROOT_SEARCH_INDEX
+chgrp -R www-data $ROOT_SEARCH_INDEX
+chmod -R 770 $ROOT_SEARCH_INDEX
 
 # Go back to original dir
 cd $STARTDIR 

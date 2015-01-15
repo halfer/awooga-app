@@ -14,7 +14,7 @@ use Awooga\Core\GitImporter;
 use Awooga\Core\Searcher;
 use Awooga\Core\UpdateAll;
 
-$repoRoot = $root . '/filesystem/mount';
+$repoRoot = $root . '/filesystem/mount/repos';
 $searchIndex = $root . '/filesystem/mount/search-index';
 
 // Connect to the database (@todo Move this to env config)
