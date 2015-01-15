@@ -2,6 +2,8 @@
 
 namespace Awooga\Testing\Browser;
 
+use \Openbuildings\Spiderling\Driver_Phantomjs_Connection;
+
 /**
  * Let's have some declarations for magic methods
  *
@@ -40,15 +42,43 @@ abstract class TestCase extends \Openbuildings\PHPUnitSpiderling\Testcase_Spider
 	 */
 	public function driver_phantomjs()
 	{
+		$this->checkPhantomIsAvailable();
+
 		// We can supply a log location here (or omit to use /dev/null)
 		$logFile = '/tmp/phantom-awooga.log';
-		$connection = new \Openbuildings\Spiderling\Driver_Phantomjs_Connection();
+		$connection = new Driver_Phantomjs_Connection();
 		$connection->start(null, self::LOG_ACTIONS ? $logFile : '/dev/null');
 
 		$driver = new \Openbuildings\Spiderling\Driver_Phantomjs();
 		$driver->connection($connection);
 
-		// Try waiting to see if Travis can be made more robust
+		$this->waitUntilPhantomStarts($connection);
+
+		return $driver;
+	}
+
+	/**
+	 * Throws a fatal exception if the PhantomJS executable is not found
+	 * 
+	 * @throws \Exception
+	 */
+	protected function checkPhantomIsAvailable()
+	{
+		$output = $return = null;
+		exec('which phantomjs', $output, $return);
+		if ($return)
+		{
+			throw new \Exception("Can't find 'phantomjs' - does the PATH include it?");
+		}		
+	}
+
+	/**
+	 * Try waiting to see if Travis can be made more robust
+	 * 
+	 * @param Driver_Phantomjs_Connection $connection
+	 */
+	protected function waitUntilPhantomStarts(Driver_Phantomjs_Connection $connection)
+	{
 		$i = 0;
 		while (!$connection->is_running() || !$connection->is_running())
 		{
@@ -57,9 +87,7 @@ abstract class TestCase extends \Openbuildings\PHPUnitSpiderling\Testcase_Spider
 			{
 				break;
 			}
-		}
-
-		return $driver;
+		}		
 	}
 
 	/**
