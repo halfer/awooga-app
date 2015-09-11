@@ -361,6 +361,9 @@ class GitImporter extends BaseGitImporter
 	 * 
 	 * Maybe this should be configurable?
 	 * 
+	 * (This used to use NOW() in MySQL, but this returns the time including DST, so I've
+	 * switched to using DateTime instead).
+	 * 
 	 * @param integer $repoId
 	 * @param boolean $wasSuccessful
 	 * @return boolean True if successful
@@ -370,14 +373,19 @@ class GitImporter extends BaseGitImporter
 		$minutes = $wasSuccessful ? 4 * 60 : $this->getRetryInMinutes($repoId);
 		$sql = "
 			UPDATE repository
-				SET due_at = NOW() + INTERVAL :time_minutes MINUTE
+				SET due_at = :timestamp
 				WHERE id = :repo_id
 		";
+		$timestamp = new \DateTime();
+		$timestamp->add(new \DateInterval("PT{$minutes}M"));
 
 		return $this->runStatement(
 			$this->getDriver(),
 			$sql,
-			array(':repo_id' => $repoId, ':time_minutes' => $minutes, )
+			array(
+				':repo_id' => $repoId,
+				':timestamp' => $timestamp->format('Y-m-d H:i:s'),
+			)
 		);
 	}
 
