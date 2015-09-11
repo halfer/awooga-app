@@ -13,6 +13,7 @@ nbproject/
 # Ignore Composer and vendors
 vendor/
 bower_components/
+node_modules/
 bin/
 composer.lock
 composer.phar
