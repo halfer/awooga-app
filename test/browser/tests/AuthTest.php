@@ -31,6 +31,28 @@ class AuthTest extends TestCase
 	}
 
 	/**
+	 * Check to see if any tests are working on Travis containers
+	 * 
+	 * @driver simple
+	 */
+	public function testAnythingAtAllSimple()
+	{
+		$text = $this->visit(self::DOMAIN)->find('.container')->text();
+		$this->assertContains('Questions about this site', $text);
+	}
+
+	/**
+	 * Check to see if any tests are working on Travis containers
+	 * 
+	 * @driver phantomjs
+	 */
+	public function testAnythingAtAllPhantom()
+	{
+		$text = $this->visit(self::DOMAIN)->find('.container')->text();
+		$this->assertContains('Questions about this site', $text);
+	}
+
+	/**
 	 * Checks the test-environment auth provider is working
 	 * 
 	 * @driver phantomjs
