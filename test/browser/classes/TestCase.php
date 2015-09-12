@@ -26,7 +26,7 @@ abstract class TestCase extends \Openbuildings\PHPUnitSpiderling\Testcase_Spider
 	const DOMAIN = 'http://localhost:8090';
 
 	// Change this to turn logging back on
-	const LOG_ACTIONS = false;
+	const LOG_ACTIONS = true;
 
 	/**
 	 * Common library loading for all test classes
