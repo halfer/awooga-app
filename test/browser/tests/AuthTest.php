@@ -38,8 +38,9 @@ class AuthTest extends TestCase
 	public function testTestProvider()
 	{
 		$element = $this->
-			visit(self::DOMAIN . '/auth?provider=test')->
-			find('#auth-logout');
+			visit(self::DOMAIN . '/auth?provider=test');
+		$this->encodedScreenshot("Screenshot of auth provider");
+		$this->find('#auth-logout'); // Will fail here?
 		$this->assertEquals('Logout ' . self::TEST_USER, $element->text());
 	}
 
