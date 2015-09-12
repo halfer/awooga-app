@@ -5,6 +5,7 @@ php:
 notifications:
   email: false
 before_script:
+  - phantomjs --help
   - composer self-update
   - COMPOSER=composer.travis.json composer install
   - git submodule init
