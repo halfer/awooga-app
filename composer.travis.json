@@ -7,6 +7,18 @@
     },
     "require-dev": {
         "maximebf/debugbar": "1.*",
-        "openbuildings/phpunit-spiderling": "0.1.*"
+        "openbuildings/phpunit-spiderling": "0.1.*",
+        "jakoch/phantomjs-installer": "1.9.8"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "PhantomInstaller\\Installer::installPhantomJS"
+        ],
+        "post-update-cmd": [
+            "PhantomInstaller\\Installer::installPhantomJS"
+        ]
+    },
+    "config": {
+        "bin-dir": "bin"
     }
 }
