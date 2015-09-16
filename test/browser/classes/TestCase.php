@@ -23,7 +23,7 @@ abstract class TestCase extends \Openbuildings\PHPUnitSpiderling\Testcase_Spider
 {
 	use \Awooga\Testing\BaseTestCase;
 
-	const DOMAIN = 'http://127.0.0.1:8095';
+	const DOMAIN = 'http://127.0.0.1:8090';
 
 	// Change this to turn logging back on
 	const LOG_ACTIONS = true;
