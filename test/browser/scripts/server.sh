@@ -6,7 +6,7 @@ cd `dirname $0`/../../..
 
 # Start up built-in web server
 php \
-	-S localhost:8090 \
+	-S 127.0.0.1:8090 \
 	-t web \
 	test/browser/scripts/router.php \
 	2> /dev/null
