@@ -16,7 +16,6 @@ before_script:
   - export PATH=`pwd`/bin:$PATH
   - cp config/env-config.php.example config/env-config.php
   - touch /tmp/phantom-awooga.log
-  - cp Phantomjs.php vendor/openbuildings/spiderling/src/Openbuildings/Spiderling/
 script:
   - phpunit --coverage-clover=coverage.clover
   - wget https://scrutinizer-ci.com/ocular.phar
