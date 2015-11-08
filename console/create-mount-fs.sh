@@ -16,6 +16,9 @@ ROOT_REPOS=$MOUNT_POINT/repos
 SIZE=20
 USER=awooga
 
+# Mount command is not found on Ubuntu at boot time, need to specify full path
+MOUNTCMD=/bin/mount
+
 # Bomb out if not run as root, exit as fail
 if [ "$EUID" -ne 0 ]
 then
@@ -49,10 +52,10 @@ if [ ! -f "$IMAGE" ]; then
 fi
 
 # Mount if the filing system is not already mounted
-mount | cut -d ' ' -f 3 | grep -q "^${PROJECT_ROOT}/${MOUNT_POINT}$"
+$MOUNTCMD | cut -d ' ' -f 3 | grep -q "^${PROJECT_ROOT}/${MOUNT_POINT}$"
 if [ $? -ne 0 ]; then
 	mkdir --parents $MOUNT_POINT
-	mount $IMAGE $MOUNT_POINT
+	$MOUNTCMD $IMAGE $MOUNT_POINT
 fi
 
 # Set appropriate user perms on mounted filing system
