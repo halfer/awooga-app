@@ -8,6 +8,7 @@ To install, you'll need Composer and Bower to get the project's dependencies:
 
     curl -sS https://getcomposer.org/installer | php
     php composer.phar install
+    git submodule init && git submodule update
     sudo apt-get install npm
     npm install bower
     bower install
