@@ -6,6 +6,7 @@
 # use of a filing system is to prevent large remote repos from accidentally/maliciously
 # overwhelming the local machine by consuming all available disk space.
 #
+# @todo I've added a full path for `mount`, do I need to do this for `mkdir`, `chown`, `chmod` etc?
 ######
 
 # Set up some constants
@@ -55,7 +56,7 @@ fi
 $MOUNTCMD | cut -d ' ' -f 3 | grep -q "^${PROJECT_ROOT}/${MOUNT_POINT}$"
 if [ $? -ne 0 ]; then
 	mkdir --parents $MOUNT_POINT
-	$MOUNTCMD $IMAGE $MOUNT_POINT
+	$MOUNTCMD -t ext3 $IMAGE $MOUNT_POINT
 fi
 
 # Set appropriate user perms on mounted filing system
