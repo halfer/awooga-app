@@ -15,5 +15,5 @@ vendor/
 bower_components/
 node_modules/
 bin/
-composer.lock
+composer
 composer.phar
