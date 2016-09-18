@@ -16,7 +16,7 @@ class AuthTest extends TestCase
 	 */
 	public function testTitle()
 	{
-		$page = $this->visit(self::DOMAIN . '/auth');
+		$page = $this->visit($this->getTestDomain() . '/auth');
 		$this->assertEquals('Login — Awooga', $page->find('title')->text());
 	}
 
@@ -38,7 +38,7 @@ class AuthTest extends TestCase
 	public function testTestProvider()
 	{
 		$element = $this->
-			visit(self::DOMAIN . '/auth?provider=test')->
+			visit($this->getTestDomain() . '/auth?provider=test')->
 			find('#auth-logout');
 		$this->assertEquals('Logout ' . self::TEST_USER, $element->text());
 	}
@@ -61,7 +61,7 @@ class AuthTest extends TestCase
 		$this->assertFalse($timeBefore, "Check there is no service-user pair to start with");
 
 		// When we logon, let's check we now have a service record
-		$loginUrl = self::DOMAIN . '/auth?provider=test';
+		$loginUrl = $this->getTestDomain() . '/auth?provider=test';
 		$this->visit($loginUrl);
 		$this->waitUntilRedirected($loginUrl);
 		$idsFirst = $this->getUserIdsFromUsername($this->getDriver(), self::TEST_USER);

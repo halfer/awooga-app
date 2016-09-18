@@ -10,8 +10,8 @@ class NewReportTest extends TestCase
 	public function testWebAssetsAvailable()
 	{
 		$assets = array(
-			array(self::DOMAIN . '/assets/main.css', 700, 1000),
-			array(self::DOMAIN . '/assets/jquery.min.js', 80000, 90000)
+			array($this->getTestDomain() . '/assets/main.css', 700, 1000),
+			array($this->getTestDomain() . '/assets/jquery.min.js', 80000, 90000)
 		);
 		foreach ($assets as $asset)
 		{
@@ -45,7 +45,7 @@ class NewReportTest extends TestCase
 	 */
 	protected function getNavBarText()
 	{
-		return $this->visit(self::DOMAIN)->find('#navbar')->text();
+		return $this->visit($this->getTestDomain())->find('#navbar')->text();
 	}
 
 	/**
@@ -582,6 +582,6 @@ class NewReportTest extends TestCase
 	 */
 	protected function pageUrl()
 	{
-		return self::DOMAIN . '/report/new';
+		return $this->getTestDomain() . '/report/new';
 	}
 }

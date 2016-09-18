@@ -14,7 +14,7 @@ class BrowseTest extends TestCase
 	 */
 	public function testTitle()
 	{
-		$page = $this->visit(self::DOMAIN . '/browse');
+		$page = $this->visit($this->getTestDomain() . '/browse');
 		$this->assertEquals('Browse reports — Awooga', $page->find('title')->text());
 	}
 
@@ -26,7 +26,7 @@ class BrowseTest extends TestCase
 	public function testBrowse()
 	{
 		$this->
-			visit(self::DOMAIN . '/browse')->
+			visit($this->getTestDomain() . '/browse')->
 
 			// Check the pagination device is present
 			assertHasCss('#paginator')->
@@ -42,7 +42,7 @@ class BrowseTest extends TestCase
 	 */
 	public function testSourceStrings()
 	{
-		$page = $this->visit(self::DOMAIN . '/browse');
+		$page = $this->visit($this->getTestDomain() . '/browse');
 
 		// Check the report link goes to /report/x
 		$firstSource = $page->find('table#reports tbody tr:first-child td:last-child')->text();
@@ -130,7 +130,7 @@ class BrowseTest extends TestCase
 	{
 		$assertHasPaginator = $hasPaginator ? 'assertHasCss' : 'assertHasNoCss';
 		$this->
-			visit(self::DOMAIN . '/browse?search=' . urlencode($search))->
+			visit($this->getTestDomain() . '/browse?search=' . urlencode($search))->
 			assertHasCss("#addressSearch[value*='$search']")->
 			assertHasCss("h3:contains('$expectedResults results')")->
 			$assertHasPaginator('#paginator')

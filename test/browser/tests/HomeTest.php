@@ -11,7 +11,7 @@ class HomeTest extends TestCase
 	 */
 	public function testTitle()
 	{
-		$page = $this->visit(self::DOMAIN);
+		$page = $this->visit($this->getTestDomain());
 		$this->assertEquals('Awooga', $page->find('title')->text());
 	}
 
@@ -24,7 +24,7 @@ class HomeTest extends TestCase
 	{
 		$this->
 			// A help section
-			visit(self::DOMAIN)->
+			visit($this->getTestDomain())->
 			// Check a help section is present
 			assertHasCss("h3:contains('What does a listing mean?')")->
 			// Check our assertions are working by testing something that isn't there
@@ -55,7 +55,7 @@ class HomeTest extends TestCase
 	 */
 	public function testExampleSearches()
 	{
-		$links = $this->visit(self::DOMAIN)->all('form small a[href^="/browse"]');
+		$links = $this->visit($this->getTestDomain())->all('form small a[href^="/browse"]');
 		$this->assertEquals(5, count($links), "Check we have the right number of example searches");
 	}
 
@@ -67,7 +67,7 @@ class HomeTest extends TestCase
 	public function testMoreInterestingQuestions()
 	{
 		$this->
-			visit(self::DOMAIN)->
+			visit($this->getTestDomain())->
 			click_link('more-questions')->
 			// This seems needed to help the browser settle before we get the current path
 			assertHasCss("h3:contains(\"What's the current focus?\")")

@@ -15,7 +15,7 @@ class ReportTest extends TestCase
 	 */
 	public function testRepoReport()
 	{
-		$page = $this->visit(self::DOMAIN . '/report/7');
+		$page = $this->visit($this->getTestDomain() . '/report/7');
 
 		// Check URL
 		$this->assertEquals(
@@ -80,7 +80,7 @@ class ReportTest extends TestCase
 	 */
 	public function testUserReport()
 	{
-		$page = $this->visit(self::DOMAIN . '/report/26');
+		$page = $this->visit($this->getTestDomain() . '/report/26');
 
 		// Check user owner
 		$this->checkReportSource($page, 'User: github.com/halfer');
@@ -109,7 +109,7 @@ class ReportTest extends TestCase
 	{
 		// Check that a report owned by a user shows an edit link
 		$this->loginTestUser();
-		$reportHeader = $this->visit(self::DOMAIN . '/report/24')->find('#report-header')->text();
+		$reportHeader = $this->visit($this->getTestDomain() . '/report/24')->find('#report-header')->text();
 		$this->assertContains('Edit report', $reportHeader);
 	}
 
@@ -137,7 +137,7 @@ class ReportTest extends TestCase
 		foreach (array(26, 7) as $reportId)
 		{
 			$reportHeader = $this->
-				visit(self::DOMAIN . '/report/' . $reportId)->
+				visit($this->getTestDomain() . '/report/' . $reportId)->
 				find('#report-header')->text();
 			$this->assertNotContains('Edit report', $reportHeader);
 		}
@@ -153,11 +153,11 @@ class ReportTest extends TestCase
 	public function testCreateAndUpdateDates()
 	{
 		$this->
-			visit(self::DOMAIN . '/report/25')->
+			visit($this->getTestDomain() . '/report/25')->
 			find('#write-dates')->
 				find('small:contains("Created at")')->end()->
 			end()->
-			visit(self::DOMAIN . '/report/26')->
+			visit($this->getTestDomain() . '/report/26')->
 			find('#write-dates')->
 				find('small:contains("Created at")')->end()->
 				find('small:contains("Last updated at")')->end()->

@@ -11,7 +11,7 @@ class IssueTest extends TestCase
 	 */
 	public function testTitle()
 	{
-		$page = $this->visit(self::DOMAIN . '/issues');
+		$page = $this->visit($this->getTestDomain() . '/issues');
 		$this->assertEquals('Issue types — Awooga', $page->find('title')->text());
 	}
 
@@ -25,7 +25,7 @@ class IssueTest extends TestCase
 	public function testIssues()
 	{
 		// Check number of issues
-		$rows = $this->visit(self::DOMAIN . '/issues')->all('table tbody tr');
+		$rows = $this->visit($this->getTestDomain() . '/issues')->all('table tbody tr');
 		$this->assertEquals(10, count($rows));
 
 		// Check the counts for the first issue

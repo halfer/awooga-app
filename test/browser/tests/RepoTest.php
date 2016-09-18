@@ -11,7 +11,7 @@ class RepoTest extends TestCase
 	 */
 	public function testTitle()
 	{
-		$page = $this->visit(self::DOMAIN . '/repos');
+		$page = $this->visit($this->getTestDomain() . '/repos');
 		$this->assertEquals('Source repositories — Awooga', $page->find('title')->text());
 	}
 
@@ -23,7 +23,7 @@ class RepoTest extends TestCase
 	public function testRepos()
 	{
 		$this->
-			visit(self::DOMAIN . '/repos')->
+			visit($this->getTestDomain() . '/repos')->
 			assertHasCss('table tbody tr:first-child td:nth-child(2):contains("24")')
 		;
 	}

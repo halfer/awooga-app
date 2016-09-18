@@ -11,7 +11,7 @@ class LogTest extends TestCase
 	 */
 	public function testTitle()
 	{
-		$page = $this->visit(self::DOMAIN . '/logs');
+		$page = $this->visit($this->getTestDomain() . '/logs');
 		$this->assertEquals('Import logs — Awooga', $page->find('title')->text());
 	}
 

@@ -120,7 +120,7 @@ abstract class TestCase extends \halfer\SpiderlingUtils\TestCase
 	protected function loginTestUser()
 	{
 		// Logon and then check that it worked
-		$this->visit(self::DOMAIN . '/auth?provider=test');
+		$this->visit($this->getTestDomain() . '/auth?provider=test');
 		$this->assertEquals('Logout testuser', $this->find('#auth-status')->text());
 	}
 }
