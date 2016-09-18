@@ -11,7 +11,7 @@ $root = realpath(__DIR__ . '/../../..');
 $_ENV['SLIM_MODE'] = 'test';
 
 // Save our process ID for later termination
-file_put_contents($root . '/.server.pid', getmypid());
+file_put_contents('/tmp/spiderling-phantom.server.pid', getmypid());
 
 if (preg_match('#^/assets/#', $_SERVER["REQUEST_URI"]))
 {
