@@ -10,6 +10,7 @@
         "phpunit/phpunit": "4.4.*",
         "maximebf/debugbar": "1.*",
         "openbuildings/phpunit-spiderling": "0.1.*",
+        "halfer/spiderling-utils": "dev-master",
         "jakoch/phantomjs-installer": "1.9.8"
     },
     "scripts": {
@@ -22,5 +23,11 @@
     },
     "config": {
         "bin-dir": "bin"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "https://github.com/halfer/spiderling-utils.git"
+        }
+    ]
 }
