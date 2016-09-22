@@ -3,12 +3,25 @@
         "slim/slim": "2.4.*",
         "league/plates": "3.1.*",
         "michelf/php-markdown": "1.4.*",
-        "zendframework/zendsearch": "dev-master"
+        "zendframework/zendsearch": "dev-master",
+        "lusitanian/oauth": "~0.3"
     },
     "require-dev": {
-        "maximebf/debugbar": "1.*",
+        "phpunit/phpunit": "4.8.*",
         "openbuildings/phpunit-spiderling": "0.1.*",
-        "halfer/spiderling-utils": "dev-master"
+        "halfer/spiderling-utils": "dev-master",
+        "jakoch/phantomjs-installer": "2.1.1-p06"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "PhantomInstaller\\Installer::installPhantomJS"
+        ],
+        "post-update-cmd": [
+            "PhantomInstaller\\Installer::installPhantomJS"
+        ]
+    },
+    "config": {
+        "bin-dir": "bin"
     },
     "repositories": [
         {
