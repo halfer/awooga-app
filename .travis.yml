@@ -17,9 +17,10 @@ before_script:
   - export PATH=`pwd`/bin:$PATH
   - cp config/env-config.php.example config/env-config.php
   - touch /tmp/phantom-awooga.log
+  - which phpunit
   - which phantomjs
 script:
-  - bin/phpunit --coverage-clover=coverage.clover
+  - phpunit --coverage-clover=coverage.clover
   - wget https://scrutinizer-ci.com/ocular.phar
   - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
   - cat /tmp/phantom-awooga.log
