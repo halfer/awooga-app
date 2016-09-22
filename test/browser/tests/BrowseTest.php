@@ -116,6 +116,7 @@ class BrowseTest extends TestCase
 			$this->waitUntilRedirected($originalUrl),
 			"Ensure the search moves to the second page"
 		);
+		$this->encodedScreenshot("Screenshot of problem page");
 		$this->checkTableRowCount(3);
 	}
 
