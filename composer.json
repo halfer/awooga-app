@@ -11,7 +11,7 @@
         "maximebf/debugbar": "1.*",
         "openbuildings/phpunit-spiderling": "0.1.*",
         "halfer/spiderling-utils": "dev-master",
-        "jakoch/phantomjs-installer": "1.9.8"
+        "jakoch/phantomjs-installer": "2.1.1-p06"
     },
     "scripts": {
         "post-install-cmd": [

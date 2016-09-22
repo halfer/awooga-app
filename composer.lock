@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "2726fffb74db704967c9374371ab8838",
+    "content-hash": "82da9bebb11040ebc0c7a287826af567",
     "packages": [
         {
             "name": "league/plates",
@@ -437,12 +437,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/halfer/spiderling-utils.git",
-                "reference": "16069723ee409e5f636c89dfaebd6bacfa44c007"
+                "reference": "963de92a596f6bfa7d0de31880ecceacd8375a13"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/halfer/spiderling-utils/zipball/16069723ee409e5f636c89dfaebd6bacfa44c007",
-                "reference": "16069723ee409e5f636c89dfaebd6bacfa44c007",
+                "url": "https://api.github.com/repos/halfer/spiderling-utils/zipball/963de92a596f6bfa7d0de31880ecceacd8375a13",
+                "reference": "963de92a596f6bfa7d0de31880ecceacd8375a13",
                 "shasum": ""
             },
             "require": {
@@ -476,23 +476,24 @@
                 "source": "https://github.com/halfer/spiderling-utils/tree/master",
                 "issues": "https://github.com/halfer/spiderling-utils/issues"
             },
-            "time": "2016-09-22 20:55:21"
+            "time": "2016-09-22 21:44:05"
         },
         {
             "name": "jakoch/phantomjs-installer",
-            "version": "1.9.8",
+            "version": "2.1.1-p06",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jakoch/phantomjs-installer.git",
-                "reference": "fd6459094404f698a4edb9609e5e8c55c6418824"
+                "reference": "26f870052263c00d09103928ad39c935108f51d4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jakoch/phantomjs-installer/zipball/fd6459094404f698a4edb9609e5e8c55c6418824",
-                "reference": "fd6459094404f698a4edb9609e5e8c55c6418824",
+                "url": "https://api.github.com/repos/jakoch/phantomjs-installer/zipball/26f870052263c00d09103928ad39c935108f51d4",
+                "reference": "26f870052263c00d09103928ad39c935108f51d4",
                 "shasum": ""
             },
             "require": {
+                "ext-bz2": "*",
                 "ext-openssl": "*"
             },
             "type": "custom-installer",
@@ -517,7 +518,7 @@
                 "headless",
                 "phantomjs"
             ],
-            "time": "2014-12-05 17:57:27"
+            "time": "2016-08-09 10:14:29"
         },
         {
             "name": "maximebf/debugbar",
