@@ -437,12 +437,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/halfer/spiderling-utils.git",
-                "reference": "814a87e98322984e9f200f713c3668b6f1d366e5"
+                "reference": "b116c5c078180aeb4dfe289081c1cffed9fc3b20"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/halfer/spiderling-utils/zipball/814a87e98322984e9f200f713c3668b6f1d366e5",
-                "reference": "814a87e98322984e9f200f713c3668b6f1d366e5",
+                "url": "https://api.github.com/repos/halfer/spiderling-utils/zipball/b116c5c078180aeb4dfe289081c1cffed9fc3b20",
+                "reference": "b116c5c078180aeb4dfe289081c1cffed9fc3b20",
                 "shasum": ""
             },
             "require": {
@@ -476,7 +476,7 @@
                 "source": "https://github.com/halfer/spiderling-utils/tree/master",
                 "issues": "https://github.com/halfer/spiderling-utils/issues"
             },
-            "time": "2016-09-22 21:57:55"
+            "time": "2016-09-23 09:15:01"
         },
         {
             "name": "jakoch/phantomjs-installer",
