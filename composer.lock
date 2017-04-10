@@ -4,7 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "285341bfae57f8414e0318c2f24d3874",
+    "hash": "d8ccb089fcb8a915145742b55296cf24",
+    "content-hash": "3b93411cf8d73efe0cabc323dee22b8e",
     "packages": [
         {
             "name": "league/plates",
@@ -433,16 +434,16 @@
         },
         {
             "name": "halfer/spiderling-utils",
-            "version": "dev-master",
+            "version": "v0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/halfer/spiderling-utils.git",
-                "reference": "c82f87ac0d55c9649e31753d3d2e722fcae81df5"
+                "reference": "14312ccbe4d472f8d7b34c0c7ca4ec63636db012"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/halfer/spiderling-utils/zipball/c82f87ac0d55c9649e31753d3d2e722fcae81df5",
-                "reference": "c82f87ac0d55c9649e31753d3d2e722fcae81df5",
+                "url": "https://api.github.com/repos/halfer/spiderling-utils/zipball/14312ccbe4d472f8d7b34c0c7ca4ec63636db012",
+                "reference": "14312ccbe4d472f8d7b34c0c7ca4ec63636db012",
                 "shasum": ""
             },
             "require": {
@@ -473,10 +474,10 @@
             "description": "A PHPUnit/Spiderling utility to use Phantom in a headless test environment",
             "homepage": "https://github.com/halfer/spiderling-utils.git",
             "support": {
-                "source": "https://github.com/halfer/spiderling-utils/tree/master",
+                "source": "https://github.com/halfer/spiderling-utils/tree/v0.2",
                 "issues": "https://github.com/halfer/spiderling-utils/issues"
             },
-            "time": "2016-09-28 11:54:12"
+            "time": "2017-04-10 18:27:11"
         },
         {
             "name": "jakoch/phantomjs-installer",
@@ -1980,8 +1981,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "zendframework/zendsearch": 20,
-        "halfer/spiderling-utils": 20
+        "zendframework/zendsearch": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

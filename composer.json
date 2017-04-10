@@ -10,7 +10,7 @@
         "phpunit/phpunit": "4.7.*",
         "maximebf/debugbar": "1.*",
         "openbuildings/phpunit-spiderling": "0.1.*",
-        "halfer/spiderling-utils": "dev-master",
+        "halfer/spiderling-utils": "0.2",
         "jakoch/phantomjs-installer": "2.1.1-p06"
     },
     "scripts": {
