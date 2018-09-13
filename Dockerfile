@@ -22,11 +22,17 @@ RUN cd /tmp/project && \
         --name htmlpurifier \
         https://github.com/ezyang/htmlpurifier.git modules/htmlpurifier
 
-# Do the composer stuff
+# Do the Composer stuff
 COPY build/composer.sh /tmp/build/composer.sh
 RUN cd /tmp/build && sh /tmp/build/composer.sh
 COPY composer.json composer.lock /tmp/project/
 RUN cd /tmp/project/ && php /tmp/build/composer.phar install
+
+# Do the Bower stuff
+RUN apk add npm
+RUN cd /tmp/project/ && npm install bower
+COPY bower.json /tmp/project/
+RUN cd /tmp/project/ && node_modules/bower/bin/bower --allow-root install
 
 # ***
 # Run time environment
@@ -52,6 +58,7 @@ RUN sed -i \
 # Copy source files from the filing system
 COPY src src
 COPY web web
+COPY --from=base /tmp/project/bower_components bower_components
 
 # Copy Git submodules from "base"
 COPY --from=base /tmp/project/modules modules
