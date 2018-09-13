@@ -50,6 +50,7 @@ WORKDIR /var/www/localhost/htdocs
 # Prep Apache
 RUN mkdir -p /run/apache2
 RUN echo "ServerName localhost" > /etc/apache2/conf.d/server-name.conf
+COPY build/apache/rewrite.conf /etc/apache2/conf.d/rewrite.conf
 # Change the docroot
 RUN sed -i \
     -e 's/\/var\/www\/localhost\/htdocs/\/var\/www\/localhost\/htdocs\/web/g' \
@@ -65,8 +66,6 @@ COPY --from=base /tmp/project/modules modules
 
 # Copy Composer dependencies from "base"
 COPY --from=base /tmp/project/vendor vendor
-
-# @todo Add custom Apache config
 
 # Copy config into place
 # @todo This config should be injected in, not trapped in code
