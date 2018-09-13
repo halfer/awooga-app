@@ -14,6 +14,7 @@ nbproject/
 vendor/
 bower_components/
 node_modules/
-bin/
+bin/phantomjs
+bin/phpunit
 composer
 composer.phar

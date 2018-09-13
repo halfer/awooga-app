@@ -74,6 +74,7 @@ COPY config/env-config.php.example config/env-config.php
 # Start Apache
 EXPOSE 80
 # @todo Move this to a shell script, blow up if SLIM_MODE does not exist
+# @todo Also blow up if docker network alias does not exist
 CMD ["/usr/sbin/httpd", "-DFOREGROUND"]
 
 # ***
