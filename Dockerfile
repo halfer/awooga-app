@@ -33,15 +33,21 @@ RUN cd /tmp/project/ && php /tmp/build/composer.phar install
 # ***
 FROM alpine:3.8 AS runtime
 
-WORKDIR /var/www/localhost
-
 # Install software
 RUN apk update
 RUN apk add php-apache2
+# Requirements for the PHP runtime
+RUN apk add php-session php-pdo_mysql
+
+WORKDIR /var/www/localhost/htdocs
 
 # Prep Apache
 RUN mkdir -p /run/apache2
 RUN echo "ServerName localhost" > /etc/apache2/conf.d/server-name.conf
+# Change the docroot
+RUN sed -i \
+    -e 's/\/var\/www\/localhost\/htdocs/\/var\/www\/localhost\/htdocs\/web/g' \
+    /etc/apache2/httpd.conf
 
 # Copy source files from the filing system
 COPY src src
@@ -55,14 +61,19 @@ COPY --from=base /tmp/project/vendor vendor
 
 # @todo Add custom Apache config
 
-# @todo Copy config into place
+# Copy config into place
+# @todo This config should be injected in, not trapped in code
+COPY config/env-config.php.example config/env-config.php
 
 # @todo Add Cron system
 
 # @todo Add healthcheck
 
+# @todo Mount the filesystem
+
 # Start Apache
 EXPOSE 80
+# @todo Move this to a shell script, blow up if SLIM_MODE does not exist
 CMD ["/usr/sbin/httpd", "-DFOREGROUND"]
 
 # ***
