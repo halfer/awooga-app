@@ -43,7 +43,9 @@ FROM alpine:3.8 AS runtime
 RUN apk update
 RUN apk add php-apache2
 # Requirements for the PHP runtime
-RUN apk add php-session php-pdo_mysql
+# Debug Toolbar needs 'json'
+# Symfony\\Polyfill\\Mbstring needs 'iconv'
+RUN apk add php-session php-pdo_mysql php-json php-iconv
 
 WORKDIR /var/www/localhost/htdocs
 
