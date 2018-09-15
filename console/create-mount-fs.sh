@@ -22,7 +22,9 @@ USER=awooga
 # Mount command is not found on Ubuntu at boot time, need to specify full path
 MOUNTCMD=/bin/mount
 
-# Bomb out if not run as root, exit as fail
+# Bomb out if not run as root, exit as fail (if this is only ever run
+# in a container, it could just be taken out)
+EUID=`id -u`
 if [ "$EUID" -ne 0 ]
 then
     echo "Mount script must be run as root"
@@ -84,7 +86,7 @@ chgrp -R www-data $ROOT_SEARCH_INDEX
 chmod -R 770 $ROOT_SEARCH_INDEX
 
 # Go back to original dir
-cd $STARTDIR 
+cd $STARTDIR
 
 # Exit OK
 exit 0
