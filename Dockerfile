@@ -47,6 +47,12 @@ RUN apk add php-apache2
 # Symfony\\Polyfill\\Mbstring needs 'iconv'
 RUN apk add php-session php-pdo_mysql php-json php-iconv
 
+# Add dumb init to improve sig handling
+RUN wget \
+    -O /usr/local/bin/dumb-init \
+    https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64
+RUN chmod +x /usr/local/bin/dumb-init
+
 WORKDIR /var/www/localhost/htdocs
 
 # Prep Apache
@@ -77,13 +83,11 @@ COPY config/env-config.php.example config/env-config.php
 
 # @todo Add healthcheck
 
-# @todo Mount the filesystem
-
 # Start Apache
 EXPOSE 80
-# @todo Move this to a shell script, blow up if SLIM_MODE does not exist
-# @todo Also blow up if docker network alias does not exist
-CMD ["/usr/sbin/httpd", "-DFOREGROUND"]
+COPY bin/container-start.sh /tmp/container-start.sh
+ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
+CMD ["sh", "/tmp/container-start.sh"]
 
 # ***
 # Test environment
