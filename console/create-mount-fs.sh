@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/bin/sh
+#
+# Converted for use in Alpine/BusyBox
 
 ######
 #
@@ -33,7 +35,11 @@ result=$?
 
 if [ $result -ne 0 ]; then
 	# Create this user
-	useradd --no-create-home --shell /bin/false $USER
+    #
+    # -H Don't create a home folder
+    # -D Don't assign a password
+    # -s Use this shell
+	adduser -H -D -s /bin/false $USER
 fi
 
 # Save pwd and then change dir to the script location
@@ -55,7 +61,8 @@ fi
 # Mount if the filing system is not already mounted
 $MOUNTCMD | cut -d ' ' -f 3 | grep -q "^${PROJECT_ROOT}/${MOUNT_POINT}$"
 if [ $? -ne 0 ]; then
-	mkdir --parents $MOUNT_POINT
+    # -p Create all parent dirs as necessary
+	mkdir -p $MOUNT_POINT
 	$MOUNTCMD -t ext3 $IMAGE $MOUNT_POINT
 fi
 
@@ -66,12 +73,12 @@ chown $USER $MOUNT_POINT
 # private filing system?
 
 # Set up repo folder (only need rwx access for Awooga user)
-mkdir --parents $ROOT_REPOS
+mkdir -p $ROOT_REPOS
 chown -R $USER $ROOT_REPOS
 chmod -R 700 $ROOT_REPOS
 
 # Set up search index folder (needs write to Awooga and Apache users)
-mkdir --parents $ROOT_SEARCH_INDEX
+mkdir -p $ROOT_SEARCH_INDEX
 chown -R $USER $ROOT_SEARCH_INDEX
 chgrp -R www-data $ROOT_SEARCH_INDEX
 chmod -R 770 $ROOT_SEARCH_INDEX
