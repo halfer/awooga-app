@@ -21,6 +21,3 @@ docker run \
 
 # Go back to original dir
 cd $STARTDIR
-
-# Go back to original dir
-cd $STARTDIR

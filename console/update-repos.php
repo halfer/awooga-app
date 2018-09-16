@@ -14,10 +14,18 @@ use Awooga\Core\GitImporter;
 use Awooga\Core\Searcher;
 use Awooga\Core\UpdateAll;
 
-# Get the config file (@todo fix the hardwire env name)
+# Get an environment name
+$envName = getenv('SLIM_MODE');
+if (!$envName)
+{
+    echo "Error: needs an env var of `SLIM_MODE`\n";
+    exit(1);
+}
+
+# Get the config file
 $configPath = $root . '/config/env-config.php';
 $allConfig = include($configPath);
-$config = $allConfig['production']['database'];
+$config = $allConfig[$envName]['database'];
 
 // Connect to the database using config values
 $dsn = "mysql:dbname={$config['database']};host={$config['host']};username={$config['username']};password={$config['password']}";

@@ -1,5 +1,5 @@
-Installation instructions
-=========================
+Non-Docker installation instructions
+===
 
 Getting started
 -------
@@ -47,7 +47,8 @@ General
 To run an update, do the following. Note that the cron will do it for you, so this is only if you
 want to run it by hand.
 
-    sudo console/create-mount-fs.sh && sudo -u awooga php console/update-repos.php
+    SLIM_MODE=production sudo console/create-mount-fs.sh
+    sudo -u awooga php console/update-repos.php
 
 Testing
 -------
