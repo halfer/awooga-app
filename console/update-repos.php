@@ -14,12 +14,17 @@ use Awooga\Core\GitImporter;
 use Awooga\Core\Searcher;
 use Awooga\Core\UpdateAll;
 
+# Get the config file (@todo fix the hardwire env name)
+$configPath = $root . '/config/env-config.php';
+$allConfig = include($configPath);
+$config = $allConfig['production']['database'];
+
+// Connect to the database using config values
+$dsn = "mysql:dbname={$config['database']};host={$config['host']};username={$config['username']};password={$config['password']}";
+$pdo = new PDO($dsn, 'awooga_user', 'password');
+
 $repoRoot = $root . '/filesystem/mount/repos';
 $searchIndex = $root . '/filesystem/mount/search-index';
-
-// Connect to the database (@todo Move this to env config)
-$dsn = 'mysql:dbname=awooga;host=localhost;username=awooga_user;password=password';
-$pdo = new PDO($dsn, 'awooga_user', 'password');
 
 // Add a time limit to prevent crons overlapping (@todo Move this to config). Maybe would be
 // better though to detect instance of this script and exit if it is running?
