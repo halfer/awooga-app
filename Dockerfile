@@ -65,7 +65,9 @@ RUN sed -i \
     /etc/apache2/httpd.conf
 
 # Add Git for scheduled pulls
-RUN apk add git
+# ctype is required by HTML Purifier
+# dom is required by Zend Lucene
+RUN apk add git php-cli php-ctype php-dom
 
 # Copy source files from the filing system
 COPY console/update-repos.php console/update-repos.php
