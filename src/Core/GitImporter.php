@@ -236,7 +236,7 @@ class GitImporter extends BaseGitImporter
 		$fqTarget = $this->repoRoot . '/' . $target;
 
 		// Let's do an explicit check for permissions, so we can report it properly
-		$writeable = @mkdir($fqTarget) && @rmdir($fqTarget);
+		$writeable = @mkdir($fqTarget, 0777, true) && @rmdir($fqTarget);
 		if (!$writeable)
 		{
 			$relativePath = str_replace($this->repoRoot, '', $fqTarget);
