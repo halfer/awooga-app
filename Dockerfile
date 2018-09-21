@@ -65,8 +65,7 @@ RUN sed -i \
     /etc/apache2/httpd.conf
 
 # Copy source files from the filing system
-RUN apk add e2fsprogs
-COPY console/create-mount-fs.sh console/create-mount-fs.sh
+COPY console/update-repos.php console/update-repos.php
 COPY src src
 COPY web web
 COPY --from=base /tmp/project/bower_components bower_components
