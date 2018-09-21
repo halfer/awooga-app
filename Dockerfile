@@ -64,6 +64,9 @@ RUN sed -i \
     -e 's/\/var\/www\/localhost\/htdocs/\/var\/www\/localhost\/htdocs\/web/g' \
     /etc/apache2/httpd.conf
 
+# Add Git for scheduled pulls
+RUN apk add git
+
 # Copy source files from the filing system
 COPY console/update-repos.php console/update-repos.php
 COPY src src
