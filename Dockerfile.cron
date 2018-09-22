@@ -1,7 +1,7 @@
 # Dockerfile for Awooga runtime (cron)
 
 # A separate stage is inserted here by the build script
-__BASE__
+#__BASE__
 
 FROM alpine:3.8 AS runtime
 

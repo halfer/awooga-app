@@ -1,7 +1,7 @@
 # Dockerfile for Awooga runtime (web)
 
 # A separate stage is inserted here by the build script
-__BASE__
+#__BASE__
 
 # ***
 # Run time environment
