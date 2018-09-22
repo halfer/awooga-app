@@ -6,7 +6,7 @@
 FROM alpine:3.8 AS runtime
 
 RUN apk update
-RUN apk add php-cli git php-ctype php-dom
+RUN apk add php-cli git php-ctype php-dom php-pdo_mysql php-json php-iconv
 
 # Add dumb init to improve sig handling
 COPY --from=base /usr/local/bin/dumb-init /usr/local/bin/dumb-init
