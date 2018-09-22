@@ -11,6 +11,8 @@ RUN apk add php-cli git php-ctype php-dom
 # Add dumb init to improve sig handling
 COPY --from=base /usr/local/bin/dumb-init /usr/local/bin/dumb-init
 
+WORKDIR /root
+
 # Copy source files from the filing system
 COPY console/update-repos.php console/update-repos.php
 COPY src src
@@ -27,6 +29,6 @@ COPY config/env-config.php.example config/env-config.php
 
 # @todo Add healthcheck
 
-# @todo Start update script
+# Start update script
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
-CMD ["sleep", "100000"]
+CMD ["php", "/root/console/update-repos.php"]

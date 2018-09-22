@@ -30,13 +30,7 @@ RUN sed -i \
     -e 's/\/var\/www\/localhost\/htdocs/\/var\/www\/localhost\/htdocs\/web/g' \
     /etc/apache2/httpd.conf
 
-# Add Git for scheduled pulls
-# ctype is required by HTML Purifier
-# dom is required by Zend Lucene
-RUN apk add git php-cli php-ctype php-dom
-
 # Copy source files from the filing system
-COPY console/update-repos.php console/update-repos.php
 COPY src src
 COPY web web
 COPY --from=base /tmp/project/bower_components bower_components

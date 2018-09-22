@@ -1,7 +1,9 @@
 #!/bin/bash
 
-# The 'r' command inserts a whole file at the pattern
 APP_NAME=cron
+REGISTRY=registry.gitlab.com/halfercode/awooga-$APP_NAME
+
+# The 'r' command inserts a whole file at the pattern
 sed \
     -e '/__BASE__/r Dockerfile.base' \
     Dockerfile.$APP_NAME \
@@ -9,6 +11,6 @@ sed \
 
 docker build \
     --file /tmp/awooga.Dockerfile.$APP_NAME \
-	--tag awooga-$APP_NAME \
+	--tag $REGISTRY \
 	--target runtime \
 	.
