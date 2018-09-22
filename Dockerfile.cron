@@ -1,0 +1,10 @@
+# Dockerfile for Awooga runtime (cron)
+
+FROM alpine:3.8 AS base
+
+# @todo Copy base stuff from Dockerfile web
+
+FROM alpine:3.8 AS runtime
+
+RUN apk update
+RUN apk add php-cli git php-ctype php-dom
