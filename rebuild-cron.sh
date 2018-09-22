@@ -1,7 +1,8 @@
 #!/bin/bash
 
 APP_NAME=cron
-REGISTRY=registry.gitlab.com/halfercode/awooga-$APP_NAME
+PROJECT=awooga-$APP_NAME
+REGISTRY=registry.gitlab.com/halfercode/$PROJECT
 
 # The 'r' command inserts a whole file at the pattern
 sed \
@@ -11,6 +12,11 @@ sed \
 
 docker build \
     --file /tmp/awooga.Dockerfile.$APP_NAME \
-	--tag $REGISTRY \
+	--tag $PROJECT \
 	--target runtime \
 	.
+
+echo
+echo "Suggested:"
+echo "  docker tag $PROJECT $REGISTRY:<version>"
+echo "  docker push $REGISTRY:<version>"
