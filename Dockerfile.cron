@@ -1,10 +1,35 @@
 # Dockerfile for Awooga runtime (cron)
 
-FROM alpine:3.8 AS base
-
-# @todo Copy base stuff from Dockerfile web
+# A separate stage is inserted here by the build script
+__BASE__
 
 FROM alpine:3.8 AS runtime
 
 RUN apk update
 RUN apk add php-cli git php-ctype php-dom
+
+# Add dumb init to improve sig handling
+RUN wget \
+    -O /usr/local/bin/dumb-init \
+    https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64
+RUN chmod +x /usr/local/bin/dumb-init
+
+# Copy source files from the filing system
+COPY console/update-repos.php console/update-repos.php
+COPY src src
+
+# Copy Git submodules from "base"
+COPY --from=base /tmp/project/modules modules
+
+# Copy Composer dependencies from "base"
+COPY --from=base /tmp/project/vendor vendor
+
+# Copy config into place
+# @todo This config should be injected in, not trapped in code
+COPY config/env-config.php.example config/env-config.php
+
+# @todo Add healthcheck
+
+# @todo Start update script
+ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
+CMD ["sleep", "100000"]

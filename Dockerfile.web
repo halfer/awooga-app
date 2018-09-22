@@ -1,38 +1,7 @@
 # Dockerfile for Awooga runtime (web)
 
-FROM alpine:3.8 AS base
-
-# Need PHP for Composer
-# Composer needs openssl, json, phar, iconv/mbstring, zip
-# Composer recommends zlib
-# Need Git for submodules
-RUN apk update
-RUN apk add \
-    php-cli git openssl \
-    php-openssl php-json php-mbstring php-phar php-zip
-# PHPUnit needs tokenizer, dom, bz2
-RUN apk add php-tokenizer php-dom php-bz2
-
-# Get the Git submodules
-# @todo There is no hash lock on this, can I use Composer instead?
-RUN mkdir /tmp/project/
-RUN cd /tmp/project && \
-    git init && \
-    git submodule add \
-        --name htmlpurifier \
-        https://github.com/ezyang/htmlpurifier.git modules/htmlpurifier
-
-# Do the Composer stuff
-COPY build/composer.sh /tmp/build/composer.sh
-RUN cd /tmp/build && sh /tmp/build/composer.sh
-COPY composer.json composer.lock /tmp/project/
-RUN cd /tmp/project/ && php /tmp/build/composer.phar install
-
-# Do the Bower stuff
-RUN apk add npm
-RUN cd /tmp/project/ && npm install bower
-COPY bower.json /tmp/project/
-RUN cd /tmp/project/ && node_modules/bower/bin/bower --allow-root install
+# A separate stage is inserted here by the build script
+__BASE__
 
 # ***
 # Run time environment
@@ -84,8 +53,6 @@ COPY --from=base /tmp/project/vendor vendor
 # Copy config into place
 # @todo This config should be injected in, not trapped in code
 COPY config/env-config.php.example config/env-config.php
-
-# @todo Add Cron system
 
 # @todo Add healthcheck
 
