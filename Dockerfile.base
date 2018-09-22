@@ -34,3 +34,9 @@ RUN apk add npm
 RUN cd /tmp/project/ && npm install bower
 COPY bower.json /tmp/project/
 RUN cd /tmp/project/ && node_modules/bower/bin/bower --allow-root install
+
+# Add dumb init to improve sig handling
+RUN wget \
+    -O /usr/local/bin/dumb-init \
+    https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64
+RUN chmod +x /usr/local/bin/dumb-init

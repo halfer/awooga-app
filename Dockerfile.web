@@ -17,10 +17,7 @@ RUN apk add php-apache2
 RUN apk add php-session php-pdo_mysql php-json php-iconv
 
 # Add dumb init to improve sig handling
-RUN wget \
-    -O /usr/local/bin/dumb-init \
-    https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64
-RUN chmod +x /usr/local/bin/dumb-init
+COPY --from=base /usr/local/bin/dumb-init /usr/local/bin/dumb-init
 
 WORKDIR /var/www/localhost/htdocs
 

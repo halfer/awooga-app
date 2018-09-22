@@ -9,10 +9,7 @@ RUN apk update
 RUN apk add php-cli git php-ctype php-dom
 
 # Add dumb init to improve sig handling
-RUN wget \
-    -O /usr/local/bin/dumb-init \
-    https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64
-RUN chmod +x /usr/local/bin/dumb-init
+COPY --from=base /usr/local/bin/dumb-init /usr/local/bin/dumb-init
 
 # Copy source files from the filing system
 COPY console/update-repos.php console/update-repos.php
