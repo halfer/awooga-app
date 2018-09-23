@@ -8,6 +8,11 @@ FROM alpine:3.8 AS runtime
 RUN apk update
 RUN apk add php-cli git php-ctype php-dom php-pdo_mysql php-json php-iconv
 
+# Fix the version of iconv (e.g. see https://github.com/phpearth/docker-php/issues/3,
+# https://github.com/docker-library/php/issues/240)
+RUN apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing gnu-libiconv
+ENV LD_PRELOAD /usr/lib/preloadable_libiconv.so php
+
 # Add dumb init to improve sig handling
 COPY --from=base /usr/local/bin/dumb-init /usr/local/bin/dumb-init
 
