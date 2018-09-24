@@ -8,6 +8,12 @@
 # ***
 FROM alpine:3.8 AS runtime
 
+# Create the Apache user before the Apache installer does so, so we can force a UID
+# -D = Don't assign a password
+# -H = Don't create home directory
+# -u UID = User id
+RUN adduser -D -H -u 17777 apache
+
 # Install software
 RUN apk update
 RUN apk add php-apache2

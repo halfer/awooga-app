@@ -16,7 +16,12 @@ ENV LD_PRELOAD /usr/lib/preloadable_libiconv.so php
 # Add dumb init to improve sig handling
 COPY --from=base /usr/local/bin/dumb-init /usr/local/bin/dumb-init
 
-WORKDIR /root
+# Use the Apache user to match the user in the web container
+WORKDIR /home/apache
+# -D = Don't assign a password
+# -u UID = User id
+RUN adduser -D -u 17777 apache
+USER apache
 
 # Copy source files from the filing system
 COPY console/update-repos.php console/update-repos.php
@@ -36,4 +41,4 @@ COPY config/env-config.php.example config/env-config.php
 
 # Start update script
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
-CMD ["php", "/root/console/update-repos.php"]
+CMD ["php", "/home/apache/console/update-repos.php"]
